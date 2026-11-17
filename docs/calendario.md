@@ -77,7 +77,7 @@ No turno do Grande Prêmio acontecem **8 corridas ao mesmo tempo**, uma por casa
 |---|---|
 | Média Grama, Longa Grama | **Polaris** |
 | Sprint Terra, Milha Terra | **Algol** |
-| Outras | Uma NPC "campeã da casa" gerada (sem encontros no MVP) |
+| Outras | A **campeã da casa**: a garota do elenco da mesma casa com maior soma de atributos, sem contar a jogadora (sem encontros no MVP, [campanhas](campanhas.md) §4.3) |
 
 Distâncias do Grande Prêmio (inicial): Sprint 1200 m · Milha 1600 m · Média 2400 m · Longa 3200 m.
 
@@ -102,8 +102,8 @@ Cada campanha tem:
 | Vitória | Vencer a corrida | Difícil |
 | Série | Vencer 2 corridas de uma série (§7.4) | Difícil |
 
-- Os objetivos 4 e 5 em diante pressupõem fama para entrar em Prata e Ouro. A campanha deve deixar isso claro no capítulo de história anterior.
-- **Exemplo completo:** a campanha da **Lira** está no [elenco](elenco.md#campanha-da-lira).
+- A corrida de um objetivo é **por convite**: a garota entra mesmo sem a fama da categoria. A fama limita só as opcionais ([campanhas](campanhas.md) §8).
+- **Exemplo completo:** a campanha da **Lira** está no [elenco](elenco.md#campanha-da-lira). As outras 5 do MVP, os 12 arquétipos das outras 42 garotas e o plano de balanceamento estão em [campanhas.md](campanhas.md).
 
 ### 3.3 Ponto de virada
 
@@ -431,7 +431,7 @@ No começo da carreira, a **Fechadora** é forte na Sprint e a **Ponteira** é f
 - Recalibrar o ritmo também nos níveis 150–300 (o `ajustar_ritmo` hoje usa 500 e 800).
 - Aceitar como "sabor" do começo de carreira e compensar com a meta (top 5 em vez de top 3).
 
-Fica como pendência de balanceamento.
+Enquanto isso, as campanhas usam exceções: Fechadora de Longa corre o ano 1 na Média, e Fechadora de Sprint e Ponteira de Longa precisam de top 3 na Estreia ([campanhas](campanhas.md) §4.2). Fica como pendência de balanceamento.
 
 ## 12. Escopo do MVP
 

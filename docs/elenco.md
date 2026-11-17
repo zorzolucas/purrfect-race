@@ -13,7 +13,7 @@
 | 2 | **Nashira** | Inicial | Perseguidora / Arrancadora | Média | Grama | Cinza-azulada |
 | 3 | **Mira** | Inicial | Fechadora / — | Longa | Grama | Frajola (preto e branco) |
 | 4 | **Capela** | Pool | Arrancadora / Perseguidora | Milha | Grama | Creme com pontas escuras |
-| 5 | **Antares** | Pool | Ponteira / Perseguidora | Sprint | Grama | Tricolor |
+| 5 | **Antares** | Pool | Ponteira / Perseguidora | Sprint | Terra | Tricolor |
 | 6 | **Shaula** | Pool | Fechadora / Arrancadora | Longa | Terra | Preta |
 | R1 | **Polaris** | Rival (NPC) | Ponteira | Média | Grama | Branca |
 | R2 | **Algol** | Rival (NPC) | Arrancadora | Sprint | Terra | Tigrada cinza |
@@ -82,7 +82,7 @@ As 6 garotas cobrem as 5 copas e o Campeonato Final (5 garotas diferentes) sem s
 
 **Série natural:** *Estrela da Milha* (Taça Brisa e Prêmio Cometa, anos 2 e 3). Os objetivos 5 e 6 já empurram para ela.
 
-**As outras 5 campanhas do MVP** (Nashira, Mira, Capela, Antares e Shaula) seguem este modelo e ainda precisam ser escritas.
+**As outras 5 campanhas do MVP** (Nashira, Mira, Capela, Antares e Shaula) e o modelo das outras 42 garotas estão em [campanhas.md](campanhas.md).
 
 ---
 

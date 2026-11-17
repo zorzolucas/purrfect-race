@@ -101,7 +101,7 @@ Cada garota tem uma aptidão por **distância** (Sprint, Milha, Média, Longa) e
 
 Cada cópia extra sobe o **nível de vínculo** da garota, até no máximo **5**. Cada nível dá:
 - \+ limite máximo de atributos (de 1000 até 1200 no nível 5);
-- \+ atributos iniciais na carreira;
+- \+ atributos iniciais na carreira (inicial: +4 em cada atributo por nível; com a madrinha, teto de +50 por atributo, ver [campanhas](campanhas.md) §2);
 - 1 habilidade nova desbloqueada.
 
 Não há raridade nem estrelas de personagem: todas as garotas valem o mesmo.
@@ -401,7 +401,7 @@ Da análise de UI das referências: personagem grande no centro e informação e
 - Afobação (§5.5): chance, duração e custo de fôlego, testados no simulador.
 - **Nome do jogo:** buscar marcas registradas parecidas antes de publicar (§1).
 - Pesos do sorteio do mapa, força dos amuletos e do Desafio.
-- **Recalibrar tudo para 72 turnos:** ganhos de treino, força das NPCs por categoria, fama por corrida e curva esperada de atributos ([calendário](calendario.md) §2). O protótipo ainda roda 48 turnos.
+- **Recalibrar tudo para 72 turnos:** ganhos de treino, força das NPCs por categoria, fama por corrida e curva esperada de atributos ([calendário](calendario.md) §2). O protótipo ainda roda 48 turnos. O plano, as metas e a ordem de ajuste estão em [campanhas](campanhas.md) §6.
 - Instrução pré-corrida (§5.7): nenhuma instrução pode ser sempre a melhor.
 - Olheiro e relatório pós-corrida: custo de rodar ~50 simulações rápidas no Godot sem travar a tela.
 
@@ -409,5 +409,6 @@ Da análise de UI das referências: personagem grande no centro e informação e
 
 - [Elenco](elenco.md): as 6 garotas do MVP com eventos, 2 rivais e o elenco completo de 48.
 - [Calendário da carreira](calendario.md): turnos, objetivos, mapa de rotas, clima, amuletos, semente, magnitude, fama e férias.
+- [Campanhas e balanceamento](campanhas.md): metas de dificuldade, endgame, as campanhas do MVP, os 12 arquétipos das outras 42 garotas e o plano do bot.
 - [MCP do Blender](mcp-blender.md) e [MCP do Godot](mcp-godot.md): ferramentas para modelar e montar o jogo.
 - [Fórmula da corrida](corrida.md): fases, velocidade, fôlego, bloqueio, habilidades e calibração.

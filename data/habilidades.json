@@ -14,7 +14,7 @@
     {"id": "frente_firme", "nome": "Frente Firme", "fase": 2, "tipo": "vel", "val": 1.2, "dur": 5.0, "custo": 180, "cond": {"pos_max": 2}, "descricao": "No Final, se estiver em 1º ou 2º, segura a ponta acelerando."},
     {"id": "respiro_curto", "nome": "Respiro Curto", "fase": 3, "tipo": "hp", "val": 0.05, "dur": 0, "custo": 120, "descricao": "No Sprint, recupera 5% do fôlego."}
   ],
-  "pontos_por_categoria": {"estreia": 40, "aberta": 60, "prata": 90, "ouro": 130, "gp1": 200, "gp2": 200},
+  "pontos_por_categoria": {"estreia": 40, "aberta": 60, "prata": 90, "ouro": 130, "gp1": 200, "gp2": 200, "gp3": 200},
   "pontos_por_posicao": [1.0, 0.8, 0.6, 0.5, 0.5],
   "pontos_resto": 0.3,
   "desconto_biblioteca": 0.3

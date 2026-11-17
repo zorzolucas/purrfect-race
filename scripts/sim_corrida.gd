@@ -59,6 +59,7 @@ var t := 0.0
 var done := false
 var rs: Array = []
 var rng := RandomNumberGenerator.new()
+var ordem_meio: Array = []  # classificação quando a corredora 0 passa da metade (vitória de virada)
 ## Clima (calendario.md §4.4): chuva tira 15% da aceleração e aumenta o bloqueio em 50%;
 ## calor tira 2% do fôlego. Os outros climas não mexem na corrida.
 var mult_acel := 1.0
@@ -226,6 +227,8 @@ func step() -> Array:
 		if r.x >= D:
 			r.t = t
 	done = rs.all(func(r): return r.t >= 0.0)
+	if ordem_meio.is_empty() and rs[0].x >= D * 0.5:
+		ordem_meio = classificacao()
 	return ev
 
 

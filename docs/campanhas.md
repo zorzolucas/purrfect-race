@@ -1,5 +1,6 @@
 # Nekomusume — Campanhas e balanceamento
 
+> Versão 0.2 — 2026-11-17. Na v0.2 entraram os resultados do bot na carreira de 72 turnos (§7) e as regras de virada calibradas.
 > Versão 0.1 — 2026-11-17. Complementa o [calendário](calendario.md) §3 (estrutura da campanha) e o [elenco](elenco.md).
 > Valores marcados com **(inicial)** são pontos de partida para balanceamento.
 
@@ -39,11 +40,11 @@ O jogo **fica um pouco mais fácil** conforme o jogador junta madrinhas e cópia
 | Fonte | Bônus (inicial) | Teto |
 |---|---|---|
 | **Vínculo** (GDD §3.5) | +4 em cada atributo inicial por nível (nível 5 = +20) | — |
-| **Madrinha** (GDD §3.6) | +5% dos atributos finais dela | +40 por atributo |
-| **Vínculo + madrinha juntos** | — | **+50 por atributo** |
+| **Madrinha** (GDD §3.6) | +3% dos atributos finais dela | +20 por atributo |
+| **Vínculo + madrinha juntos** | — | **+25 por atributo** |
 | **Inspiração** da madrinha (turnos 25 e 49) | chance de atributos e de +1 nível de aptidão | 1 aptidão por inspiração |
 
-O bônus pesa no começo (no turno 13, +50 é ~25% da média esperada) e some no fim (no turno 72, ~6%). Assim a conta madura passa mais fácil pelos objetivos do ano 1, mas o GP final continua exigindo uma boa carreira.
+O bônus parece pequeno, mas cresce durante a carreira: com atributos maiores ela entra e vai bem em mais corridas, que dão fama e atributos. No bot, com teto de +50 a conta madura completava 73% das carreiras e a curva terminava 75 pontos acima. Por isso o teto ficou em +25 (§7).
 
 ### 2.2 Liberações "horizontais"
 
@@ -88,7 +89,7 @@ As 6 campanhas seguem o modelo do calendário §3.2: objetivos 1, 2, 4 e 5 próp
 | — | 41–47 | *Capítulo 5: "Quando o plano falha"*. O evento de mesmo nome acontece aqui. | — | — |
 | 6 | 48 | GP do ano 2, Média Grama | Top 3 | Normal |
 
-**Ponto de virada:** se ela **venceu o GP do ano 2**, ou ficou **top 2** no GP do ano 2 e o jogador escolheu "seguir o plano à risca" no evento *Plano perfeito*, segue o caminho **O plano perfeito**. Senão, segue **Improviso**.
+**Ponto de virada:** se o jogador escolheu "seguir o plano à risca" no capítulo *O plano perfeito* e ela ficou **top 2** no GP do ano 2, segue o caminho **O plano perfeito**. Senão, segue **Improviso**.
 
 | Caminho | Objetivo 7 (turno 60) | GP final (turno 72) | Final |
 |---|---|---|---|
@@ -117,7 +118,7 @@ As corridas do ano 1 são na **Média**: no nível baixo a Fechadora sofre na Lo
 | — | 41–47 | *Capítulo 5: "Quem é a outra Mira?"*. Ela descobre que gosta de correr no fundo. | — | — |
 | 6 | 48 | GP do ano 2, Longa Grama | Top 3 | Normal |
 
-**Ponto de virada:** se o evento *A outra Mira* já aconteceu (ele pede uma vitória de virada) e o jogador escolheu "aceitar", segue o caminho **A outra Mira**. Senão, segue **Nuvens**.
+**Ponto de virada:** se o jogador escolheu "então corra do seu jeito" no capítulo *Quem é a outra Mira?* e ela já venceu **pelo menos 1 corrida de virada** (fora do top 5 na metade da corrida), segue o caminho **A outra Mira**. Senão, segue **Nuvens**.
 
 | Caminho | Objetivo 7 (turno 60) | GP final (turno 72) | Final |
 |---|---|---|---|
@@ -144,7 +145,7 @@ As corridas do ano 1 são na **Média**: no nível baixo a Fechadora sofre na Lo
 | — | 41–47 | *Capítulo 5: "Sem plateia"*. O evento de mesmo nome acontece aqui. | — | — |
 | 6 | 48 | GP do ano 2, Milha Grama | Top 3 | Normal |
 
-**Ponto de virada:** se ela tem **fama de 4000 ou mais** no turno 48 (inicial, calibrar no bot), segue o caminho **Ídolo**. Senão, segue **Corredora**. Liberar o fã-clube no evento *Fã-clube* dá fama extra.
+**Ponto de virada:** se ela tem **fama de 5500 ou mais** no turno 48, segue o caminho **Ídolo**. Senão, segue **Corredora**. Liberar o evento no capítulo *Fã-clube* dá fama extra.
 
 | Caminho | Objetivo 7 (turno 60) | GP final (turno 72) | Final |
 |---|---|---|---|
@@ -171,7 +172,7 @@ As corridas do ano 1 são na **Média**: no nível baixo a Fechadora sofre na Lo
 | — | 41–47 | *Capítulo 5: "Distância demais"*. O evento de mesmo nome acontece aqui. | — | — |
 | 6 | 48 | GP do ano 2, Sprint Terra | Top 3 | Normal |
 
-**Ponto de virada:** se ela **venceu o GP do ano 2**, ou ficou **top 3** no GP do ano 2 **sem ter se lesionado desde o turno 25**, segue o caminho **Sem freio**. Senão, segue **Fôlego novo**.
+**Ponto de virada:** se ela **venceu o GP do ano 2**, ficou **top 2 no objetivo 5** e **não se lesionou desde o turno 25**, segue o caminho **Sem freio**. Senão, segue **Fôlego novo**.
 
 | Caminho | Objetivo 7 (turno 60) | GP final (turno 72) | Final |
 |---|---|---|---|
@@ -200,7 +201,7 @@ Como a Mira, ela é Fechadora de Longa, então o ano 1 é na **Média Terra**.
 | — | 41–47 | *Capítulo 5: "Lira de novo"*. O evento de mesmo nome acontece aqui. | — | — |
 | 6 | 48 | GP do ano 2, Longa Terra | Top 3 | Normal |
 
-**Ponto de virada:** se o jogador escolheu "perguntar" no evento *Carta de casa* e a afinidade com ela está em **60 ou mais** (inicial), segue o caminho **Raízes**. Senão, segue **Sombra**.
+**Ponto de virada:** se o jogador escolheu "perguntar" no capítulo *Carta de casa* e **saiu com ela pelo menos 1 vez** (ação Sair), segue o caminho **Raízes**. Senão, segue **Sombra**.
 
 | Caminho | Objetivo 7 (turno 60) | GP final (turno 72) | Final |
 |---|---|---|---|
@@ -213,12 +214,12 @@ Como a Mira, ela é Fechadora de Longa, então o ano 1 é na **Média Terra**.
 
 | Garota | Obj. 2 | Obj. 4 | Obj. 5 | Virada decidida por | Caminhos |
 |---|---|---|---|---|---|
-| Lira | Top 3 casa | Rival (Polaris, Média) | Prêmio Cometa top 3 | Resultado + escolha | Coroa da Milha / Revanche |
+| Lira | Top 3 casa | Rival (Polaris, na Milha) | Prêmio Cometa top 3 | Resultado + escolha | Coroa da Milha / Revanche |
 | Nashira | Top 3 casa | Fora de casa (Milha) | Rival (Polaris) | Resultado + escolha | O plano perfeito / Improviso |
 | Mira | Top 3 Média | Top 5 casa | Top 3 casa | Escolha (evento) | A outra Mira / Nuvens |
 | Capela | Maratona | Fora de casa (Sprint) | Prêmio Cometa top 3 | Fama | Ídolo / Corredora |
-| Antares | Top 3 casa | Rival (Algol, Milha) | Top 3 casa | Resultado + sem lesão | Sem freio / Fôlego novo |
-| Shaula | Top 3 Média | Outro piso (Grama) | Top 3 casa | Escolha + afinidade | Raízes / Sombra |
+| Antares | Top 3 casa | Rival (Algol, Milha) | Top 3 casa | Resultado + saúde | Sem freio / Fôlego novo |
+| Shaula | Top 3 Média | Outro piso (Grama) | Top 3 casa | Escolha + saídas | Raízes / Sombra |
 
 Cada campanha usa um tipo diferente de virada. É de propósito: o bot mede se cada tipo dá a divisão de 35% a 65% (§1).
 
@@ -285,7 +286,7 @@ São **84 textos** no total (12 × 7). As campanhas do MVP têm mais capítulos 
 
 **Competitiva** (referência: Lira). *Quer vencer tudo agora e aprende que vencer também é esperar.*
 - Objetivo 2: top 3. Objetivo 4: Prata na casa, **à frente de {rival}**.
-- Virada: venceu o objetivo 5 ou o GP do ano 2 → **Coroa**. Senão → **Revanche**.
+- Virada: venceu o GP do ano 2 **e** ficou top 2 no objetivo 5 → **Coroa**. Senão → **Revanche**.
 - Coroa: vencer Ouro na casa (Difícil); GP final top 3. Revanche: Ouro na casa à frente de {rival}; GP final top 3 e à frente de {rival}.
 - Capítulos: 1 *"Ainda não?!"*: {nome} descobre que vai passar seis meses sem correr. 2 *"Primeira chegada"*: {rival} se apresenta depois da estreia. 3 *"Quem é ela?"*: {rival} vence {nome} numa opcional e ela treina sem parar. 4A *"Esperar também é correr"*. 4B *"Ajuste de contas"*.
 - Finais: A *"Paciência de campeã"*: ela vira a referência das novatas. B *"Rival de respeito"*: as duas combinam correr juntas no ano seguinte.
@@ -299,7 +300,7 @@ São **84 textos** no total (12 × 7). As campanhas do MVP têm mais capítulos 
 
 **Durona** (referência: Antares). *Só sabe ir com tudo e aprende a ouvir o corpo.*
 - Objetivo 2: top 3. Objetivo 4: Prata no **outro piso**, top 5 ("provar que corre em qualquer chão").
-- Virada: venceu o GP do ano 2, ou ficou top 3 nele **sem lesão desde o turno 25** → **Sem limites**. Senão → **Corpo e cabeça**.
+- Virada: venceu o GP do ano 2 **sem lesão desde o turno 25** → **Sem limites**. Senão → **Corpo e cabeça**.
 - Sem limites: vencer Ouro na casa (Difícil); GP final top 3. Corpo e cabeça: Ouro na distância vizinha, top 3; GP final top 3 e à frente de {rival}.
 - Capítulos: 1 *"Antes do sol"*: {nome} treina antes de todo mundo acordar. 2 *"Mais um"*: ela esconde uma dor para não perder treino. 3 *"Chão diferente"*: corrida no outro piso. 4A *"Sem freio"*. 4B *"Respirar"*.
 - Finais: A *"Ninguém segura"*. B *"Saber parar"*: ela ganha uma distância nova.
@@ -315,14 +316,14 @@ São **84 textos** no total (12 × 7). As campanhas do MVP têm mais capítulos 
 
 **Leal**. *Corre por uma promessa e descobre o que quer para si.*
 - Objetivo 2: Maratona (2 corridas com top 5). Objetivo 4: Prata na casa, **à frente de {rival}** ("a amiga de infância virou rival").
-- Virada: afinidade com ela em **70 ou mais** no turno 48 (inicial) → **Promessa**. Senão → **Por mim**.
+- Virada: **saiu com ela 2 vezes ou mais** até o turno 48 → **Promessa**. Senão → **Por mim**.
 - Promessa: Ouro na casa, top 3; GP final top 3 e à frente de {rival}. Por mim: vencer Ouro na casa (Difícil); GP final top 3.
 - Capítulos: 1 *"A promessa"*: {nome} prometeu a alguém de casa que correria o GP. 2 *"Carta"*: a resposta chega depois da estreia. 3 *"Do outro lado"*: {rival} é alguém que ela conhece desde pequena. 4A *"Cumprir"*. 4B *"Minha corrida"*.
 - Finais: A *"Promessa cumprida"*. B *"Correr por mim"*.
 
 **Perfeccionista**. *Nunca está satisfeita e aprende que bom também é bom.*
 - Objetivo 2: top 3. Objetivo 4: Prata **fora de casa**, top 5 ("a corrida errada").
-- Virada: venceu **3 corridas ou mais** até o turno 48 → **Recorde**. Senão → **Bom o bastante**.
+- Virada: venceu **10 corridas ou mais** até o turno 48 → **Recorde**. Senão → **Bom o bastante**.
 - Recorde: vencer Ouro na casa (Difícil); GP final top 3. Bom o bastante: Ouro na casa, top 3; GP final top 3 e à frente de {rival}.
 - Capítulos: 1 *"Cronômetro"*: {nome} refaz o mesmo treino até sair perfeito. 2 *"Segundo lugar"*: um 2º lugar que ela trata como derrota. 3 *"Fora do lugar"*: uma distância que ela não domina. 4A *"Décimo de segundo"*. 4B *"Respirar fundo"*.
 - Finais: A *"Recorde"*: o tempo dela vai para o quadro da academia. B *"Bom o bastante"*: ela sorri no pódio pela primeira vez.
@@ -331,21 +332,21 @@ São **84 textos** no total (12 × 7). As campanhas do MVP têm mais capítulos 
 
 **Estrela** (referência: Capela). *Brilha com plateia e descobre se corre pelos aplausos ou pela pista.*
 - Objetivo 2: Maratona (2 corridas com top 5). Objetivo 4: Prata **fora de casa**, top 5.
-- Virada: fama de **4000 ou mais** no turno 48 (inicial) → **Holofote**. Senão → **Pista vazia**.
+- Virada: fama de **7500 ou mais** no turno 48 → **Holofote**. Senão → **Pista vazia**.
 - Holofote: Maratona, 2 corridas com top 3 desde o GP do ano 2 (1 Ouro); GP final top 3 e à frente de {rival}. Pista vazia: vencer Ouro na casa (Difícil); GP final top 3.
 - Capítulos: 1 *"Primeira foto"*: {nome} quer ser famosa antes de correr. 2 *"Fã"*: a primeira fã aparece. 3 *"Turnê"*: ela quer correr em todo lugar. 4A *"Palco"*. 4B *"Madrugada"*.
 - Finais: A *"Palco e pista"*. B *"Sem plateia"*.
 
 **Festeira**. *Faz amizade com todas, atrapalha o treino e aprende a hora de focar.*
 - Objetivo 2: top 3. Objetivo 4: Prata no **outro piso**, top 5.
-- Virada: passou por **2 nós de Festival ou mais** até o turno 48 → **Rainha da festa**. Senão → **Hora de focar**.
+- Virada: passou por **pelo menos 1 nó de Festival** até o turno 48 → **Rainha da festa**. Senão → **Hora de focar**.
 - Rainha da festa: Ouro na casa, top 3; GP final top 3 e à frente de {rival}. Hora de focar: vencer Ouro na casa (Difícil); GP final top 3.
 - Capítulos: 1 *"Boas-vindas"*: {nome} organiza uma festa no primeiro dia. 2 *"Depois da festa"*: ela chega cansada num treino importante. 3 *"Todo mundo convidado"*: até {rival} vai à festa dela. 4A *"A festa continua"*. 4B *"Luzes apagadas"*.
 - Finais: A *"Rainha da festa"*: a comemoração do GP é a maior que a academia já viu. B *"Hora de focar"*: ela comemora sozinha, com um sorvete.
 
 **Curiosa**. *Quer testar tudo e descobre onde é a casa dela.*
 - Objetivo 2: Aberta **fora de casa**, top 5. Objetivo 4: Prata no **outro piso**, top 5.
-- Virada: correu nas **4 distâncias** até o turno 48 → **Exploradora**. Senão → **Volta para casa**.
+- Virada: ficou **top 3 nas 4 distâncias** até o turno 48 → **Exploradora**. Senão → **Volta para casa**.
 - Exploradora: Ouro na distância vizinha, top 3; GP final, versão da distância vizinha, top 3. Volta para casa: vencer Ouro na casa (Difícil); GP final top 3.
 - Capítulos: 1 *"E se?"*: {nome} pergunta tudo sobre todas as pistas. 2 *"Outra distância"*: ela quer correr fora de casa logo depois da estreia. 3 *"Chão novo"*. 4A *"Mapa completo"*. 4B *"O caminho de volta"*.
 - Finais: A *"Exploradora"*: ela coleciona as 4 distâncias no caderno. B *"Volta para casa"*.
@@ -354,14 +355,14 @@ São **84 textos** no total (12 × 7). As campanhas do MVP têm mais capítulos 
 
 **Sonhadora** (referência: Mira). *Distraída o ano todo, acorda na reta final.*
 - Objetivo 2: top 3. Objetivo 4: Prata na casa, **à frente de {rival}**.
-- Virada: venceu **1 corrida de virada** (estava fora do top 5 na metade da corrida) até o turno 48 → **Acordada**. Senão → **Céu aberto**.
+- Virada: venceu **2 corridas de virada** (estava fora do top 5 na metade da corrida) até o turno 48 → **Acordada**. Senão → **Céu aberto**.
 - Acordada: vencer Ouro na casa (Difícil); GP final top 3. Céu aberto: Ouro na distância vizinha, top 3; GP final top 3 e à frente de {rival}.
 - Capítulos: 1 *"Nas nuvens"*: {nome} esquece o horário do treino olhando o céu. 2 *"Lá atrás"*: ela larga em último na estreia e ninguém entende. 3 *"Reta final"*. 4A *"Desperta"*. 4B *"Nuvens"*.
 - Finais: A *"Do fundo"*: ela larga em último e cruza em primeiro. B *"Corre porque gosta"*.
 
 **Misteriosa** (referência: Shaula). *Esconde um passado e decide se mostra quem é.*
 - Objetivo 2: top 3. Objetivo 4: Prata no **outro piso**, top 5 ("a pista de onde ela veio").
-- Virada: escolheu "perguntar" no capítulo 3 **e** afinidade com ela em **60 ou mais** (inicial) → **Raízes**. Senão → **Sombra**.
+- Virada: escolheu "perguntar" no capítulo 3 → **Raízes**. Senão → **Sombra**.
 - Raízes: Ouro na distância vizinha, top 3; GP final top 3 e à frente de {rival}. Sombra: vencer Ouro na casa (Difícil); GP final top 3.
 - Capítulos: 1 *"Ninguém sabe"*: {nome} não fala de onde veio. 2 *"Foto antiga"*: cai uma foto da mochila dela. 3 *"Pergunta"*: escolha entre perguntar e respeitar o silêncio. 4A *"De onde eu vim"*. 4B *"Sombra"*.
 - Finais: A *"Volta para casa"*. B *"Última na pista"*.
@@ -380,9 +381,11 @@ São **84 textos** no total (12 × 7). As campanhas do MVP têm mais capítulos 
 | Resultado | Competitiva | Colocação nos objetivos |
 | Resultado + escolha | Capitã, Estrategista, Teimosa | Colocação + escolha do capítulo 3 |
 | Resultado + saúde | Durona | Colocação + turno da última lesão |
-| Afinidade | Leal | Afinidade no turno 48 |
-| Escolha + afinidade | Misteriosa | Escolha + afinidade |
-| Contador | Perfeccionista (vitórias), Estrela (fama), Festeira (Festivais), Curiosa (distâncias), Sonhadora (vitórias de virada) | Contadores da carreira |
+| Saídas | Leal | Quantas vezes ela saiu (ação Sair) |
+| Escolha | Misteriosa | Escolha do capítulo 3 |
+| Contador | Perfeccionista (vitórias), Estrela (fama), Festeira (Festivais), Curiosa (distâncias com top 3), Sonhadora (vitórias de virada) | Contadores da carreira |
+
+*Na v0.2, "afinidade com ela" virou "saídas": o protótipo só tem afinidade com as colegas, e sair com a garota é o jeito que o jogador tem de passar tempo com ela.*
 
 ### 5.6 Quem tem cada arquétipo
 
@@ -454,43 +457,47 @@ O protótipo ainda roda a carreira antiga de **48 turnos**, com objetivos 2 e 4 
 
 *% de carreiras que passaram de cada objetivo.* A diferença entre a melhor e a pior é de 15 pontos, e o objetivo 2 derruba até 40% de quem chega nele. Esses números não valem para a carreira nova, mas mostram onde estão os buracos: o começo é duro demais para Fechadoras e para a Antares.
 
-### 6.2 Mudanças no protótipo (PR seguinte)
+### 6.2 Mudanças no protótipo (feitas)
 
-1. **72 turnos** em `data/calendario.json`, com o semestre de base, as férias nos turnos 21–22, 45–46 e 69–70, as categorias e o calendário fixo.
-2. **`data/campanhas.json`** com as 6 campanhas do MVP e os 12 arquétipos. A campanha das outras 42 é montada no carregamento a partir do arquétipo e da casa (§4.1), sem guardar 42 cópias.
-3. **Metas novas** na avaliação de objetivo: rival, maratona, fora de casa, outro piso, vitória e vitória de virada.
-4. **Ponto de virada** com os 6 tipos de regra (§5.5).
-5. **Rival da campanha** e **campeã da casa** nas corridas de objetivo e no GP.
-6. **Mapa** com os trechos de 72 turnos (calendário §4.1).
-7. **Bot** com dois perfis de conta (§1) e as metas novas.
-8. **Testes** (`teste_mapa`, `teste_save`) atualizados para 72 turnos.
+1. **72 turnos** em `data/calendario.json`: semestre de base, 7 trechos com 24 nós, férias nos turnos 21–22, 45–46 e 69–70, vésperas e o calendário fixo de 16 corridas.
+2. **`data/campanhas.json`** com as 6 campanhas do MVP, os 12 arquétipos e o arquétipo de cada garota. `scripts/campanha.gd` monta a campanha das outras 42 a partir do arquétipo e da casa (§4.1), sem guardar 42 cópias.
+3. **Metas novas** na avaliação de objetivo: rival, maratona, fora de casa, outro piso e vitória. A simulação guarda a ordem na metade da corrida para contar as vitórias de virada.
+4. **Ponto de virada** com as regras da §5.5, decidido ao cumprir o GP do ano 2. O caminho entra no save.
+5. **Capítulos de história** como diálogos nos turnos 1, 14, 25, 33 e 41, mais o do caminho no turno 49. O final aparece na tela de fim.
+6. **Rival da campanha** e **campeã da casa** (uma garota do elenco) nas corridas de objetivo com meta de rival e em todo GP.
+7. **Madrinha** e inspirações no código da carreira, ainda sem tela (só o bot usa).
+8. **Bot** com conta nova e madura, e o teste `teste_campanhas` para as 48 campanhas.
 
-**Formato do `data/campanhas.json`** (esboço):
+O olheiro, as séries e a instrução pré-corrida ainda não estão no protótipo.
+
+**Formato do `data/campanhas.json`:**
 
 ```json
 {
-  "garotas": {
+  "mvp": {
     "Nashira": {
       "objetivos": [
-        {"turno": 13, "categoria": "estreia", "casa": "media_grama", "meta": {"tipo": "colocacao", "max": 5}},
-        {"turno": 32, "categoria": "prata", "casa": "milha_grama", "meta": {"tipo": "colocacao", "max": 5}},
-        {"turno": 40, "categoria": "ouro", "casa": "media_grama", "meta": {"tipo": "rival", "rival": "Polaris"}}
+        {"turno": 13, "cat": "estreia", "dist": "media", "piso": "grama", "meta": {"max": 5}},
+        {"turno": 40, "cat": "ouro", "dist": "media", "piso": "grama", "meta": {"rival": "Polaris"}}
       ],
-      "virada": {"tipo": "resultado_escolha", "venceu": [48], "ou_top": {"turno": 48, "max": 2, "escolha": "plano_a_risca"}},
-      "caminhos": {"A": {...}, "B": {...}}
+      "capitulos": [{"turno": 33, "titulo": "O plano perfeito", "texto": "...", "escolhas": [...]}],
+      "virada": {"e": [{"flag": "plano_a_risca"}, {"top": [48, 2]}]},
+      "caminhos": {"A": {"nome": "...", "objetivos": [...], "capitulo": {...}, "final": {...}}, "B": {...}}
     }
   },
   "arquetipos": {
-    "competitiva": {"obj2": {...}, "obj4": {...}, "virada": {...}, "caminhos": {...}}
+    "competitiva": {"obj2": {"turno": 20, "cat": "aberta", "onde": "casa", "meta": {"max": 3}}, "obj4": {...}, "virada": {...}, "capitulos": [...], "caminhos": {...}}
   },
-  "arquetipo_por_garota": {"Altair": "competitiva", "...": "..."}
+  "arquetipo_por_garota": {"Altair": "competitiva"}
 }
 ```
 
+Uma meta pode ter `max` (colocação), `rival` (nome ou `true` para a rival da campanha) e `maratona` (quantas corridas com aquela colocação desde o objetivo anterior). O `onde` dos arquétipos é `casa`, `vizinha` ou `outro_piso`.
+
 ### 6.3 O que o bot faz
 
-- Joga como hoje (treina o atributo mais atrasado em relação ao perfil da casa, descansa com energia baixa, escolhe o nó pelo tipo), mais:
-- **Opcionais:** corre quando o olheiro diz Favorita ou Disputada e a fama ainda não basta para o próximo objetivo. Depois disso, só Favorita.
+- Treina o atributo mais atrasado em relação ao perfil da casa e descansa com energia abaixo de 45 (ou sai, se o humor estiver Normal ou pior). Escolhe o nó do mapa pelo tipo, preferindo Treino focado e Circuito.
+- **Opcionais:** corre quando a média dos atributos, com a aptidão, chega a 95% da força da corrida (o olheiro diria Favorita ou Disputada) e a energia está em 50 ou mais. Entre as possíveis, escolhe a que dá mais fama.
 - **Escolhas de história:** sorteia 50/50, para medir os dois caminhos.
 - **Instrução pré-corrida:** sempre Normal.
 - **Amuletos:** pega o primeiro oferecido (como hoje).
@@ -498,7 +505,9 @@ O protótipo ainda roda a carreira antiga de **48 turnos**, com objetivos 2 e 4 
 
 ### 6.4 O que medir
 
-Para cada garota, **40 carreiras** com conta nova e 40 com conta madura nas 6 do MVP, e **20 + 20** em cada uma das 42 do modelo (~4.000 carreiras no total, rodando headless na nuvem).
+**20 carreiras** com conta nova e 20 com conta madura para cada uma das 48 garotas (1.920 carreiras, uns 15 minutos em 4 núcleos). Com 20 carreiras, a taxa de uma garota sozinha varia uns ±11 pontos só por sorte, então a regra dos 10 pontos é conferida **por casa e por arquétipo** (60 a 120 carreiras cada).
+
+Comando: `Godot --headless --path . --script res://testes/balanco.gd -- 20 <garota|mvp|modelo|todas> <nova|madura> [saida.json]`.
 
 | Medida | Por quê |
 |---|---|
@@ -521,23 +530,81 @@ Mexer sempre na ordem abaixo, um botão por vez, e rodar de novo:
 3. **Teto e valor dos bônus de conta** (§2.1), até a conta madura chegar perto de 55%.
 4. **Fama por corrida** e fama para entrar, se o bot não alcança Prata ou Ouro a tempo.
 5. **Meta de objetivos específicos**, só para uma garota ou arquétipo fora da faixa de 10 pontos.
-6. **Regras de virada** (os números marcados "inicial", como fama 4000 e afinidade 60), até a divisão ficar entre 35% e 65%.
+6. **Regras de virada** (os números de fama, vitórias e saídas), até a divisão ficar entre 35% e 65%.
 
 ### 6.6 Pronto quando
 
 - Taxa geral entre **30% e 40%** (conta nova) e entre **50% e 60%** (conta madura).
-- Todas as 48 garotas a **até 10 pontos** uma da outra.
+- Todas as casas e todos os arquétipos a **até 10 pontos** um do outro (com 20 carreiras por garota, a taxa de uma garota sozinha é ruidosa demais).
 - Nenhum objetivo derruba **mais de 25%** de quem chega nele.
 - Todos os pontos de virada entre **35% e 65%**.
 - Os resultados ficam registrados na §7 deste documento, com a semente e o número de carreiras.
 
 ## 7. Resultados
 
-*Ainda sem resultados. Esta seção é preenchida no PR da migração.*
+Rodada de 2026-11-17 no protótipo de 72 turnos: **20 carreiras por garota e por conta** (sementes 1 a 20), as 48 garotas, 1.920 carreiras.
+
+### 7.1 Conta nova
+
+| Objetivo | 1 (t13) | 2 (t20) | 3 (t24) | 4 (t32) | 5 (t40) | 6 (t48) | 7 (t60) | 8 (t72) |
+|---|---|---|---|---|---|---|---|---|
+| Passa | 93% | 84% | 75% | 65% | 57% | 48% | 41% | **35%** |
+| Queda de quem chega | 7% | 10% | 11% | 13% | 13% | 16% | 16% | 14% |
+
+- **Carreiras completas: 34,7%** (alvo 30% a 40%). Nenhum objetivo derruba mais de 16% de quem chega nele (teto 25%).
+- **Por casa:** de 31% (Média Grama e Milha Grama) a 38% (Longa Grama). Diferença de 7 pontos.
+- **Por arquétipo:** de 28% (Festeira) a 45% (Perfeccionista). Diferença de 17 pontos, acima da meta, mas cada arquétipo tem só 60 a 80 carreiras (±6 pontos de sorte). Fica para conferir numa rodada maior.
+- **Garotas:** de 25% a 50%, dentro do que a sorte explica com 20 carreiras cada.
+- **Curva de atributos:** 207 / 308 / 407 / 537 / 664 / 799 nos turnos 13, 24, 36, 48, 60 e 72 (alvo 200 / 330 / 460 / 590 / 700 / 800).
+- **18 corridas** por carreira (alvo 14 a 20). Fama média de 3.400 no turno 40.
+- **GP final vencido** em 30% das carreiras: é o ritmo para liberar a Magnitude 1.
+- **Depois da virada**, o caminho A completa 74% e o B 70%.
+
+### 7.2 Conta madura
+
+| Objetivo | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 |
+|---|---|---|---|---|---|---|---|---|
+| Passa | 99% | 96% | 92% | 85% | 78% | 71% | 63% | **56%** |
+
+- **Carreiras completas: 55,9%** (alvo 50% a 60%), com o teto de **+25 por atributo** para vínculo + madrinha.
+- Por casa, de 51% a 61%. A curva fica uns 25 a 55 pontos acima da conta nova, e o GP final é vencido em 48% das carreiras.
+- Com o teto anterior (+50), a conta madura completava **73%**: o bônus inicial vira mais corridas, mais fama e mais atributos.
+
+### 7.3 Ponto de virada (conta nova)
+
+| Divisão no caminho A | Campanhas |
+|---|---|
+| 35% a 65% (dentro da meta) | Lira, Nashira, Mira, Capela, Antares, Shaula, Capitã, Competitiva, Curiosa, Durona, Estrategista, Estrela, Festeira, Perfeccionista, Sonhadora, Teimosa |
+| Perto do limite | Leal (34%), Misteriosa (34%) |
+
+- O bot quase não usa Sair e nunca se lesiona, então as regras de **saídas** e de **lesão** são as menos confiáveis aqui. Um jogador que sai mais com a garota vai para o caminho A da Leal e da Shaula com mais frequência.
+- Com conta madura, os caminhos de vitória ficam mais comuns (Durona e Perfeccionista com 80% no A). A meta de 35% a 65% vale para a conta nova.
+
+### 7.4 O que mudou para chegar aqui
+
+| Botão | Antes (48 turnos) | Agora |
+|---|---|---|
+| Ganho do treino principal / secundário | 75 / 28 | 39 / 14 |
+| Retorno decrescente | 1,15 − 0,45 × atributo/limite | Sem queda (1,0) |
+| Bônus por nível de treino | +10% por nível | +30% por nível |
+| Atributos por corrida | — | +5 a +15 em cada atributo (calendário §7.1) |
+| Força das NPCs | Fixa por categoria | Por categoria e por ano, × distância (calendário §2) |
+| Vínculo por nível | +8 | +4 |
+| Madrinha | +5%, teto 40 | +3%, teto 20; com o vínculo, teto 25 |
+
+O ganho do treino caiu porque o semestre de base sozinho levava a garota a ~320 na Estreia. O bônus por nível e os atributos por corrida devolvem o crescimento nos anos 2 e 3, quando ela corre mais e treina menos.
+
+### 7.5 Próximos passos
+
+- Rodar 100 carreiras por arquétipo para confirmar a diferença de 17 pontos entre arquétipos.
+- Testar com jogadores de verdade: o bot não planeja rota nem usa o calendário fixo de propósito.
+- Conferir as regras de virada da Leal e da Misteriosa numa próxima rodada.
 
 ## 8. Decisões pequenas tomadas aqui
 
 - **Objetivo dá entrada:** a corrida de um objetivo é por convite, mesmo sem a fama da categoria. Sem isso, uma carreira poderia acabar por falta de fama num objetivo que a garota venceria. A fama continua limitando as **opcionais**. (O calendário §3.2 dizia que os objetivos 4 e 5 "pressupõem fama".)
 - **Campeã da casa** vira uma garota do elenco (§4.3).
 - **Fechadoras de Longa** correm o ano 1 na Média (§4.2), como a Mira e a Shaula.
+- **Correr dá atributos** (calendário §7.1) e o **pelotão fica mais forte a cada ano** (calendário §2). As duas mudanças saíram do balanceamento (§7.4).
+- A **Lira** corre o objetivo 4 na Milha, com a Polaris de visitante, em vez de ir à Média. O antigo derrubava 2 de cada 3 carreiras dela.
 - Os nomes de capítulos e finais são provisórios.

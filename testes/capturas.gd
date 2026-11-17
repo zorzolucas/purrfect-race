@@ -46,7 +46,10 @@ func _initialize() -> void:
 			main.mostrar_carreira("Treino de Velocidade: +60 Vel, +22 Pod."),
 		func():
 			_salvar("2a_encontro")
-			main.mostrar_carreira(main.carreira.escolher(0)),
+			var txt: String = main.carreira.escolher(0)
+			_avancar_ate(13)  # a Estreia é no turno 13, depois do semestre de base
+			_resolver_encontro()
+			main.mostrar_carreira(txt),
 		func():
 			_salvar("2_objetivo_estreia")
 			main.mostrar_corrida()
@@ -110,7 +113,7 @@ func _resolver_encontro() -> void:
 		c.escolher(0)
 
 
-## Joga sozinho (sem tela) até o turno pedido, para chegar às férias.
+## Joga sozinho (sem tela) até o turno pedido.
 func _avancar_ate(alvo: int) -> void:
 	var c = main.carreira
 	var guard := 0
@@ -124,9 +127,8 @@ func _avancar_ate(alvo: int) -> void:
 				var d = c.montar_corrida(dados.garotas)
 				var sim := SimCorrida.new(d.field, d.distancia, d.seed, d.clima)
 				var pos: int = sim.rodar_ate_o_fim().find(0) + 1
-				c.registrar_corrida(maxi(1, pos - 4))  # empurra para cumprir os objetivos
+				c.registrar_corrida(maxi(1, pos - 4), {"rival_pos": 12})  # empurra para cumprir os objetivos
 			"amuleto": c.escolher_amuleto(c.oferta_amuleto[0], c.amuletos[0] if c.amuletos.size() >= 6 else "")
-			"sem_fama": c.fama = 2000
 			_:
 				if c.energia < 45:
 					c.descansar()

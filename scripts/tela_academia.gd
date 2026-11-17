@@ -34,7 +34,7 @@ func _ready() -> void:
 	if salvo:
 		var pc := UI.painel(Color("#25402f"))
 		var h := UI.hbox(12)
-		var txt := "Carreira em andamento: %s, semana %d de %d." % [salvo.nome, salvo.turno, Carreira.BAL.turnos]
+		var txt := "Carreira em andamento: %s, turno %d de %d." % [salvo.nome, salvo.turno, Carreira.BAL.turnos]
 		if salvo.terminou:
 			txt = "A carreira de %s terminou. Falta decidir se a nova versão fica salva." % salvo.nome
 		var l := UI.label(txt, 18, UI.TEXTO, true)

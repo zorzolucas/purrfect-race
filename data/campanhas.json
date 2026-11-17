@@ -1,0 +1,2517 @@
+{
+ "_doc": "Campanhas (docs/campanhas.md). As 6 do MVP estão escritas aqui; as outras 42 são montadas a partir do arquétipo e da casa (scripts/campanha.gd). Valores (inicial).",
+ "mvp": {
+  "Lira": {
+   "tema": "Uma garota que odeia esperar descobre que vencer também é saber esperar.",
+   "objetivos": [
+    {
+     "turno": 13,
+     "cat": "estreia",
+     "meta": {
+      "max": 5
+     },
+     "dist": "milha",
+     "piso": "grama"
+    },
+    {
+     "turno": 20,
+     "cat": "aberta",
+     "meta": {
+      "max": 3
+     },
+     "dist": "milha",
+     "piso": "grama"
+    },
+    {
+     "turno": 24,
+     "cat": "gp1",
+     "meta": {
+      "max": 5
+     },
+     "dist": "milha",
+     "piso": "grama"
+    },
+    {
+     "turno": 32,
+     "cat": "prata",
+     "meta": {
+      "rival": "Polaris"
+     },
+     "dist": "milha",
+     "piso": "grama"
+    },
+    {
+     "turno": 40,
+     "cat": "ouro",
+     "meta": {
+      "max": 3
+     },
+     "dist": "milha",
+     "piso": "grama",
+     "nome": "Prêmio Cometa"
+    },
+    {
+     "turno": 48,
+     "cat": "gp2",
+     "meta": {
+      "max": 3
+     },
+     "dist": "milha",
+     "piso": "grama"
+    }
+   ],
+   "capitulos": [
+    {
+     "turno": 1,
+     "titulo": "Seis meses?!",
+     "texto": "{nome} chega querendo correr no primeiro dia e descobre que vai passar um semestre inteiro só treinando. — Seis meses?! Eu vou explodir!"
+    },
+    {
+     "turno": 14,
+     "titulo": "Rival declarada",
+     "texto": "Depois da estreia, a Polaris passa por {nome} no corredor e diz que a Milha é \"uma distância de passagem\". {nome} passa a noite inteira correndo em volta do pátio."
+    },
+    {
+     "turno": 25,
+     "titulo": "Na casa dela",
+     "texto": "{nome} decide que vai vencer a Polaris na distância dela. A treinadora avisa: a Média pede paciência, e paciência é o que ela menos tem."
+    },
+    {
+     "turno": 33,
+     "titulo": "Cometa",
+     "texto": "O Prêmio Cometa é a corrida mais bonita da Milha. {nome} quer vencer antes de qualquer outra coisa."
+    },
+    {
+     "turno": 41,
+     "titulo": "Primeira derrota",
+     "texto": "{nome} perde uma corrida que achava ganha e some do treino. Você a encontra sentada sozinha na arquibancada.",
+     "escolhas": [
+      {
+       "texto": "Sentar do lado e consolar",
+       "resultado": "Vocês ficam em silêncio até o sol se pôr. No dia seguinte ela volta ao treino sorrindo.",
+       "efeitos": {
+        "humor": 1
+       }
+      },
+      {
+       "texto": "Deixar ela treinar sozinha",
+       "resultado": "Ela corre até não aguentar mais. Volta calada, mas com um olhar diferente.",
+       "efeitos": {
+        "det": 15,
+        "flag": "treinar_sozinha"
+       }
+      }
+     ]
+    }
+   ],
+   "virada": {
+    "ou": [
+     {
+      "e": [
+       {
+        "venceu": [
+         40
+        ]
+       },
+       {
+        "venceu": [
+         48
+        ]
+       }
+      ]
+     },
+     {
+      "e": [
+       {
+        "flag": "treinar_sozinha"
+       },
+       {
+        "venceu": [
+         48
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   "caminhos": {
+    "A": {
+     "nome": "Coroa da Milha",
+     "objetivos": [
+      {
+       "turno": 60,
+       "cat": "ouro",
+       "meta": {
+        "max": 1
+       },
+       "dist": "milha",
+       "piso": "grama"
+      },
+      {
+       "turno": 72,
+       "cat": "gp3",
+       "meta": {
+        "max": 3
+       },
+       "dist": "milha",
+       "piso": "grama"
+      }
+     ],
+     "capitulo": {
+      "turno": 49,
+      "titulo": "Coroa da Milha",
+      "texto": "{nome} venceu na Milha e agora todas querem vencê-la. Pela primeira vez, ela precisa defender em vez de atacar."
+     },
+     "final": {
+      "titulo": "Quem espera, vence",
+      "texto": "{nome} aprende a segurar o ritmo e vira a referência das novatas da academia."
+     }
+    },
+    "B": {
+     "nome": "Revanche",
+     "objetivos": [
+      {
+       "turno": 60,
+       "cat": "ouro",
+       "meta": {
+        "rival": "Polaris"
+       },
+       "dist": "media",
+       "piso": "grama"
+      },
+      {
+       "turno": 72,
+       "cat": "gp3",
+       "meta": {
+        "max": 3,
+        "rival": "Polaris"
+       },
+       "dist": "media",
+       "piso": "grama"
+      }
+     ],
+     "capitulo": {
+      "turno": 49,
+      "titulo": "Revanche",
+      "texto": "A Polaris continua na frente. {nome} pede para correr o último ano inteiro de olho nela."
+     },
+     "final": {
+      "titulo": "A chama e a estrela",
+      "texto": "A rivalidade vira respeito, e as duas combinam de correr juntas no ano seguinte."
+     }
+    }
+   }
+  },
+  "Nashira": {
+   "tema": "Uma garota que planeja tudo descobre que a melhor corrida dela foi a que saiu do roteiro.",
+   "objetivos": [
+    {
+     "turno": 13,
+     "cat": "estreia",
+     "meta": {
+      "max": 5
+     },
+     "dist": "media",
+     "piso": "grama"
+    },
+    {
+     "turno": 20,
+     "cat": "aberta",
+     "meta": {
+      "max": 3
+     },
+     "dist": "media",
+     "piso": "grama"
+    },
+    {
+     "turno": 24,
+     "cat": "gp1",
+     "meta": {
+      "max": 5
+     },
+     "dist": "media",
+     "piso": "grama"
+    },
+    {
+     "turno": 32,
+     "cat": "prata",
+     "meta": {
+      "max": 5
+     },
+     "dist": "milha",
+     "piso": "grama"
+    },
+    {
+     "turno": 40,
+     "cat": "ouro",
+     "meta": {
+      "rival": "Polaris"
+     },
+     "dist": "media",
+     "piso": "grama"
+    },
+    {
+     "turno": 48,
+     "cat": "gp2",
+     "meta": {
+      "max": 3
+     },
+     "dist": "media",
+     "piso": "grama"
+    }
+   ],
+   "capitulos": [
+    {
+     "turno": 1,
+     "titulo": "O caderno",
+     "texto": "{nome} chega com um caderno cheio de anotações sobre todas as corredoras da academia. Até sobre você."
+    },
+    {
+     "turno": 14,
+     "titulo": "Dados insuficientes",
+     "texto": "A estreia não sai como {nome} previu. Ela abre uma página nova no caderno, com o próprio nome no topo."
+    },
+    {
+     "turno": 25,
+     "titulo": "A página da Polaris",
+     "texto": "{nome} enche um caderno só com a Polaris e decide testar um plano B numa distância menor."
+    },
+    {
+     "turno": 33,
+     "titulo": "O plano perfeito",
+     "texto": "{nome} mostra um plano para o resto do ano, turno por turno, até o Grande Prêmio.",
+     "escolhas": [
+      {
+       "texto": "Seguir o plano à risca",
+       "resultado": "Ela sorri e fecha o caderno com cuidado. — Então está decidido.",
+       "efeitos": {
+        "int": 15,
+        "flag": "plano_a_risca"
+       }
+      },
+      {
+       "texto": "Deixar margem para improvisar",
+       "resultado": "Ela franze a testa, mas risca duas linhas do plano. — Só duas.",
+       "efeitos": {
+        "humor": 1
+       }
+      }
+     ]
+    },
+    {
+     "turno": 41,
+     "titulo": "Quando o plano falha",
+     "texto": "Uma corrida sai completamente do roteiro, e {nome} fica sem saber o que fazer com o caderno na mão."
+    }
+   ],
+   "virada": {
+    "e": [
+     {
+      "flag": "plano_a_risca"
+     },
+     {
+      "top": [
+       48,
+       2
+      ]
+     }
+    ]
+   },
+   "caminhos": {
+    "A": {
+     "nome": "O plano perfeito",
+     "objetivos": [
+      {
+       "turno": 60,
+       "cat": "ouro",
+       "meta": {
+        "max": 1
+       },
+       "dist": "media",
+       "piso": "grama"
+      },
+      {
+       "turno": 72,
+       "cat": "gp3",
+       "meta": {
+        "max": 3
+       },
+       "dist": "media",
+       "piso": "grama"
+      }
+     ],
+     "capitulo": {
+      "turno": 49,
+      "titulo": "Última página",
+      "texto": "O plano deu certo até aqui. Falta a última página."
+     },
+     "final": {
+      "titulo": "Caderno fechado",
+      "texto": "O plano dá certo do começo ao fim, e {nome} dá o caderno de presente para uma novata."
+     }
+    },
+    "B": {
+     "nome": "Improviso",
+     "objetivos": [
+      {
+       "turno": 60,
+       "cat": "ouro",
+       "meta": {
+        "max": 3
+       },
+       "dist": "longa",
+       "piso": "grama"
+      },
+      {
+       "turno": 72,
+       "cat": "gp3",
+       "meta": {
+        "max": 3,
+        "rival": "Polaris"
+       },
+       "dist": "media",
+       "piso": "grama"
+      }
+     ],
+     "capitulo": {
+      "turno": 49,
+      "titulo": "Sem anotações",
+      "texto": "{nome} deixa o caderno no armário pela primeira vez e vai treinar sem ele."
+     },
+     "final": {
+      "titulo": "Página em branco",
+      "texto": "{nome} corre sem anotar nada e descobre que gosta."
+     }
+    }
+   }
+  },
+  "Mira": {
+   "tema": "Uma sonhadora que todos acham distraída descobre que corre melhor quando para de tentar ser outra pessoa.",
+   "objetivos": [
+    {
+     "turno": 13,
+     "cat": "estreia",
+     "meta": {
+      "max": 5
+     },
+     "dist": "media",
+     "piso": "grama"
+    },
+    {
+     "turno": 20,
+     "cat": "aberta",
+     "meta": {
+      "max": 3
+     },
+     "dist": "media",
+     "piso": "grama"
+    },
+    {
+     "turno": 24,
+     "cat": "gp1",
+     "meta": {
+      "max": 5
+     },
+     "dist": "media",
+     "piso": "grama"
+    },
+    {
+     "turno": 32,
+     "cat": "prata",
+     "meta": {
+      "max": 5
+     },
+     "dist": "longa",
+     "piso": "grama"
+    },
+    {
+     "turno": 40,
+     "cat": "ouro",
+     "meta": {
+      "max": 3
+     },
+     "dist": "longa",
+     "piso": "grama"
+    },
+    {
+     "turno": 48,
+     "cat": "gp2",
+     "meta": {
+      "max": 3
+     },
+     "dist": "longa",
+     "piso": "grama"
+    }
+   ],
+   "capitulos": [
+    {
+     "turno": 1,
+     "titulo": "Perdida",
+     "texto": "{nome} chega atrasada no primeiro dia porque seguiu um gato de verdade até o jardim."
+    },
+    {
+     "turno": 14,
+     "titulo": "Longe demais",
+     "texto": "{nome} quer correr a Longa, mas a treinadora começa pela Média. Ela acha que é porque ninguém acredita nela."
+    },
+    {
+     "turno": 25,
+     "titulo": "Três mil e duzentos",
+     "texto": "Finalmente a Longa. {nome} olha a pista inteira e diz que dá para ver as nuvens mudando de forma durante a corrida."
+    },
+    {
+     "turno": 33,
+     "titulo": "Nuvem em forma de peixe",
+     "texto": "No meio do treino, {nome} para e aponta para o céu. Uma nuvem em forma de peixe."
+    },
+    {
+     "turno": 41,
+     "titulo": "Quem é a outra Mira?",
+     "texto": "{nome} confessa que gosta de correr lá atrás, vendo todas na frente, e que tem vergonha disso.",
+     "escolhas": [
+      {
+       "texto": "\"Então corra do seu jeito.\"",
+       "resultado": "Ela fica vermelha e sorri. — Do fundo, então.",
+       "efeitos": {
+        "det": 15,
+        "flag": "aceitar"
+       }
+      },
+      {
+       "texto": "\"Tente ficar mais perto da frente.\"",
+       "resultado": "Ela concorda com a cabeça, sem muita certeza.",
+       "efeitos": {
+        "vel": 15
+       }
+      }
+     ]
+    }
+   ],
+   "virada": {
+    "e": [
+     {
+      "flag": "aceitar"
+     },
+     {
+      "viradas_min": 1
+     }
+    ]
+   },
+   "caminhos": {
+    "A": {
+     "nome": "A outra Mira",
+     "objetivos": [
+      {
+       "turno": 60,
+       "cat": "ouro",
+       "meta": {
+        "max": 1
+       },
+       "dist": "longa",
+       "piso": "grama"
+      },
+      {
+       "turno": 72,
+       "cat": "gp3",
+       "meta": {
+        "max": 3
+       },
+       "dist": "longa",
+       "piso": "grama"
+      }
+     ],
+     "capitulo": {
+      "turno": 49,
+      "titulo": "Do fundo",
+      "texto": "{nome} larga em último de propósito e já ninguém estranha."
+     },
+     "final": {
+      "titulo": "Primeira a chegar",
+      "texto": "{nome} larga em último e cruza em primeiro, como sempre sonhou."
+     }
+    },
+    "B": {
+     "nome": "Nuvens",
+     "objetivos": [
+      {
+       "turno": 60,
+       "cat": "ouro",
+       "meta": {
+        "max": 3
+       },
+       "dist": "media",
+       "piso": "grama"
+      },
+      {
+       "turno": 72,
+       "cat": "gp3",
+       "meta": {
+        "max": 3,
+        "rival": "Polaris"
+       },
+       "dist": "longa",
+       "piso": "grama"
+      }
+     ],
+     "capitulo": {
+      "turno": 49,
+      "titulo": "Céu aberto",
+      "texto": "{nome} para de se comparar com as outras e volta a olhar as nuvens no caminho do treino."
+     },
+     "final": {
+      "titulo": "Corre porque gosta",
+      "texto": "{nome} para de se comparar e passa a correr pelo céu do caminho."
+     }
+    }
+   }
+  },
+  "Capela": {
+   "tema": "Uma garota que só brilha com plateia descobre se corre pelos aplausos ou pela pista.",
+   "objetivos": [
+    {
+     "turno": 13,
+     "cat": "estreia",
+     "meta": {
+      "max": 5
+     },
+     "dist": "milha",
+     "piso": "grama"
+    },
+    {
+     "turno": 20,
+     "cat": "aberta",
+     "meta": {
+      "max": 5,
+      "maratona": 2
+     },
+     "dist": "milha",
+     "piso": "grama"
+    },
+    {
+     "turno": 24,
+     "cat": "gp1",
+     "meta": {
+      "max": 5
+     },
+     "dist": "milha",
+     "piso": "grama"
+    },
+    {
+     "turno": 32,
+     "cat": "prata",
+     "meta": {
+      "max": 5
+     },
+     "dist": "sprint",
+     "piso": "grama"
+    },
+    {
+     "turno": 40,
+     "cat": "ouro",
+     "meta": {
+      "max": 3
+     },
+     "dist": "milha",
+     "piso": "grama",
+     "nome": "Prêmio Cometa"
+    },
+    {
+     "turno": 48,
+     "cat": "gp2",
+     "meta": {
+      "max": 3
+     },
+     "dist": "milha",
+     "piso": "grama"
+    }
+   ],
+   "capitulos": [
+    {
+     "turno": 1,
+     "titulo": "Primeira fila",
+     "texto": "{nome} ensaia escondida uma dança de vitória antes mesmo de correr a primeira vez."
+    },
+    {
+     "turno": 14,
+     "titulo": "Fã número 1",
+     "texto": "Aparece a primeira fã de {nome}, com um cartaz escrito à mão. Agora ela quer correr em todo lugar."
+    },
+    {
+     "turno": 25,
+     "titulo": "Palco pequeno",
+     "texto": "Uma corrida curta, sem holofote, para {nome} aprender a largar rápido."
+    },
+    {
+     "turno": 33,
+     "titulo": "Fã-clube",
+     "texto": "O fã-clube de {nome} marcou um evento no mesmo dia de um treino importante.",
+     "escolhas": [
+      {
+       "texto": "Liberar o evento",
+       "resultado": "Ela volta rouca de tanto cantar, e o fã-clube dobra de tamanho.",
+       "efeitos": {
+        "fama": 300,
+        "humor": 1
+       }
+      },
+      {
+       "texto": "Insistir no treino",
+       "resultado": "Ela treina emburrada, mas treina bem.",
+       "efeitos": {
+        "vel": 15,
+        "humor": -1
+       }
+      }
+     ]
+    },
+    {
+     "turno": 41,
+     "titulo": "Sem plateia",
+     "texto": "Uma corrida debaixo de chuva, com a arquibancada vazia. {nome} não sabe para quem correr."
+    }
+   ],
+   "virada": {
+    "fama_min": 5500
+   },
+   "caminhos": {
+    "A": {
+     "nome": "Ídolo",
+     "objetivos": [
+      {
+       "turno": 60,
+       "cat": "ouro",
+       "meta": {
+        "max": 3,
+        "maratona": 2
+       },
+       "dist": "milha",
+       "piso": "grama"
+      },
+      {
+       "turno": 72,
+       "cat": "gp3",
+       "meta": {
+        "max": 3,
+        "rival": true
+       },
+       "dist": "milha",
+       "piso": "grama"
+      }
+     ],
+     "capitulo": {
+      "turno": 49,
+      "titulo": "Turnê",
+      "texto": "{nome} vira a corredora mais famosa da academia. Agora todo mundo espera um show."
+     },
+     "final": {
+      "titulo": "Palco e pista",
+      "texto": "{nome} faz o show depois da corrida, e a arquibancada inteira canta junto."
+     }
+    },
+    "B": {
+     "nome": "Corredora",
+     "objetivos": [
+      {
+       "turno": 60,
+       "cat": "ouro",
+       "meta": {
+        "max": 1
+       },
+       "dist": "milha",
+       "piso": "grama"
+      },
+      {
+       "turno": 72,
+       "cat": "gp3",
+       "meta": {
+        "max": 3
+       },
+       "dist": "milha",
+       "piso": "grama"
+      }
+     ],
+     "capitulo": {
+      "turno": 49,
+      "titulo": "Arquibancada vazia",
+      "texto": "{nome} começa a treinar de madrugada, quando não tem ninguém olhando."
+     },
+     "final": {
+      "titulo": "Sem plateia",
+      "texto": "{nome} vence de madrugada num treino vazio e percebe que não precisa de ninguém olhando."
+     }
+    }
+   }
+  },
+  "Antares": {
+   "tema": "Uma garota que só sabe ir com tudo aprende que o corpo também tem voz.",
+   "objetivos": [
+    {
+     "turno": 13,
+     "cat": "estreia",
+     "meta": {
+      "max": 5
+     },
+     "dist": "sprint",
+     "piso": "terra"
+    },
+    {
+     "turno": 20,
+     "cat": "aberta",
+     "meta": {
+      "max": 3
+     },
+     "dist": "sprint",
+     "piso": "terra"
+    },
+    {
+     "turno": 24,
+     "cat": "gp1",
+     "meta": {
+      "max": 5
+     },
+     "dist": "sprint",
+     "piso": "terra"
+    },
+    {
+     "turno": 32,
+     "cat": "prata",
+     "meta": {
+      "rival": "Algol"
+     },
+     "dist": "milha",
+     "piso": "terra"
+    },
+    {
+     "turno": 40,
+     "cat": "ouro",
+     "meta": {
+      "max": 3
+     },
+     "dist": "sprint",
+     "piso": "terra"
+    },
+    {
+     "turno": 48,
+     "cat": "gp2",
+     "meta": {
+      "max": 3
+     },
+     "dist": "sprint",
+     "piso": "terra"
+    }
+   ],
+   "capitulos": [
+    {
+     "turno": 1,
+     "titulo": "Cinco da manhã",
+     "texto": "{nome} já está na pista quando todo mundo acorda. E volta para a pista depois do jantar."
+    },
+    {
+     "turno": 14,
+     "titulo": "A provocadora",
+     "texto": "A Algol aparece na arquibancada e ri da estreia de {nome}. — Isso foi uma corrida ou um aquecimento?"
+    },
+    {
+     "turno": 25,
+     "titulo": "No terreno dela",
+     "texto": "A Algol desafia {nome} para uma corrida na Milha, a distância em que ela é mais forte."
+    },
+    {
+     "turno": 33,
+     "titulo": "Lanche proibido",
+     "texto": "{nome} aparece com um pacote de biscoitos escondido no uniforme e oferece metade."
+    },
+    {
+     "turno": 41,
+     "titulo": "Distância demais",
+     "texto": "{nome} tenta uma corrida longa por conta própria e passa mal no meio do caminho.",
+     "escolhas": [
+      {
+       "texto": "Apoiar e treinar o fôlego juntas",
+       "resultado": "Ela resmunga, mas aceita. — Só porque é você.",
+       "efeitos": {
+        "est": 15
+       }
+      },
+      {
+       "texto": "Mandar voltar para a Sprint",
+       "resultado": "Ela concorda rápido demais. A Sprint é o lugar dela.",
+       "efeitos": {
+        "pod": 15
+       }
+      }
+     ]
+    }
+   ],
+   "virada": {
+    "e": [
+     {
+      "venceu": [
+       48
+      ]
+     },
+     {
+      "top": [
+       40,
+       2
+      ]
+     },
+     {
+      "sem_lesao_desde": 25
+     }
+    ]
+   },
+   "caminhos": {
+    "A": {
+     "nome": "Sem freio",
+     "objetivos": [
+      {
+       "turno": 60,
+       "cat": "ouro",
+       "meta": {
+        "max": 1
+       },
+       "dist": "sprint",
+       "piso": "terra"
+      },
+      {
+       "turno": 72,
+       "cat": "gp3",
+       "meta": {
+        "max": 3
+       },
+       "dist": "sprint",
+       "piso": "terra"
+      }
+     ],
+     "capitulo": {
+      "turno": 49,
+      "titulo": "Sem freio",
+      "texto": "{nome} está inteira e mais rápida do que nunca. Ela quer o último ano no limite."
+     },
+     "final": {
+      "titulo": "Ninguém segura",
+      "texto": "{nome} vence a Algol na largada, e as duas apostam corrida até o refeitório."
+     }
+    },
+    "B": {
+     "nome": "Fôlego novo",
+     "objetivos": [
+      {
+       "turno": 60,
+       "cat": "ouro",
+       "meta": {
+        "max": 3
+       },
+       "dist": "milha",
+       "piso": "terra"
+      },
+      {
+       "turno": 72,
+       "cat": "gp3",
+       "meta": {
+        "max": 3,
+        "rival": "Algol"
+       },
+       "dist": "milha",
+       "piso": "terra"
+      }
+     ],
+     "capitulo": {
+      "turno": 49,
+      "titulo": "Respirar",
+      "texto": "{nome} aprende a respirar no meio da corrida. A Milha deixa de ser longe demais."
+     },
+     "final": {
+      "titulo": "Saber parar",
+      "texto": "{nome} aprende a respirar no meio da corrida e ganha uma distância nova."
+     }
+    }
+   }
+  },
+  "Shaula": {
+   "tema": "Uma garota que diz não ligar para nada carrega uma cidade inteira nas costas.",
+   "objetivos": [
+    {
+     "turno": 13,
+     "cat": "estreia",
+     "meta": {
+      "max": 5
+     },
+     "dist": "media",
+     "piso": "terra"
+    },
+    {
+     "turno": 20,
+     "cat": "aberta",
+     "meta": {
+      "max": 3
+     },
+     "dist": "media",
+     "piso": "terra"
+    },
+    {
+     "turno": 24,
+     "cat": "gp1",
+     "meta": {
+      "max": 5
+     },
+     "dist": "media",
+     "piso": "terra"
+    },
+    {
+     "turno": 32,
+     "cat": "prata",
+     "meta": {
+      "max": 5
+     },
+     "dist": "longa",
+     "piso": "grama"
+    },
+    {
+     "turno": 40,
+     "cat": "ouro",
+     "meta": {
+      "max": 3
+     },
+     "dist": "longa",
+     "piso": "terra"
+    },
+    {
+     "turno": 48,
+     "cat": "gp2",
+     "meta": {
+      "max": 3
+     },
+     "dist": "longa",
+     "piso": "terra"
+    }
+   ],
+   "capitulos": [
+    {
+     "turno": 1,
+     "titulo": "Terra batida",
+     "texto": "{nome} é a última a sair da pista toda noite. Quando você pergunta, ela diz que perdeu a hora."
+    },
+    {
+     "turno": 14,
+     "titulo": "Cidade pequena",
+     "texto": "Sem querer, {nome} conta que corria na terra da cidade natal antes de entrar na academia."
+    },
+    {
+     "turno": 25,
+     "titulo": "Grama alheia",
+     "texto": "A academia quer ver se {nome} corre na grama. Ela diz que tanto faz, mas treina o dobro."
+    },
+    {
+     "turno": 33,
+     "titulo": "Carta de casa",
+     "texto": "{nome} recebe uma carta da cidade natal e passa o dia inteiro calada.",
+     "escolhas": [
+      {
+       "texto": "Perguntar",
+       "resultado": "Ela demora, mas conta. A mãe dela escuta todas as corridas pelo rádio.",
+       "efeitos": {
+        "humor": 1,
+        "flag": "perguntou"
+       }
+      },
+      {
+       "texto": "Respeitar o silêncio",
+       "resultado": "Ela agradece com um aceno e volta para a pista.",
+       "efeitos": {
+        "det": 10
+       }
+      }
+     ]
+    },
+    {
+     "turno": 41,
+     "titulo": "Lira de novo",
+     "texto": "{nome} e a Lira brigam outra vez, agora na frente de todo mundo."
+    }
+   ],
+   "virada": {
+    "e": [
+     {
+      "flag": "perguntou"
+     },
+     {
+      "saidas_min": 1
+     }
+    ]
+   },
+   "caminhos": {
+    "A": {
+     "nome": "Raízes",
+     "objetivos": [
+      {
+       "turno": 60,
+       "cat": "ouro",
+       "meta": {
+        "max": 3
+       },
+       "dist": "media",
+       "piso": "terra"
+      },
+      {
+       "turno": 72,
+       "cat": "gp3",
+       "meta": {
+        "max": 3,
+        "rival": true
+       },
+       "dist": "longa",
+       "piso": "terra"
+      }
+     ],
+     "capitulo": {
+      "turno": 49,
+      "titulo": "De onde eu vim",
+      "texto": "{nome} começa a contar histórias da cidade natal no refeitório."
+     },
+     "final": {
+      "titulo": "Volta para casa",
+      "texto": "A cidade natal escuta o GP pelo rádio, e {nome} acena para a câmera pela primeira vez."
+     }
+    },
+    "B": {
+     "nome": "Sombra",
+     "objetivos": [
+      {
+       "turno": 60,
+       "cat": "ouro",
+       "meta": {
+        "max": 1
+       },
+       "dist": "longa",
+       "piso": "terra"
+      },
+      {
+       "turno": 72,
+       "cat": "gp3",
+       "meta": {
+        "max": 3
+       },
+       "dist": "longa",
+       "piso": "terra"
+      }
+     ],
+     "capitulo": {
+      "turno": 49,
+      "titulo": "Sombra",
+      "texto": "{nome} volta a ser a última a sair da pista, agora com a Lira do lado."
+     },
+     "final": {
+      "titulo": "Última na pista",
+      "texto": "{nome} vence e continua sendo a última a sair da pista, agora com a Lira do lado."
+     }
+    }
+   }
+  }
+ },
+ "arquetipos": {
+  "competitiva": {
+   "nome": "Competitiva",
+   "tema": "Quer vencer tudo agora e aprende que vencer também é esperar.",
+   "obj2": {
+    "turno": 20,
+    "cat": "aberta",
+    "meta": {
+     "max": 3
+    },
+    "onde": "casa"
+   },
+   "obj4": {
+    "turno": 32,
+    "cat": "prata",
+    "meta": {
+     "rival": true
+    },
+    "onde": "casa"
+   },
+   "virada": {
+    "e": [
+     {
+      "venceu": [
+       48
+      ]
+     },
+     {
+      "top": [
+       40,
+       2
+      ]
+     }
+    ]
+   },
+   "capitulos": [
+    {
+     "turno": 1,
+     "titulo": "Ainda não?!",
+     "texto": "{nome} descobre que vai passar seis meses sem correr e quase derruba a porta da sala da treinadora."
+    },
+    {
+     "turno": 14,
+     "titulo": "Primeira chegada",
+     "texto": "Depois da estreia, {rival} se apresenta para {nome}. — Bem-vinda. Vai demorar para me alcançar."
+    },
+    {
+     "turno": 25,
+     "titulo": "Quem é ela?",
+     "texto": "{rival} vence {nome} numa corrida qualquer, e {nome} passa a treinar sem parar."
+    }
+   ],
+   "caminhos": {
+    "A": {
+     "nome": "Coroa",
+     "objetivos": [
+      {
+       "turno": 60,
+       "cat": "ouro",
+       "meta": {
+        "max": 1
+       },
+       "onde": "casa"
+      },
+      {
+       "turno": 72,
+       "cat": "gp3",
+       "meta": {
+        "max": 3
+       },
+       "onde": "casa"
+      }
+     ],
+     "capitulo": {
+      "turno": 49,
+      "titulo": "Esperar também é correr",
+      "texto": "{nome} venceu. Agora ela precisa aprender a defender o que conquistou."
+     },
+     "final": {
+      "titulo": "Paciência de campeã",
+      "texto": "{nome} vira a referência das novatas da academia."
+     }
+    },
+    "B": {
+     "nome": "Revanche",
+     "objetivos": [
+      {
+       "turno": 60,
+       "cat": "ouro",
+       "meta": {
+        "max": 3
+       },
+       "onde": "casa"
+      },
+      {
+       "turno": 72,
+       "cat": "gp3",
+       "meta": {
+        "max": 3,
+        "rival": true
+       },
+       "onde": "casa"
+      }
+     ],
+     "capitulo": {
+      "turno": 49,
+      "titulo": "Ajuste de contas",
+      "texto": "{rival} continua na frente. {nome} passa o último ano de olho nela."
+     },
+     "final": {
+      "titulo": "Rival de respeito",
+      "texto": "{nome} e {rival} combinam de correr juntas no ano seguinte."
+     }
+    }
+   }
+  },
+  "capita": {
+   "nome": "Capitã",
+   "tema": "Cuida de todo mundo e precisa aprender a correr por si.",
+   "obj2": {
+    "turno": 20,
+    "cat": "aberta",
+    "meta": {
+     "max": 5,
+     "maratona": 2
+    },
+    "onde": "casa"
+   },
+   "obj4": {
+    "turno": 32,
+    "cat": "prata",
+    "meta": {
+     "max": 5
+    },
+    "onde": "vizinha"
+   },
+   "virada": {
+    "e": [
+     {
+      "flag": "grupo"
+     },
+     {
+      "top": [
+       48,
+       3
+      ]
+     }
+    ]
+   },
+   "capitulos": [
+    {
+     "turno": 1,
+     "titulo": "Monitora",
+     "texto": "{nome} vira responsável pelas novatas logo no primeiro dia e decora o nome de todas."
+    },
+    {
+     "turno": 14,
+     "titulo": "Todas juntas",
+     "texto": "{nome} leva as novatas para correr as Abertas com ela."
+    },
+    {
+     "turno": 25,
+     "titulo": "Escolha",
+     "texto": "Uma novata pede ajuda na véspera de uma corrida importante de {nome}.",
+     "escolhas": [
+      {
+       "texto": "Cuidar do grupo",
+       "resultado": "{nome} passa a noite ajudando a novata. As duas dormem tarde, e felizes.",
+       "efeitos": {
+        "humor": 1,
+        "flag": "grupo"
+       }
+      },
+      {
+       "texto": "Focar em si",
+       "resultado": "{nome} pede desculpas e vai dormir cedo. Treina melhor no dia seguinte.",
+       "efeitos": {
+        "det": 10
+       }
+      }
+     ]
+    }
+   ],
+   "caminhos": {
+    "A": {
+     "nome": "Capitã da academia",
+     "objetivos": [
+      {
+       "turno": 60,
+       "cat": "ouro",
+       "meta": {
+        "max": 3
+       },
+       "onde": "casa"
+      },
+      {
+       "turno": 72,
+       "cat": "gp3",
+       "meta": {
+        "max": 3,
+        "rival": true
+       },
+       "onde": "casa"
+      }
+     ],
+     "capitulo": {
+      "turno": 49,
+      "titulo": "Faixa de capitã",
+      "texto": "A academia escolhe {nome} como capitã. Agora todas correm atrás dela."
+     },
+     "final": {
+      "titulo": "Todas na foto",
+      "texto": "A academia inteira aparece na foto do pódio de {nome}."
+     }
+    },
+    "B": {
+     "nome": "Voo solo",
+     "objetivos": [
+      {
+       "turno": 60,
+       "cat": "ouro",
+       "meta": {
+        "max": 1
+       },
+       "onde": "casa"
+      },
+      {
+       "turno": 72,
+       "cat": "gp3",
+       "meta": {
+        "max": 3
+       },
+       "onde": "casa"
+      }
+     ],
+     "capitulo": {
+      "turno": 49,
+      "titulo": "Só eu e a pista",
+      "texto": "{nome} entrega a faixa de monitora e treina sozinha pela primeira vez."
+     },
+     "final": {
+      "titulo": "A estrada é minha",
+      "texto": "{nome} corre o Grande Prêmio sem olhar para trás."
+     }
+    }
+   }
+  },
+  "durona": {
+   "nome": "Durona",
+   "tema": "Só sabe ir com tudo e aprende a ouvir o corpo.",
+   "obj2": {
+    "turno": 20,
+    "cat": "aberta",
+    "meta": {
+     "max": 3
+    },
+    "onde": "casa"
+   },
+   "obj4": {
+    "turno": 32,
+    "cat": "prata",
+    "meta": {
+     "max": 5
+    },
+    "onde": "outro_piso"
+   },
+   "virada": {
+    "e": [
+     {
+      "venceu": [
+       48
+      ]
+     },
+     {
+      "sem_lesao_desde": 25
+     }
+    ]
+   },
+   "capitulos": [
+    {
+     "turno": 1,
+     "titulo": "Antes do sol",
+     "texto": "{nome} treina antes de todo mundo acordar e reclama que o dia é curto."
+    },
+    {
+     "turno": 14,
+     "titulo": "Mais um",
+     "texto": "{nome} esconde uma dor no tornozelo para não perder treino."
+    },
+    {
+     "turno": 25,
+     "titulo": "Chão diferente",
+     "texto": "A treinadora quer ver {nome} correndo no outro piso. — Chão é chão."
+    }
+   ],
+   "caminhos": {
+    "A": {
+     "nome": "Sem limites",
+     "objetivos": [
+      {
+       "turno": 60,
+       "cat": "ouro",
+       "meta": {
+        "max": 1
+       },
+       "onde": "casa"
+      },
+      {
+       "turno": 72,
+       "cat": "gp3",
+       "meta": {
+        "max": 3
+       },
+       "onde": "casa"
+      }
+     ],
+     "capitulo": {
+      "turno": 49,
+      "titulo": "Sem freio",
+      "texto": "{nome} chega inteira ao último ano e quer tudo no limite."
+     },
+     "final": {
+      "titulo": "Ninguém segura",
+      "texto": "Ninguém segura {nome} na reta final."
+     }
+    },
+    "B": {
+     "nome": "Corpo e cabeça",
+     "objetivos": [
+      {
+       "turno": 60,
+       "cat": "ouro",
+       "meta": {
+        "max": 3
+       },
+       "onde": "vizinha"
+      },
+      {
+       "turno": 72,
+       "cat": "gp3",
+       "meta": {
+        "max": 3,
+        "rival": true
+       },
+       "onde": "casa"
+      }
+     ],
+     "capitulo": {
+      "turno": 49,
+      "titulo": "Respirar",
+      "texto": "{nome} aprende que descansar também é treino."
+     },
+     "final": {
+      "titulo": "Saber parar",
+      "texto": "{nome} aprende a parar a tempo e ganha uma distância nova."
+     }
+    }
+   }
+  },
+  "estrategista": {
+   "nome": "Estrategista",
+   "tema": "Planeja tudo e descobre o valor do improviso.",
+   "obj2": {
+    "turno": 20,
+    "cat": "aberta",
+    "meta": {
+     "max": 3
+    },
+    "onde": "casa"
+   },
+   "obj4": {
+    "turno": 32,
+    "cat": "prata",
+    "meta": {
+     "rival": true
+    },
+    "onde": "casa"
+   },
+   "virada": {
+    "e": [
+     {
+      "flag": "plano"
+     },
+     {
+      "top": [
+       48,
+       2
+      ]
+     }
+    ]
+   },
+   "capitulos": [
+    {
+     "turno": 1,
+     "titulo": "Planilha",
+     "texto": "{nome} já sabe o tempo de todas as veteranas antes do primeiro treino."
+    },
+    {
+     "turno": 14,
+     "titulo": "Variável nova",
+     "texto": "{rival} não faz nada do que {nome} previu."
+    },
+    {
+     "turno": 25,
+     "titulo": "O plano",
+     "texto": "{nome} mostra um plano para chegar ao Grande Prêmio.",
+     "escolhas": [
+      {
+       "texto": "Seguir à risca",
+       "resultado": "{nome} sublinha o plano duas vezes.",
+       "efeitos": {
+        "int": 15,
+        "flag": "plano"
+       }
+      },
+      {
+       "texto": "Deixar margem",
+       "resultado": "{nome} apaga uma linha do plano, a contragosto.",
+       "efeitos": {
+        "humor": 1
+       }
+      }
+     ]
+    }
+   ],
+   "caminhos": {
+    "A": {
+     "nome": "Tudo previsto",
+     "objetivos": [
+      {
+       "turno": 60,
+       "cat": "ouro",
+       "meta": {
+        "max": 1
+       },
+       "onde": "casa"
+      },
+      {
+       "turno": 72,
+       "cat": "gp3",
+       "meta": {
+        "max": 3
+       },
+       "onde": "casa"
+      }
+     ],
+     "capitulo": {
+      "turno": 49,
+      "titulo": "Execução",
+      "texto": "O plano está funcionando. Falta executar o resto."
+     },
+     "final": {
+      "titulo": "Tudo como previsto",
+      "texto": "Tudo sai exatamente como {nome} planejou."
+     }
+    },
+    "B": {
+     "nome": "Fora do roteiro",
+     "objetivos": [
+      {
+       "turno": 60,
+       "cat": "ouro",
+       "meta": {
+        "max": 3
+       },
+       "onde": "vizinha"
+      },
+      {
+       "turno": 72,
+       "cat": "gp3",
+       "meta": {
+        "max": 3,
+        "rival": true
+       },
+       "onde": "casa"
+      }
+     ],
+     "capitulo": {
+      "turno": 49,
+      "titulo": "Sem mapa",
+      "texto": "{nome} deixa a planilha de lado e corre uma distância nova."
+     },
+     "final": {
+      "titulo": "Fora do roteiro",
+      "texto": "A melhor corrida de {nome} foi a que ela não planejou."
+     }
+    }
+   }
+  },
+  "leal": {
+   "nome": "Leal",
+   "tema": "Corre por uma promessa e descobre o que quer para si.",
+   "obj2": {
+    "turno": 20,
+    "cat": "aberta",
+    "meta": {
+     "max": 5,
+     "maratona": 2
+    },
+    "onde": "casa"
+   },
+   "obj4": {
+    "turno": 32,
+    "cat": "prata",
+    "meta": {
+     "rival": true
+    },
+    "onde": "casa"
+   },
+   "virada": {
+    "saidas_min": 2
+   },
+   "capitulos": [
+    {
+     "turno": 1,
+     "titulo": "A promessa",
+     "texto": "{nome} prometeu a alguém de casa que correria o Grande Prêmio."
+    },
+    {
+     "turno": 14,
+     "titulo": "Carta",
+     "texto": "Depois da estreia chega uma carta de casa, com um desenho de {nome} cruzando a chegada."
+    },
+    {
+     "turno": 25,
+     "titulo": "Do outro lado",
+     "texto": "{rival} é alguém que {nome} conhece desde pequena."
+    }
+   ],
+   "caminhos": {
+    "A": {
+     "nome": "Promessa",
+     "objetivos": [
+      {
+       "turno": 60,
+       "cat": "ouro",
+       "meta": {
+        "max": 3
+       },
+       "onde": "casa"
+      },
+      {
+       "turno": 72,
+       "cat": "gp3",
+       "meta": {
+        "max": 3,
+        "rival": true
+       },
+       "onde": "casa"
+      }
+     ],
+     "capitulo": {
+      "turno": 49,
+      "titulo": "Cumprir",
+      "texto": "{nome} conta para você quem fez a promessa com ela."
+     },
+     "final": {
+      "titulo": "Promessa cumprida",
+      "texto": "{nome} cumpre a promessa e liga para casa ainda de uniforme."
+     }
+    },
+    "B": {
+     "nome": "Por mim",
+     "objetivos": [
+      {
+       "turno": 60,
+       "cat": "ouro",
+       "meta": {
+        "max": 1
+       },
+       "onde": "casa"
+      },
+      {
+       "turno": 72,
+       "cat": "gp3",
+       "meta": {
+        "max": 3
+       },
+       "onde": "casa"
+      }
+     ],
+     "capitulo": {
+      "turno": 49,
+      "titulo": "Minha corrida",
+      "texto": "{nome} percebe que agora corre por ela mesma."
+     },
+     "final": {
+      "titulo": "Correr por mim",
+      "texto": "{nome} vence por ela mesma, e gosta disso."
+     }
+    }
+   }
+  },
+  "perfeccionista": {
+   "nome": "Perfeccionista",
+   "tema": "Nunca está satisfeita e aprende que bom também é bom.",
+   "obj2": {
+    "turno": 20,
+    "cat": "aberta",
+    "meta": {
+     "max": 3
+    },
+    "onde": "casa"
+   },
+   "obj4": {
+    "turno": 32,
+    "cat": "prata",
+    "meta": {
+     "max": 5
+    },
+    "onde": "vizinha"
+   },
+   "virada": {
+    "vitorias_min": 10
+   },
+   "capitulos": [
+    {
+     "turno": 1,
+     "titulo": "Cronômetro",
+     "texto": "{nome} refaz o mesmo treino até sair perfeito."
+    },
+    {
+     "turno": 14,
+     "titulo": "Segundo lugar",
+     "texto": "{nome} trata um segundo lugar como derrota."
+    },
+    {
+     "turno": 25,
+     "titulo": "Fora do lugar",
+     "texto": "Uma corrida numa distância que {nome} não domina."
+    }
+   ],
+   "caminhos": {
+    "A": {
+     "nome": "Recorde",
+     "objetivos": [
+      {
+       "turno": 60,
+       "cat": "ouro",
+       "meta": {
+        "max": 1
+       },
+       "onde": "casa"
+      },
+      {
+       "turno": 72,
+       "cat": "gp3",
+       "meta": {
+        "max": 3
+       },
+       "onde": "casa"
+      }
+     ],
+     "capitulo": {
+      "turno": 49,
+      "titulo": "Décimo de segundo",
+      "texto": "{nome} está atrás de um recorde, décimo por décimo."
+     },
+     "final": {
+      "titulo": "Recorde",
+      "texto": "O tempo de {nome} vai para o quadro da academia."
+     }
+    },
+    "B": {
+     "nome": "Bom o bastante",
+     "objetivos": [
+      {
+       "turno": 60,
+       "cat": "ouro",
+       "meta": {
+        "max": 3
+       },
+       "onde": "casa"
+      },
+      {
+       "turno": 72,
+       "cat": "gp3",
+       "meta": {
+        "max": 3,
+        "rival": true
+       },
+       "onde": "casa"
+      }
+     ],
+     "capitulo": {
+      "turno": 49,
+      "titulo": "Respirar fundo",
+      "texto": "{nome} aprende a comemorar o que deu certo."
+     },
+     "final": {
+      "titulo": "Bom o bastante",
+      "texto": "{nome} sorri no pódio pela primeira vez."
+     }
+    }
+   }
+  },
+  "estrela": {
+   "nome": "Estrela",
+   "tema": "Brilha com plateia e descobre se corre pelos aplausos ou pela pista.",
+   "obj2": {
+    "turno": 20,
+    "cat": "aberta",
+    "meta": {
+     "max": 5,
+     "maratona": 2
+    },
+    "onde": "casa"
+   },
+   "obj4": {
+    "turno": 32,
+    "cat": "prata",
+    "meta": {
+     "max": 5
+    },
+    "onde": "vizinha"
+   },
+   "virada": {
+    "fama_min": 7500
+   },
+   "capitulos": [
+    {
+     "turno": 1,
+     "titulo": "Primeira foto",
+     "texto": "{nome} quer ser famosa antes de correr a primeira vez."
+    },
+    {
+     "turno": 14,
+     "titulo": "Fã",
+     "texto": "Aparece a primeira fã de {nome}."
+    },
+    {
+     "turno": 25,
+     "titulo": "Turnê",
+     "texto": "{nome} quer correr em todo lugar."
+    }
+   ],
+   "caminhos": {
+    "A": {
+     "nome": "Holofote",
+     "objetivos": [
+      {
+       "turno": 60,
+       "cat": "ouro",
+       "meta": {
+        "max": 3,
+        "maratona": 2
+       },
+       "onde": "casa"
+      },
+      {
+       "turno": 72,
+       "cat": "gp3",
+       "meta": {
+        "max": 3,
+        "rival": true
+       },
+       "onde": "casa"
+      }
+     ],
+     "capitulo": {
+      "turno": 49,
+      "titulo": "Palco",
+      "texto": "{nome} é a mais famosa da academia, e todas querem um show."
+     },
+     "final": {
+      "titulo": "Palco e pista",
+      "texto": "{nome} faz o show depois da corrida, e a arquibancada canta junto."
+     }
+    },
+    "B": {
+     "nome": "Pista vazia",
+     "objetivos": [
+      {
+       "turno": 60,
+       "cat": "ouro",
+       "meta": {
+        "max": 1
+       },
+       "onde": "casa"
+      },
+      {
+       "turno": 72,
+       "cat": "gp3",
+       "meta": {
+        "max": 3
+       },
+       "onde": "casa"
+      }
+     ],
+     "capitulo": {
+      "turno": 49,
+      "titulo": "Madrugada",
+      "texto": "{nome} começa a treinar quando ninguém está olhando."
+     },
+     "final": {
+      "titulo": "Sem plateia",
+      "texto": "{nome} percebe que não precisa de ninguém olhando."
+     }
+    }
+   }
+  },
+  "festeira": {
+   "nome": "Festeira",
+   "tema": "Faz amizade com todas, atrapalha o treino e aprende a hora de focar.",
+   "obj2": {
+    "turno": 20,
+    "cat": "aberta",
+    "meta": {
+     "max": 3
+    },
+    "onde": "casa"
+   },
+   "obj4": {
+    "turno": 32,
+    "cat": "prata",
+    "meta": {
+     "max": 5
+    },
+    "onde": "outro_piso"
+   },
+   "virada": {
+    "festivais_min": 1
+   },
+   "capitulos": [
+    {
+     "turno": 1,
+     "titulo": "Boas-vindas",
+     "texto": "{nome} organiza uma festa no primeiro dia."
+    },
+    {
+     "turno": 14,
+     "titulo": "Depois da festa",
+     "texto": "{nome} chega cansada num treino importante."
+    },
+    {
+     "turno": 25,
+     "titulo": "Todo mundo convidado",
+     "texto": "Até {rival} vai à festa de {nome}."
+    }
+   ],
+   "caminhos": {
+    "A": {
+     "nome": "Rainha da festa",
+     "objetivos": [
+      {
+       "turno": 60,
+       "cat": "ouro",
+       "meta": {
+        "max": 3
+       },
+       "onde": "casa"
+      },
+      {
+       "turno": 72,
+       "cat": "gp3",
+       "meta": {
+        "max": 3,
+        "rival": true
+       },
+       "onde": "casa"
+      }
+     ],
+     "capitulo": {
+      "turno": 49,
+      "titulo": "A festa continua",
+      "texto": "{nome} decide que dá para festejar e vencer."
+     },
+     "final": {
+      "titulo": "Rainha da festa",
+      "texto": "A comemoração do Grande Prêmio é a maior que a academia já viu."
+     }
+    },
+    "B": {
+     "nome": "Hora de focar",
+     "objetivos": [
+      {
+       "turno": 60,
+       "cat": "ouro",
+       "meta": {
+        "max": 1
+       },
+       "onde": "casa"
+      },
+      {
+       "turno": 72,
+       "cat": "gp3",
+       "meta": {
+        "max": 3
+       },
+       "onde": "casa"
+      }
+     ],
+     "capitulo": {
+      "turno": 49,
+      "titulo": "Luzes apagadas",
+      "texto": "{nome} desmarca todas as festas do último ano."
+     },
+     "final": {
+      "titulo": "Hora de focar",
+      "texto": "{nome} comemora sozinha, com um sorvete."
+     }
+    }
+   }
+  },
+  "curiosa": {
+   "nome": "Curiosa",
+   "tema": "Quer testar tudo e descobre onde é a casa dela.",
+   "obj2": {
+    "turno": 20,
+    "cat": "aberta",
+    "meta": {
+     "max": 5
+    },
+    "onde": "vizinha"
+   },
+   "obj4": {
+    "turno": 32,
+    "cat": "prata",
+    "meta": {
+     "max": 5
+    },
+    "onde": "outro_piso"
+   },
+   "virada": {
+    "distancias_top3_min": 4
+   },
+   "capitulos": [
+    {
+     "turno": 1,
+     "titulo": "E se?",
+     "texto": "{nome} pergunta tudo sobre todas as pistas."
+    },
+    {
+     "turno": 14,
+     "titulo": "Outra distância",
+     "texto": "{nome} quer correr fora de casa logo depois da estreia."
+    },
+    {
+     "turno": 25,
+     "titulo": "Chão novo",
+     "texto": "{nome} pede para correr no outro piso."
+    }
+   ],
+   "caminhos": {
+    "A": {
+     "nome": "Exploradora",
+     "objetivos": [
+      {
+       "turno": 60,
+       "cat": "ouro",
+       "meta": {
+        "max": 3
+       },
+       "onde": "vizinha"
+      },
+      {
+       "turno": 72,
+       "cat": "gp3",
+       "meta": {
+        "max": 3
+       },
+       "onde": "vizinha"
+      }
+     ],
+     "capitulo": {
+      "turno": 49,
+      "titulo": "Mapa completo",
+      "texto": "{nome} quer fechar o caderno com todas as distâncias."
+     },
+     "final": {
+      "titulo": "Exploradora",
+      "texto": "{nome} coleciona as quatro distâncias no caderno."
+     }
+    },
+    "B": {
+     "nome": "Volta para casa",
+     "objetivos": [
+      {
+       "turno": 60,
+       "cat": "ouro",
+       "meta": {
+        "max": 1
+       },
+       "onde": "casa"
+      },
+      {
+       "turno": 72,
+       "cat": "gp3",
+       "meta": {
+        "max": 3
+       },
+       "onde": "casa"
+      }
+     ],
+     "capitulo": {
+      "turno": 49,
+      "titulo": "O caminho de volta",
+      "texto": "{nome} percebe que gosta mesmo é da distância dela."
+     },
+     "final": {
+      "titulo": "Volta para casa",
+      "texto": "{nome} vence em casa e diz que sempre soube."
+     }
+    }
+   }
+  },
+  "sonhadora": {
+   "nome": "Sonhadora",
+   "tema": "Distraída o ano todo, acorda na reta final.",
+   "obj2": {
+    "turno": 20,
+    "cat": "aberta",
+    "meta": {
+     "max": 3
+    },
+    "onde": "casa"
+   },
+   "obj4": {
+    "turno": 32,
+    "cat": "prata",
+    "meta": {
+     "rival": true
+    },
+    "onde": "casa"
+   },
+   "virada": {
+    "viradas_min": 2
+   },
+   "capitulos": [
+    {
+     "turno": 1,
+     "titulo": "Nas nuvens",
+     "texto": "{nome} esquece o horário do treino olhando o céu."
+    },
+    {
+     "turno": 14,
+     "titulo": "Lá atrás",
+     "texto": "{nome} larga em último na estreia e ninguém entende."
+    },
+    {
+     "turno": 25,
+     "titulo": "Reta final",
+     "texto": "{nome} só parece acordar nos últimos metros."
+    }
+   ],
+   "caminhos": {
+    "A": {
+     "nome": "Acordada",
+     "objetivos": [
+      {
+       "turno": 60,
+       "cat": "ouro",
+       "meta": {
+        "max": 1
+       },
+       "onde": "casa"
+      },
+      {
+       "turno": 72,
+       "cat": "gp3",
+       "meta": {
+        "max": 3
+       },
+       "onde": "casa"
+      }
+     ],
+     "capitulo": {
+      "turno": 49,
+      "titulo": "Desperta",
+      "texto": "{nome} acorda de vez."
+     },
+     "final": {
+      "titulo": "Do fundo",
+      "texto": "{nome} larga em último e cruza em primeiro."
+     }
+    },
+    "B": {
+     "nome": "Céu aberto",
+     "objetivos": [
+      {
+       "turno": 60,
+       "cat": "ouro",
+       "meta": {
+        "max": 3
+       },
+       "onde": "vizinha"
+      },
+      {
+       "turno": 72,
+       "cat": "gp3",
+       "meta": {
+        "max": 3,
+        "rival": true
+       },
+       "onde": "casa"
+      }
+     ],
+     "capitulo": {
+      "turno": 49,
+      "titulo": "Nuvens",
+      "texto": "{nome} volta a olhar o céu no caminho do treino."
+     },
+     "final": {
+      "titulo": "Corre porque gosta",
+      "texto": "{nome} corre porque gosta, e isso basta."
+     }
+    }
+   }
+  },
+  "misteriosa": {
+   "nome": "Misteriosa",
+   "tema": "Esconde um passado e decide se mostra quem é.",
+   "obj2": {
+    "turno": 20,
+    "cat": "aberta",
+    "meta": {
+     "max": 3
+    },
+    "onde": "casa"
+   },
+   "obj4": {
+    "turno": 32,
+    "cat": "prata",
+    "meta": {
+     "max": 5
+    },
+    "onde": "outro_piso"
+   },
+   "virada": {
+    "flag": "perguntou"
+   },
+   "capitulos": [
+    {
+     "turno": 1,
+     "titulo": "Ninguém sabe",
+     "texto": "{nome} não fala de onde veio."
+    },
+    {
+     "turno": 14,
+     "titulo": "Foto antiga",
+     "texto": "Cai uma foto antiga da mochila de {nome}."
+    },
+    {
+     "turno": 25,
+     "titulo": "Pergunta",
+     "texto": "{nome} está olhando a foto de novo.",
+     "escolhas": [
+      {
+       "texto": "Perguntar",
+       "resultado": "{nome} demora, mas conta um pouco.",
+       "efeitos": {
+        "humor": 1,
+        "flag": "perguntou"
+       }
+      },
+      {
+       "texto": "Respeitar o silêncio",
+       "resultado": "{nome} guarda a foto e agradece com um aceno.",
+       "efeitos": {
+        "det": 10
+       }
+      }
+     ]
+    }
+   ],
+   "caminhos": {
+    "A": {
+     "nome": "Raízes",
+     "objetivos": [
+      {
+       "turno": 60,
+       "cat": "ouro",
+       "meta": {
+        "max": 3
+       },
+       "onde": "vizinha"
+      },
+      {
+       "turno": 72,
+       "cat": "gp3",
+       "meta": {
+        "max": 3,
+        "rival": true
+       },
+       "onde": "casa"
+      }
+     ],
+     "capitulo": {
+      "turno": 49,
+      "titulo": "De onde eu vim",
+      "texto": "{nome} começa a contar histórias de casa."
+     },
+     "final": {
+      "titulo": "Volta para casa",
+      "texto": "{nome} acena para a câmera, para alguém de casa."
+     }
+    },
+    "B": {
+     "nome": "Sombra",
+     "objetivos": [
+      {
+       "turno": 60,
+       "cat": "ouro",
+       "meta": {
+        "max": 1
+       },
+       "onde": "casa"
+      },
+      {
+       "turno": 72,
+       "cat": "gp3",
+       "meta": {
+        "max": 3
+       },
+       "onde": "casa"
+      }
+     ],
+     "capitulo": {
+      "turno": 49,
+      "titulo": "Sombra",
+      "texto": "{nome} volta a treinar sozinha até tarde."
+     },
+     "final": {
+      "titulo": "Última na pista",
+      "texto": "{nome} vence e continua sendo a última a sair da pista."
+     }
+    }
+   }
+  },
+  "teimosa": {
+   "nome": "Teimosa",
+   "tema": "Faz tudo do jeito dela e aprende a ouvir, ou prova que estava certa.",
+   "obj2": {
+    "turno": 20,
+    "cat": "aberta",
+    "meta": {
+     "max": 3
+    },
+    "onde": "casa"
+   },
+   "obj4": {
+    "turno": 32,
+    "cat": "prata",
+    "meta": {
+     "rival": true
+    },
+    "onde": "casa"
+   },
+   "virada": {
+    "e": [
+     {
+      "flag": "jeito_dela"
+     },
+     {
+      "top": [
+       48,
+       2
+      ]
+     }
+    ]
+   },
+   "capitulos": [
+    {
+     "turno": 1,
+     "titulo": "Não",
+     "texto": "{nome} recusa o plano de treino no primeiro dia."
+    },
+    {
+     "turno": 14,
+     "titulo": "Eu avisei",
+     "texto": "{nome} ignora a instrução da treinadora na estreia."
+    },
+    {
+     "turno": 25,
+     "titulo": "Briga",
+     "texto": "{nome} e a treinadora discutem sobre o plano do ano.",
+     "escolhas": [
+      {
+       "texto": "Deixar do jeito dela",
+       "resultado": "{nome} cruza os braços, satisfeita.",
+       "efeitos": {
+        "det": 15,
+        "flag": "jeito_dela"
+       }
+      },
+      {
+       "texto": "Impor o plano",
+       "resultado": "{nome} bufa, mas segue o plano.",
+       "efeitos": {
+        "int": 15
+       }
+      }
+     ]
+    }
+   ],
+   "caminhos": {
+    "A": {
+     "nome": "Do meu jeito",
+     "objetivos": [
+      {
+       "turno": 60,
+       "cat": "ouro",
+       "meta": {
+        "max": 1
+       },
+       "onde": "casa"
+      },
+      {
+       "turno": 72,
+       "cat": "gp3",
+       "meta": {
+        "max": 3
+       },
+       "onde": "casa"
+      }
+     ],
+     "capitulo": {
+      "turno": 49,
+      "titulo": "Do meu jeito",
+      "texto": "{nome} estava certa até aqui."
+     },
+     "final": {
+      "titulo": "Eu avisei",
+      "texto": "{nome} vence do jeito que sempre disse."
+     }
+    },
+    "B": {
+     "nome": "Ouvir",
+     "objetivos": [
+      {
+       "turno": 60,
+       "cat": "ouro",
+       "meta": {
+        "max": 3
+       },
+       "onde": "vizinha"
+      },
+      {
+       "turno": 72,
+       "cat": "gp3",
+       "meta": {
+        "max": 3,
+        "rival": true
+       },
+       "onde": "casa"
+      }
+     ],
+     "capitulo": {
+      "turno": 49,
+      "titulo": "Escutar",
+      "texto": "{nome} pede um conselho pela primeira vez."
+     },
+     "final": {
+      "titulo": "A treinadora tinha razão",
+      "texto": "E {nome} admite isso em público."
+     }
+    }
+   }
+  }
+ },
+ "arquetipo_por_garota": {
+  "Altair": "competitiva",
+  "Electra": "durona",
+  "Spica": "leal",
+  "Adara": "estrela",
+  "Maia": "festeira",
+  "Alcione": "teimosa",
+  "Cassiopeia": "estrategista",
+  "Vela": "leal",
+  "Auriga": "curiosa",
+  "Carina": "sonhadora",
+  "Alya": "capita",
+  "Alcor": "estrategista",
+  "Alhena": "festeira",
+  "Mizar": "teimosa",
+  "Dubhe": "sonhadora",
+  "Almach": "capita",
+  "Elnath": "competitiva",
+  "Nunki": "perfeccionista",
+  "Ankaa": "curiosa",
+  "Zosma": "misteriosa",
+  "Mintaka": "durona",
+  "Mérope": "perfeccionista",
+  "Celeno": "estrela",
+  "Andrômeda": "festeira",
+  "Bellatrix": "misteriosa",
+  "Columba": "competitiva",
+  "Fênix": "leal",
+  "Corona": "perfeccionista",
+  "Hidra": "estrela",
+  "Zaniah": "festeira",
+  "Tucana": "teimosa",
+  "Deneb": "capita",
+  "Albireo": "estrategista",
+  "Hamal": "leal",
+  "Achernar": "estrela",
+  "Mimosa": "sonhadora",
+  "Mirach": "misteriosa",
+  "Saiph": "capita",
+  "Alnair": "durona",
+  "Naos": "estrategista",
+  "Avior": "curiosa",
+  "Atria": "misteriosa"
+ }
+}

@@ -62,7 +62,7 @@ func _comecar_carreira(nome: String) -> void:
 	if carreira.vinculo > 0:
 		extra = " Vínculo %d: +%d em cada atributo e limite de %d." % [
 			carreira.vinculo, Carreira.BAL.vinculo_attr * carreira.vinculo, carreira.limite]
-	mostrar_carreira("Começa a carreira de %s! Dois anos, 5 objetivos e um mapa de rotas novo a cada carreira.%s" % [carreira.nome, extra])
+	mostrar_carreira("Começa a carreira de %s! Três anos, 8 objetivos e um mapa de rotas novo a cada carreira.%s" % [carreira.nome, extra])
 
 
 func _continuar_carreira() -> void:
@@ -88,7 +88,8 @@ func mostrar_carreira(msg: String = "") -> void:
 func mostrar_corrida() -> void:
 	var dados := carreira.montar_corrida(Dados.garotas)
 	var t := TelaCorrida.new(dados, carreira.cor)
-	t.terminou.connect(func(pos): mostrar_carreira(carreira.registrar_corrida(pos)))
+	t.terminou.connect(func(pos): mostrar_carreira(carreira.registrar_corrida(pos,
+		Carreira.extra_da_corrida(dados, t.sim.classificacao(), t.sim.ordem_meio))))
 	_trocar(t)
 
 

@@ -2,7 +2,7 @@
 
 > Versão 0.5 — 2026-11-17. Na v0.5 entrou o modelo de **campanha única**, com a da Lira como exemplo. Na v0.3 as garotas perderam o sobrenome (Lira Alazã → Lira). Na v0.2 todas foram renomeadas com nomes de estrelas: Nina → Nashira, Brisa → Mira, Vega → Capela, Tainá → Antares, Cora → Shaula, Estela → Polaris, Íris → Algol. Complementa o [GDD](GDD.md).
 > Cada garota tem só o nome de uma **estrela ou constelação**, sem sobrenome (na v0.3 saíram as pelagens). Evitamos nomes usados em outros jogos do gênero (ex.: Vega, Sirius).
-> Na v0.4 (2026-11-17) elas viraram **garotas gato**. Cada uma ganhou uma **pelagem**, que define as cores do modelo 3D (cabelo, orelhas e rabo) e combina com a cor dela na interface. As 42 garotas só com dados ganham pelagem sorteada pelo gerador quando os modelos entrarem.
+> Na v0.4 (2026-11-17) elas viraram **garotas gato**. Cada uma ganhou uma **pelagem**, que define as cores do modelo 3D (cabelo, orelhas e rabo) e combina com a cor dela na interface. Signo, aniversário, pelagem, corpo e personalidade de todas as 48 (e das rivais) estão em [visual-elenco.md](visual-elenco.md).
 > Atributos iniciais e efeitos de habilidade são **(inicial)**, ou seja, valores para balancear.
 
 ## Visão geral

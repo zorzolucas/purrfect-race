@@ -197,7 +197,7 @@ Muda com encontros, descanso, saídas, vitórias, derrotas e falhas.
 - Podem acontecer em qualquer turno (mais chance ao **Sair**).
 - São um diálogo curto com outra garota do elenco ou com uma rival, com **2 ou 3 escolhas**. Cada escolha tem efeitos (humor, atributos, energia, habilidade).
 - Repetir encontros sobe a **afinidade** entre o par. Afinidade alta libera o **treino em dupla**.
-- A afinidade vai de **0 a 100**. Alguns pares começam com **afinidade inicial**: amizade (inicial: +20) ou atrito (inicial: −10). Esses pares estão definidos no [elenco](elenco.md).
+- A afinidade vai de **0 a 100**. Alguns pares começam com **afinidade inicial**: amizade (inicial: +20) ou atrito (inicial: −10). Esses pares estão definidos no [elenco](elenco.md). Garotas de signos do mesmo elemento ganham mais +5, e cada garota tem um encontro de aniversário ([visual do elenco](visual-elenco.md) §3).
 - Isso substitui qualquer sistema de "cartas de suporte".
 - No MVP: **encontros genéricos** (servem para qualquer par) + os **capítulos de história** da campanha de cada garota ([calendário](calendario.md) §3.2).
 
@@ -354,7 +354,7 @@ Referências que o Lucas mandou: modelagem de personagem low-poly anime no Blend
 
 ### 11.2 Personagens
 
-- **Base única** de corpo para todas as garotas (~2.500 a 4.000 triângulos), com variações de cabelo, roupa, orelhas e rabo. Assim 48 garotas não viram 48 modelos do zero.
+- **Base única** de corpo para todas as garotas (~2.500 a 4.000 triângulos), com variações de cabelo e roupa, **3 alturas × 2 portes** por escala de ossos, e **orelhas e rabo com formato próprio** por garota ([visual do elenco](visual-elenco.md)). Assim 48 garotas não viram 48 modelos do zero.
 - **Orelhas e rabo** têm ossos próprios. O rabo é uma corrente de ossos com balanço físico simples, e as orelhas giram para mostrar emoção (em pé, de lado, para trás).
 - **Cor por paleta:** o modelo usa uma textura pequena de paleta (um quadrado por cor). Trocar a pelagem é trocar a paleta, sem refazer o modelo.
 - **Rosto:** olhos e boca como **textura trocável** (atlas de expressões), não como malha. Expressões do MVP: normal, feliz, determinada, cansada, triste, surpresa.
@@ -408,6 +408,7 @@ Da análise de UI das referências: personagem grande no centro e informação e
 ## 13. Documentos relacionados
 
 - [Elenco](elenco.md): as 6 garotas do MVP com eventos, 2 rivais e o elenco completo de 48.
+- [Visual do elenco](visual-elenco.md): signo, aniversário, pelagem, corpo, orelhas, rabo e personalidade de cada garota.
 - [Calendário da carreira](calendario.md): turnos, objetivos, mapa de rotas, clima, amuletos, semente, magnitude, fama e férias.
 - [Campanhas e balanceamento](campanhas.md): metas de dificuldade, endgame, as campanhas do MVP, os 12 arquétipos das outras 42 garotas e o plano do bot.
 - [MCP do Blender](mcp-blender.md) e [MCP do Godot](mcp-godot.md): ferramentas para modelar e montar o jogo.

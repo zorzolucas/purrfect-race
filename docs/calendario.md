@@ -1,21 +1,26 @@
 # Nekomusume — Calendário da Carreira
 
-> Versão 0.3 — 2026-11-12. Complementa o [GDD](GDD.md) §4.
+> Versão 0.4 — 2026-11-17. Complementa o [GDD](GDD.md) §4.
+> Na v0.4 a carreira passou para **3 anos (72 turnos)**, com semestre de base só de treino, **campanha única** por garota com ponto de virada e 2 finais (§3), **calendário fixo** de corridas com séries (§7.2 e §7.4) e **olheiro** (§7.3). Os objetivos sorteados da v0.3 saíram.
 > Na v0.3 entraram o clima do mês (§4.4), os objetivos sorteados (§3.2) e a magnitude (§10).
 > Na v0.2 o calendário virou **roguelike**: entre os objetivos, cada carreira sorteia um mapa de rotas (§4), objetivos cumpridos dão amuletos (§5) e uma semente fixa guarda os sorteios (§6).
 > Valores marcados com **(inicial)** são pontos de partida para balanceamento.
 
 ## 1. Tempo
 
-- A carreira tem **48 turnos** em **2 anos**.
-- **1 turno = meio mês**: cada mês tem 2 turnos, **Início** e **Fim**. Assim 12 meses × 2 = 24 turnos por ano, e a conta fecha (com 1 turno por semana, 2 anos dariam 104 turnos).
+- A carreira tem **72 turnos** em **3 anos**.
+- **1 turno = meio mês**: cada mês tem 2 turnos, **Início** e **Fim**. Assim 12 meses × 2 = 24 turnos por ano.
 - O ano da academia segue o ano letivo: começa em **março** e termina em **fevereiro**. As **férias de verão** caem em **janeiro**.
 - A tela mostra a data assim: *Ano 1 · Abril · Fim*.
+- **Semestre de base:** os turnos **1 a 12** (março a agosto do ano 1) são **só de treino, encontros e história**. Não há nenhuma corrida, nem Circuito. A primeira corrida é a **Estreia, no turno 13**.
 
 | Mês | Mar | Abr | Mai | Jun | Jul | Ago | Set | Out | Nov | Dez | **Jan** | Fev |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 | Turnos (ano 1) | 1–2 | 3–4 | 5–6 | 7–8 | 9–10 | 11–12 | 13–14 | 15–16 | 17–18 | 19–20 | **21–22** | 23–24 |
 | Turnos (ano 2) | 25–26 | 27–28 | 29–30 | 31–32 | 33–34 | 35–36 | 37–38 | 39–40 | 41–42 | 43–44 | **45–46** | 47–48 |
+| Turnos (ano 3) | 49–50 | 51–52 | 53–54 | 55–56 | 57–58 | 59–60 | 61–62 | 63–64 | 65–66 | 67–68 | **69–70** | 71–72 |
+
+**Por que 3 anos:** é a mesma proporção do gênero (cerca de 1/6 da carreira só de treino antes da estreia) e dá espaço para a campanha única de cada garota (§3). O custo é uma carreira de **uns 50 minutos**. Para compensar: botão de **repetir a última ação**, diálogos **já vistos** que podem ser pulados (GDD §4.9) e o amuleto **Sete Vidas** (§5.2).
 
 ## 2. Categorias de corrida
 
@@ -23,45 +28,50 @@ Toda corrida tem uma **categoria**. Ela define a força das adversárias, o prê
 
 | Categoria | Força das NPCs (média dos atributos, inicial) | Fama para entrar (inicial) | Quando aparece |
 |---|---|---|---|
-| **Estreia** | 135 | — | Só no turno 4 (a primeira corrida dela) |
-| **Aberta** | 235 | 0 | A partir do turno 5 |
-| **Prata** | 370 | 600 | A partir do turno 13 |
-| **Ouro** | 500 | 1500 | A partir do turno 25 |
-| **Grande Prêmio** | Ano 1: 400 · Ano 2: 640 | Por convite (objetivo) | Turnos 24 e 48 |
+| **Estreia** | 180 | — | Só no turno 13 (a primeira corrida dela) |
+| **Aberta** | 260 | 0 | A partir do turno 14 |
+| **Prata** | 400 | 600 | A partir do turno 25 (ano 2) |
+| **Ouro** | 560 | 1500 | A partir do turno 37 (2º semestre do ano 2) |
+| **Grande Prêmio** | Ano 1: 320 · Ano 2: 560 · Ano 3: 760 | Por convite (objetivo) | Turnos 24, 48 e 72 |
 
 - A força das NPCs varia ±10% de uma corredora para outra, para o pelotão não ser uniforme.
-- Valores recalibrados no protótipo com o bot de `testes/balanco.gd` (eram 150 / 250 / 400 / 550 / 450 e 700). A fonte da verdade é `data/calendario.json`.
 - No Grande Prêmio, a **rival com nome** da casa corre com +15% sobre a força da categoria.
+- Os números acima foram **reescalados para 72 turnos** a partir dos valores calibrados no protótipo de 48 turnos, e ainda precisam passar pelo bot de `testes/balanco.gd`. O protótipo e o `data/calendario.json` **ainda usam 48 turnos** (§12).
 
 ### 2.1 Curva esperada da jogadora
 
-Para as categorias fazerem sentido, a garota do jogador precisa crescer mais ou menos assim. É o **alvo** para calibrar os ganhos de treino (próxima etapa do GDD):
+Este é o **alvo** para calibrar os ganhos de treino em 72 turnos:
 
-| Turno | 4 | 12 | 24 | 36 | 48 |
-|---|---|---|---|---|---|
-| Média dos atributos (inicial) | ~150 | ~280 | ~450 | ~600 | ~750 |
+| Turno | 13 (Estreia) | 24 | 36 | 48 | 60 | 72 |
+|---|---|---|---|---|---|---|
+| Média dos atributos (inicial) | ~200 | ~330 | ~460 | ~590 | ~700 | ~800 |
 
-Uma jogadora que treina bem chega acima disso, e uma que descansa demais ou se lesiona chega abaixo. Os objetivos pedem top 3 ou top 5 justamente para dar margem. Amuletos e rotas boas também empurram a curva para cima, então a força das NPCs deve ser calibrada com uma carreira "média" sem amuletos raros.
+Uma jogadora que treina bem chega acima disso, e uma que descansa demais ou se lesiona chega abaixo. Amuletos e rotas boas também empurram a curva para cima, então a força das NPCs deve ser calibrada com uma carreira "média" sem amuletos raros.
 
-## 3. Objetivos
+## 3. Objetivos e campanha única
 
-São **5 objetivos**, quase sempre na **casa** da garota (sua melhor distância e piso, ver [elenco](elenco.md)). Falhou um, a carreira acaba ali, mas a garota pode ser salva como estava (GDD §4.8).
+Cada garota tem **sua própria campanha**: 8 objetivos obrigatórios, um arco de história e **2 finais**. Os 3 Grandes Prêmios são comuns a todas (na versão da casa de cada uma). Os outros 5 objetivos são escritos para ela: distância, piso, rival e até metas que não são de colocação ("chegar à frente da Polaris", "vencer na chuva"). Falhou um, a carreira acaba ali, mas a garota pode ser salva como estava (GDD §4.8).
 
-| # | Turno | Data | Corrida | Meta |
+| # | Turno | Data | Quem define | O quê |
 |---|---|---|---|---|
-| 1 | 4 | Ano 1 · Abr · Fim | **Estreia** na casa | Top 5 |
-| 2 | 12 | Ano 1 · Ago · Fim | **Aberta** na casa (sorteado, §3.2) | Top 3 |
-| 3 | 24 | Ano 1 · Fev · Fim | **Grande Prêmio** do ano 1 | Top 5 |
-| 4 | 36 | Ano 2 · Ago · Fim | **Ouro** na casa (sorteado, §3.2) | Top 3 (precisa de 1500 de fama para entrar) |
-| 5 | 48 | Ano 2 · Fev · Fim | **Grande Prêmio** do ano 2 | Top 3 |
+| 1 | 13 | Ano 1 · Set · Início | Garota | **Estreia** dela |
+| 2 | 20 | Ano 1 · Dez · Fim | Garota | Objetivo da história |
+| 3 | 24 | Ano 1 · Fev · Fim | Comum | **Grande Prêmio do ano 1** |
+| 4 | 32 | Ano 2 · Jun · Fim | Garota | Objetivo da história |
+| 5 | 40 | Ano 2 · Out · Fim | Garota | Objetivo da história |
+| 6 | 48 | Ano 2 · Fev · Fim | Comum | **Grande Prêmio do ano 2** |
+| — | — | — | — | **Ponto de virada** (§3.3) |
+| 7 | 60 | Ano 3 · Ago · Fim | Garota (por caminho) | Objetivo da história |
+| 8 | 72 | Ano 3 · Fev · Fim | Comum (meta por caminho) | **Grande Prêmio final** e o final dela |
 
-- O **objetivo 4** é o que dá sentido às corridas opcionais: sem passar por Circuitos, ela não chega a 1500 de fama até o turno 36. A tela de objetivos avisa quanto falta.
-- Vencer o Grande Prêmio do ano 2 não é obrigatório, mas dá o maior bônus de fim de carreira.
-- Os turnos de objetivo são fixos. Nesses turnos a única ação disponível é **Correr**. Se ela estiver lesionada, ela corre assim mesmo, porque a lesão só corta ganho de treino (GDD §4.5).
+- Os turnos de objetivo são iguais para todas, para o calendário e o mapa funcionarem do mesmo jeito. O que muda é a corrida e a meta.
+- Um objetivo pode **ser** uma corrida do calendário fixo (§7.2). Por exemplo, o objetivo 5 da Lira é o Prêmio Cometa.
+- Nesses turnos a única ação disponível é **Correr**. Se ela estiver lesionada, corre assim mesmo, porque a lesão só corta ganho de treino (GDD §4.5).
+- **Aviso antes do objetivo:** a partir de 6 turnos antes, a tela de objetivos mostra a etiqueta do olheiro (§7.3) com os atributos atuais e qual atributo mais aumentaria a chance. O jogador nunca chega num objetivo sem saber se está pronto.
 
 ### 3.1 Grande Prêmio
 
-No turno do Grande Prêmio acontecem **8 corridas ao mesmo tempo**, uma por casa (4 distâncias × 2 pisos). O objetivo usa a da casa da garota. As rivais com nome ficam onde combinam:
+No turno do Grande Prêmio acontecem **8 corridas ao mesmo tempo**, uma por casa (4 distâncias × 2 pisos). Normalmente o objetivo usa a da casa da garota, mas um caminho da campanha pode levar a outra versão (ex.: a Lira no caminho "Revanche" corre o GP final na Média). As rivais com nome ficam onde combinam:
 
 | Casa | Rival do Grande Prêmio |
 |---|---|
@@ -71,38 +81,37 @@ No turno do Grande Prêmio acontecem **8 corridas ao mesmo tempo**, uma por casa
 
 Distâncias do Grande Prêmio (inicial): Sprint 1200 m · Milha 1600 m · Média 2400 m · Longa 3200 m.
 
-### 3.2 Objetivos sorteados
+### 3.2 Como escrever uma campanha
 
-Os objetivos 1, 3 e 5 são sempre os mesmos (Estreia e os dois Grandes Prêmios). Os objetivos **2 e 4 são sorteados** pela semente, entre os candidatos abaixo. O objetivo sorteado aparece junto com o mapa no começo do trecho, para o jogador planejar a rota em volta dele.
+Cada campanha tem:
+- **Objetivos 1, 2, 4 e 5**, com corrida (ou categoria + casa) e meta. As metas vêm da lista abaixo, para manter a dificuldade sob controle.
+- **Meta dos GPs 1 e 2** (em geral top 5 no ano 1 e top 3 no ano 2).
+- **Capítulos de história:** 1 no semestre de base, 1 entre cada par de objetivos e 1 final para cada caminho. São os eventos únicos da garota ([elenco](elenco.md)).
+- **Condição do ponto de virada** e os dois caminhos (§3.3).
 
-- **"Casa"** é a melhor distância e piso da garota. **"Vizinha"** é a distância ao lado da casa, onde ela é Boa (GDD §3.3).
-- Cada candidato tem uma **dificuldade**. Os difíceis pagam mais: o amuleto daquele objetivo vem como escolha entre **4** em vez de 3, com pelo menos 1 incomum ou raro.
-- O **padrão** é o objetivo da tabela da §3. Ele continua na lista.
+**Tipos de meta** (a dificuldade vale para o amuleto do objetivo: os Difíceis dão escolha entre 4, com 1 incomum ou raro garantido)
 
-**Objetivo 2** (até o turno 12)
-
-| Candidato | Meta | Dificuldade |
+| Meta | Exemplo | Dificuldade |
 |---|---|---|
-| Padrão | Top 3 numa Aberta na casa (turno 12) | Normal |
-| Fora de casa | Top 3 numa Aberta na **distância vizinha** (turno 12) | Normal |
-| Outro piso | Top 5 numa Aberta na casa, **no outro piso** (turno 12) | Normal |
-| Maratona | **Duas** corridas com top 5 até o turno 12 (o turno 12 vira uma Aberta livre) | Normal |
-| Vitória | **Vencer** uma Aberta na casa (turno 12) | Difícil |
+| Colocação na casa | Top 3 numa Aberta de Milha Grama | Normal |
+| Fora de casa | Top 5 na distância vizinha | Normal |
+| Outro piso | Top 5 na casa, no outro piso | Normal (não usar se o outro piso for Ruim) |
+| Maratona | Duas corridas com top 5 desde o objetivo anterior | Normal |
+| Rival | Chegar à frente de uma rival com nome | Normal |
+| Condição | Vencer na chuva, liderar na Largada, vencer de virada | Difícil |
+| Vitória | Vencer a corrida | Difícil |
+| Série | Vencer 2 corridas de uma série (§7.4) | Difícil |
 
-**Objetivo 4** (até o turno 36). Em todos, a garota precisa ter **1500 de fama** no turno 36, então os Circuitos continuam importando.
+- Os objetivos 4 e 5 em diante pressupõem fama para entrar em Prata e Ouro. A campanha deve deixar isso claro no capítulo de história anterior.
+- **Exemplo completo:** a campanha da **Lira** está no [elenco](elenco.md#campanha-da-lira).
 
-| Candidato | Meta | Dificuldade |
-|---|---|---|
-| Padrão | Top 3 numa Ouro na casa (turno 36) | Normal |
-| Fora de casa | Top 5 numa Ouro na **distância vizinha** (turno 36) | Normal |
-| Dominar a Prata | **Vencer** uma Prata na casa (turno 36) | Normal |
-| Caçar a elite | Top 3 num **Desafio** do trecho 3 + top 5 numa Ouro na casa (turno 36). O trecho 3 garante 1 Desafio em todo caminho. | Difícil |
-| Outro piso | Top 3 numa Ouro na casa, **no outro piso** (turno 36) | Difícil |
+### 3.3 Ponto de virada
 
-Regras:
-- O sorteio pesa 2 para cada candidato Normal e 1 para cada Difícil.
-- "Outro piso" não sai para garotas com o outro piso Ruim (ex.: Capela), porque o multiplicador ×0,90 deixa o objetivo injusto.
-- Na Magnitude 3 ou mais (§10), só saem candidatos Difíceis.
+Depois do **Grande Prêmio do ano 2** (turno 48), a história se divide em **2 caminhos**. Cada caminho tem seu próprio **objetivo 7**, sua **meta para o GP final** e seu **final** (epílogo).
+
+- **O que decide:** o resultado de corridas marcadas na campanha (ex.: "terminou à frente da Polaris nos objetivos 4 e 6") e as escolhas feitas nos eventos únicos dela. Cada campanha diz a regra.
+- O jogo **não mostra** a regra exata, mas os capítulos de história dão pistas.
+- Os 2 finais ficam registrados na ficha da garota. Ver os dois é o principal motivo para jogar uma 2ª carreira com ela, além do mapa, do clima, dos amuletos e da magnitude.
 
 ## 4. Mapa de rotas
 
@@ -110,38 +119,44 @@ Os objetivos são os "chefes" da carreira e ficam sempre no mesmo turno. **Entre
 
 ### 4.1 Trechos e nós
 
-A carreira é dividida em **trechos**, um antes de cada objetivo. Cada trecho tem um mapa de **nós**. **Cada nó dura 1 mês (2 turnos).**
+A carreira é dividida em **trechos**, um antes de cada objetivo. Cada trecho tem um mapa de **nós**. **Cada nó dura 2 turnos.**
 
-| Trecho | Turnos | Nós a escolher | Fixos no fim do trecho | Chefe |
+| Trecho | Turnos | Nós a escolher | Fixos | Chefe |
 |---|---|---|---|---|
-| Chegada | 1–3 | — (tutorial, sem mapa) | — | Objetivo 1 (turno 4) |
-| 1 | 5–10 | **3** | Véspera (11) | Objetivo 2 (turno 12) |
-| 2 | 13–20 | **4** | Férias (21–22), Véspera (23) | Objetivo 3 (turno 24) |
-| 3 | 25–34 | **5** | Véspera (35) | Objetivo 4 (turno 36) |
-| 4 | 37–44 | **4** | Férias (45–46), Véspera (47) | Objetivo 5 (turno 48) |
+| Base | 1–12 | **4** (turnos 3–10) | Chegada (1–2), Preparação (11–12) | Objetivo 1, Estreia (13) |
+| 1 | 14–19 | **3** | — | Objetivo 2 (20) |
+| 2 | 21–23 | — | Férias (21–22), Véspera (23) | GP do ano 1 (24) |
+| 3 | 25–31 | **3** | Véspera (31) | Objetivo 4 (32) |
+| 4 | 33–39 | **3** | Véspera (39) | Objetivo 5 (40) |
+| 5 | 41–47 | **2** | Férias (45–46), Véspera (47) | GP do ano 2 (48) |
+| 6 | 49–59 | **5** | Véspera (59) | Objetivo 7 (60) |
+| 7 | 61–71 | **4** | Férias (69–70), Véspera (71) | GP final (72) |
 
-São **16 nós escolhidos** por carreira.
+São **24 nós escolhidos** por carreira.
 
-- **Formato do mapa:** 3 colunas, uma linha por mês. Cada nó liga ao nó logo abaixo e aos vizinhos de diagonal, então de um nó saem 2 ou 3 caminhos. O jogador vê o **trecho inteiro** antes de começar, e é isso que permite planejar a rota.
+- **Chegada** (turnos 1–2): tutorial de treino e capítulo 1 da história.
+- **Preparação** (turnos 11–12): 2 turnos normais, sem bônus de nó, antes da estreia. O capítulo da história fecha o semestre de base.
+- **Semestre de base:** os nós desse trecho **nunca são Circuito nem Desafio**, porque não há corrida antes do turno 13.
+- **Formato do mapa:** 3 colunas, uma linha por nó. Cada nó liga ao nó logo abaixo e aos vizinhos de diagonal, então de um nó saem 2 ou 3 caminhos. O jogador vê o **trecho inteiro** antes de começar, e é isso que permite planejar a rota.
 - **Véspera:** turno normal, sem opcionais, com encontro com a rival do próximo objetivo (quando houver).
-- **Dentro do nó** o jogador continua escolhendo a ação de cada turno (Treinar, Descansar, Sair, Correr, Enfermaria). O nó só muda o **contexto**: quais corridas existem, quais bônus valem, que eventos podem aparecer. O pilar "treino é dilema" fica intacto.
+- **Dentro do nó** o jogador continua escolhendo a ação de cada turno (Treinar, Descansar, Sair, Correr, Enfermaria). O nó só muda o **contexto**: quais corridas geradas existem, quais bônus valem, que eventos podem aparecer. O pilar "treino é dilema" fica intacto.
 
 ### 4.2 Tipos de nó
 
 | Nó | Efeito durante o mês (inicial) | Peso no sorteio |
 |---|---|---|
 | **Treino focado** (atributo X) | O treino de X conta **1 nível acima** (máximo 5). O mapa mostra qual atributo. | Alto |
-| **Circuito** | Cada turno oferece **2 corridas opcionais**. O mapa mostra a categoria e a casa de cada uma. **Fora do Circuito não há opcionais.** | Alto |
+| **Circuito** | Cada turno oferece **2 corridas geradas** (§7.1). O mapa mostra a categoria e a casa de cada uma. As corridas do calendário fixo existem em qualquer nó. | Alto (nunca no semestre de base) |
 | **Festival** | **Sair** sempre gera encontro, e encontros dão o dobro de afinidade. Treinos rendem −10%. | Médio |
 | **Recuperação** | Descanso rende +50%, a Enfermaria não gasta o turno e o humor não cai por falha. | Médio |
 | **Biblioteca** | Habilidades genéricas custam −30% de pontos. O treino de Inteligência conta 1 nível acima. | Baixo |
-| **Desafio** | No 2º turno há uma corrida contra uma **NPC de elite** (força da categoria +20%). Top 3 dá **1 amuleto** (§5). Fora do top 3, o humor cai 1 nível. Correr é opcional. | No máximo 1 por trecho, a partir do trecho 2 |
+| **Desafio** | No 2º turno há uma corrida contra uma **NPC de elite** (força da categoria +20%). Top 3 dá **1 amuleto** (§5). Fora do top 3, o humor cai 1 nível. Correr é opcional. | No máximo 1 por trecho, a partir do trecho 3 |
 | **Mistério** | No 1º turno, sorteia um evento especial de risco e recompensa (§4.3). | Baixo |
 
 Regras do sorteio:
 - Cada linha do mapa tem pelo menos 2 tipos diferentes de nó.
-- **Todo caminho possível** do trecho passa por pelo menos **1 Circuito**, para ninguém ficar sem corrida por azar.
-- No trecho 3, os Circuitos oferecem Ouro com mais frequência, porque o objetivo 4 pede 1500 de fama.
+- Do trecho 1 em diante, **todo caminho possível** do trecho passa por pelo menos **1 Circuito**, para ninguém ficar sem corrida gerada por azar.
+- Os Circuitos oferecem mais corridas da categoria que a campanha vai pedir no próximo objetivo.
 
 ### 4.3 Eventos de Mistério (exemplos)
 
@@ -188,9 +203,9 @@ Por isso o calor ficou em **−2%** de fôlego. Ainda assim, ele empurra a Ponte
 
 Amuletos são modificadores que valem **até o fim da carreira**. Eles criam "builds" diferentes a cada carreira.
 
-- **Como ganhar:** ao cumprir os objetivos 1 a 4, o jogador escolhe **1 entre 3** amuletos sorteados. O nó Desafio e alguns eventos de Mistério também dão amuletos.
-- **Limite:** 6 amuletos equipados. Ao ganhar o 7º, troca um ou descarta o novo.
-- Uma carreira típica termina com **4 a 6 amuletos**.
+- **Como ganhar:** ao cumprir os objetivos 1 a 7, o jogador escolhe **1 entre 3** amuletos sorteados. O nó Desafio e alguns eventos de Mistério também dão amuletos.
+- **Limite:** 6 amuletos equipados (7 com o título *Volta ao Céu*, §7.4). Ao ganhar o 7º, troca um ou descarta o novo.
+- Uma carreira típica termina com **5 a 6 amuletos**, trocando alguns no caminho.
 - **Não passam para a garota salva.** A versão salva leva só atributos, habilidades e aptidões.
 
 ### 5.1 Tipos
@@ -224,14 +239,14 @@ No MVP: **~15 amuletos**.
 
 ### 5.3 Progressão entre carreiras
 
-Cada carreira concluída (chegando ao objetivo 5, vencendo ou não) **libera novos amuletos e eventos de Mistério** no sorteio. É uma progressão lenta, que soma com o vínculo e a pool (GDD §3.5 e §6).
+Cada carreira concluída (chegando ao objetivo 8, vencendo ou não) **libera novos amuletos e eventos de Mistério** no sorteio. É uma progressão lenta, que soma com o vínculo e a pool (GDD §3.5 e §6).
 
 ## 6. Semente
 
 - Cada carreira tem uma **semente** sorteada no turno 1.
 - O mapa de todos os trechos sai da semente logo no início (o jogador só vê o trecho atual).
 - Os sorteios usam fluxos separados, cada um calculado por `hash(semente, turno, contexto)`:
-  - **mapa**, **clima**, **objetivos sorteados** e **amuletos oferecidos**;
+  - **mapa**, **clima**, **corridas geradas** e **amuletos oferecidos**;
   - **treino** (falha, lesão), com a ação escolhida no contexto;
   - **encontros** e **Mistério**;
   - **corrida**, com o id da corrida no contexto.
@@ -243,7 +258,7 @@ Cada carreira concluída (chegando ao objetivo 5, vencendo ou não) **libera nov
 A fama mede quantas pessoas acompanham a garota. Ela nunca diminui durante a carreira.
 
 **Para que serve**
-1. **Entrar em corridas** de categoria mais alta (tabela da §2). Como as opcionais só aparecem nos nós Circuito (§4.2), quem quer fama precisa escolher rotas com corridas.
+1. **Entrar em corridas** de categoria mais alta (tabela da §2).
 2. **Bônus de moeda** no fim da carreira (inicial: +1 moeda a cada 100 de fama; o valor da moeda fica para a etapa de economia).
 3. **Encontros com torcedoras**: alguns encontros genéricos só aparecem com fama alta (conteúdo futuro).
 
@@ -257,20 +272,85 @@ A fama mede quantas pessoas acompanham a garota. Ela nunca diminui durante a car
 | Ouro | 800 |
 | Grande Prêmio | 1500 |
 
-Por colocação: 2º = 50% · 3º = 30% · 4º e 5º = 15% · 6º em diante = 5%.
+Por colocação: 2º = 50% · 3º = 30% · 4º e 5º = 15% · 6º em diante = 5%. O multiplicador do olheiro (§7.3) vale por cima disso.
 
-*Exemplo:* uma garota que faz 2º na Estreia (50), vence o objetivo da Aberta (200), vence 2 Abertas opcionais (400) e faz 3º em uma Prata (120) chega ao Grande Prêmio do ano 1 com 770. Com o 4º lugar no Grande Prêmio (225) e mais duas Pratas boas no começo do ano 2, ela passa de 1500 antes do turno 36.
+### 7.1 Duas camadas de corridas opcionais
 
-### 7.1 Corridas opcionais
+As opcionais vêm de duas fontes. As duas juntas deixam o jogador **planejar uma rota** (o calendário fixo é igual em toda carreira) sem perder a variedade do roguelike (os Circuitos são sorteados).
 
-- Só aparecem nos nós **Circuito** (e no Desafio). Elas são **geradas por modelo** (categoria × distância × piso, com nome sorteado de uma lista), então o MVP não precisa de dezenas de corridas escritas à mão.
+| Camada | O que é | Onde aparece |
+|---|---|---|
+| **Calendário fixo** (§7.2) | Corridas Prata e Ouro com nome, sempre no mesmo turno do ano. Algumas formam **séries** (§7.4). | Visível desde o turno 1. Dá para correr a partir de **qualquer nó**, no turno dela. |
+| **Circuito** | Corridas **geradas** (categoria × distância × piso, com nome sorteado de uma lista). Cada turno de um nó Circuito oferece **2**. | Só nos nós Circuito (§4.2) e no Desafio. |
+
+Regras que valem para as duas:
 - Correr gasta **15 de energia** (inicial) e não dá ganho de treino naquele turno.
-- **Corridas seguidas:** a 3ª corrida em 3 turnos seguidos gasta +10 de energia e tem 30% de chance de baixar o humor 1 nível (inicial). Um Circuito seguido de outro Circuito cai nessa regra.
-- Uma carreira típica deve ter **8 a 12 corridas** contando os objetivos.
+- **Corridas seguidas:** a 3ª corrida em 3 turnos seguidos gasta +10 de energia e tem 30% de chance de baixar o humor 1 nível (inicial).
+- Uma carreira típica deve ter **14 a 20 corridas** contando os objetivos.
+
+### 7.2 Calendário fixo
+
+As corridas abaixo acontecem nos **anos 2 e 3**, no mesmo turno do ano. A Prata começa no turno 25 e a Ouro no turno 37 (2º semestre do ano 2). A coluna "Turno do ano" vai de 1 a 24, então no ano 2 some 24 e no ano 3 some 48.
+
+**Prata**
+
+| Turno do ano | Mês | Corrida | Casa |
+|---|---|---|---|
+| 3 | Abr · Início | Taça Faísca | Sprint Grama |
+| 4 | Abr · Fim | Taça Poeira Alta | Milha Terra |
+| 5 | Mai · Início | Taça Horizonte | Média Grama |
+| 6 | Mai · Fim | Taça Travessia | Longa Terra |
+| 7 | Jun · Início | Taça Brisa | Milha Grama |
+| 9 | Jul · Início | Taça Relâmpago | Sprint Terra |
+| 10 | Jul · Fim | Taça Maré | Longa Grama |
+| 11 | Ago · Início | Taça Cânion | Média Terra |
+
+**Ouro**
+
+| Turno do ano | Mês | Corrida | Casa |
+|---|---|---|---|
+| 13 | Set · Início | Prêmio Equinócio | Média Grama |
+| 14 | Set · Fim | Prêmio Trovão | Sprint Terra |
+| 15 | Out · Início | Prêmio Via Láctea | Longa Grama |
+| 16 | Out · Fim | Prêmio Cometa | Milha Grama |
+| 17 | Nov · Início | Prêmio Duna | Milha Terra |
+| 18 | Nov · Fim | Prêmio Meteoro | Sprint Grama |
+| 19 | Dez · Início | Prêmio Eclipse | Longa Terra |
+| 20 | Dez · Fim | Prêmio Nebulosa | Média Terra |
+
+- Os turnos 8, 12 e 16 do ano coincidem com objetivos (turnos 32, 60 e 40). O Prêmio Cometa (turno 40) é de propósito: uma campanha pode usar uma corrida do calendário como objetivo.
+- Os nomes são provisórios.
+- No ano 1 não há calendário fixo. As opcionais do ano 1 são só as Abertas dos Circuitos.
+
+### 7.3 Olheiro
+
+Antes de toda corrida (opcional ou objetivo), a tela mostra:
+- a **força média do pelotão** e se há **rival com nome**;
+- uma **etiqueta de chance**, calculada rodando ~50 simulações rápidas da corrida (a simulação não depende da tela, GDD §10):
+
+| Etiqueta | Chance estimada de vencer | Multiplicador de fama |
+|---|---|---|
+| **Favorita** | 40% ou mais | ×0,75 |
+| **Disputada** | 15% a 40% | ×1,0 |
+| **Azarão** | menos de 15% | ×1,5 |
+
+Assim existe uma **rota segura** (correr só onde ela é Favorita), mas ela rende menos fama. Quem arrisca corridas de Azarão junta fama mais rápido.
+
+### 7.4 Séries e títulos
+
+Vencer conjuntos de corridas do calendário fixo dá um **título**, que aparece na ficha da garota salva, mais uma recompensa na hora.
+
+| Série | Como completar | Recompensa (inicial) |
+|---|---|---|
+| **Tríplice da casa** (ex.: *Estrela da Milha*) | Vencer a Prata e as 2 Ouros (anos 2 e 3) da mesma casa | +500 de fama e 1 amuleto (escolha entre 4, 1 raro garantido) |
+| **Coroa Dupla** | Vencer Ouros da mesma distância nos 2 pisos | +300 de fama e +1 nível de aptidão no piso mais fraco |
+| **Volta ao Céu** | Vencer uma Ouro em cada uma das 4 distâncias | Título raro e +1 limite de amuleto (7) até o fim da carreira |
+
+As séries são o principal motivo para **planejar a rota** com antecedência: a Tríplice exige estar em forma em 3 turnos conhecidos, espalhados por 2 anos.
 
 ## 8. Férias de verão
 
-Turnos **21–22** (ano 1) e **45–46** (ano 2), em janeiro. É um nó fixo no fim dos trechos 2 e 4.
+Turnos **21–22** (ano 1), **45–46** (ano 2) e **69–70** (ano 3), em janeiro.
 
 - **Sem corridas.**
 - O jogador escolhe 1 entre 2 acampamentos:
@@ -278,35 +358,37 @@ Turnos **21–22** (ano 1) e **45–46** (ano 2), em janeiro. É um nó fixo no 
   - **Praia:** treinos de Velocidade e Poder contam 1 nível acima.
 - **Sair** sempre gera um encontro.
 - O descanso recupera mais energia (inicial: +50% sobre o normal).
-- As férias do ano 2 ficam logo antes do Grande Prêmio final. É o último "fôlego" para a reta final.
+- As férias do ano 3 ficam logo antes do GP final. É o último "fôlego" para a reta final.
 
 ## 9. Linha do tempo resumida
 
 | Turnos | Fase | O que acontece |
 |---|---|---|
-| 1–3 | Chegada | Tutorial de treino. Sem mapa e sem corridas. Encontro de apresentação. |
-| **4** | Objetivo 1 | **Estreia** (top 5). Primeiro amuleto. |
-| 5–10 | Trecho 1 | Mapa com 3 nós. Opcionais Aberta nos Circuitos. |
-| 11 | Véspera | |
-| **12** | Objetivo 2 | **Aberta** na casa (top 3). Amuleto. |
-| 13–20 | Trecho 2 | Mapa com 4 nós. Liberam as Pratas. Primeiro Desafio possível. |
-| 21–22 | Férias | Serra ou Praia. |
-| 23 | Véspera | Encontro com a rival do Grande Prêmio. |
-| **24** | Objetivo 3 | **Grande Prêmio** do ano 1 (top 5). Amuleto. |
-| 25–34 | Trecho 3 | Mapa com 5 nós. Liberam as Ouros. Corrida atrás de fama. |
-| 35 | Véspera | |
-| **36** | Objetivo 4 | **Ouro** na casa (top 3, fama ≥ 1500). Amuleto. |
-| 37–44 | Trecho 4 | Mapa com 4 nós. Opcionais de todas as categorias. |
-| 45–46 | Férias | Serra ou Praia. |
-| 47 | Véspera | Encontro com a rival. |
-| **48** | Objetivo 5 | **Grande Prêmio** do ano 2 (top 3). Fim da carreira. |
+| 1–2 | Chegada | Tutorial de treino. Capítulo 1 da história. |
+| 3–10 | Semestre de base | Mapa com 4 nós, sem Circuito. Só treino, encontros e história. |
+| 11–12 | Preparação | Turnos normais. Fecha o capítulo do semestre. |
+| **13** | Objetivo 1 | **Estreia** da garota. Primeiro amuleto. |
+| 14–19 | Trecho 1 | 3 nós. Abertas nos Circuitos. |
+| **20** | Objetivo 2 | Objetivo da história. |
+| 21–23 | Férias e véspera | Serra ou Praia. Encontro com a rival. |
+| **24** | Objetivo 3 | **GP do ano 1**. |
+| 25–31 | Trecho 3 | 3 nós. Começa o calendário fixo de Pratas. |
+| **32** | Objetivo 4 | Objetivo da história. |
+| 33–39 | Trecho 4 | 3 nós. Começam as Ouros (turno 37). |
+| **40** | Objetivo 5 | Objetivo da história. |
+| 41–47 | Trecho 5 | 2 nós, férias e véspera. |
+| **48** | Objetivo 6 | **GP do ano 2**. Depois vem o **ponto de virada**. |
+| 49–59 | Trecho 6 | 5 nós. Calendário fixo do ano 3, séries em jogo. |
+| **60** | Objetivo 7 | Objetivo do caminho escolhido. |
+| 61–71 | Trecho 7 | 4 nós, férias e véspera. |
+| **72** | Objetivo 8 | **GP final** e o final do caminho. Fim da carreira. |
 
 ## 10. Magnitude (dificuldade crescente)
 
 Na astronomia, a **magnitude** mede o brilho de uma estrela. Aqui ela é o nível de dificuldade de uma carreira, de **0 a 5**.
 
 - A magnitude é **por garota**. No começo da carreira, o jogador escolhe qualquer magnitude até a **maior liberada** para aquela garota.
-- **Liberar:** terminar uma carreira **vencendo o Grande Prêmio do ano 2** na magnitude M libera a magnitude M+1 para aquela garota.
+- **Liberar:** terminar uma carreira **vencendo o GP final** na magnitude M libera a magnitude M+1 para aquela garota.
 - Os efeitos se **acumulam**: a Magnitude 3 tem tudo da 1 e da 2.
 
 | Magnitude | O que muda (inicial) |
@@ -314,7 +396,7 @@ Na astronomia, a **magnitude** mede o brilho de uma estrela. Aqui ela é o níve
 | **0** | Normal. |
 | **1** | NPCs +5% de força. |
 | **2** | A carreira começa com **1 maldição** sorteada (amuleto negativo, que não ocupa vaga). |
-| **3** | Os objetivos 2 e 4 só sorteiam candidatos **Difíceis** (§3.2). |
+| **3** | As metas dos objetivos sobem um degrau: top 5 vira top 3, top 3 vira vitória (§3.2). |
 | **4** | NPCs +10% no total e rivais com nome +25% (em vez de +15%). |
 | **5** | **2 maldições**, e cada trecho tem 1 nó de Recuperação a menos no sorteio. |
 
@@ -336,7 +418,7 @@ Na astronomia, a **magnitude** mede o brilho de uma estrela. Aqui ela é o níve
 
 ## 11. Corrida em nível baixo
 
-As primeiras corridas (Estreia e Aberta) acontecem com atributos entre 150 e 300. O simulador só tinha sido calibrado de 400 para cima ([corrida.md](corrida.md) §8.1). Um teste rápido (300 corridas, 3 de cada estilo, atributos iguais) mostra que os desvios do nível baixo continuam:
+As primeiras corridas (Estreia e Abertas do ano 1) acontecem com atributos entre 200 e 330. O simulador só tinha sido calibrado de 400 para cima ([corrida.md](corrida.md) §8.1). Um teste rápido (300 corridas, 3 de cada estilo, atributos iguais) mostra que os desvios do nível baixo continuam:
 
 | Nível | 1200 | 1600 | 2000 | 3200 |
 |---|---|---|---|---|
@@ -345,7 +427,7 @@ As primeiras corridas (Estreia e Aberta) acontecem com atributos entre 150 e 300
 
 *Ponteira / Perseguidora / Arrancadora / Fechadora (%). Ideal 25%.*
 
-No começo da carreira, a **Fechadora** é forte na Sprint e a **Ponteira** é forte na Longa. Isso pesa nos objetivos 1 e 2. Duas saídas possíveis:
+No começo da carreira, a **Fechadora** é forte na Sprint e a **Ponteira** é forte na Longa. Isso pesa nos objetivos 1 e 2, então as campanhas devem evitar Sprint para Fechadoras e Longa para Ponteiras nesses objetivos até a recalibração. Duas saídas possíveis:
 - Recalibrar o ritmo também nos níveis 150–300 (o `ajustar_ritmo` hoje usa 500 e 800).
 - Aceitar como "sabor" do começo de carreira e compensar com a meta (top 5 em vez de top 3).
 
@@ -354,14 +436,18 @@ Fica como pendência de balanceamento.
 ## 12. Escopo do MVP
 
 **Entra**
-- O calendário completo de 48 turnos, com os objetivos 1, 3 e 5 fixos e os objetivos 2 e 4 sorteados (§3.2).
+- O calendário de **72 turnos** (3 anos), com semestre de base, 8 objetivos e ponto de virada.
+- **Campanha completa das 6 garotas do MVP**: 5 objetivos próprios, 2 caminhos e 2 finais cada. A primeira a ser escrita é a da Lira ([elenco](elenco.md#campanha-da-lira)).
+- **Calendário fixo** com as 16 corridas com nome e as 3 séries (§7.2 e §7.4).
+- **Olheiro** com etiqueta de chance (§7.3).
 - **Clima do mês** com 6 climas (§4.4). Só chuva e calor mexem na corrida.
 - Mapa de rotas com os **7 tipos de nó** e as regras de sorteio da §4.2.
 - **6 eventos de Mistério** e **~15 amuletos**.
 - Semente por carreira com fluxos separados (§6).
-- **Corridas com nome escrito à mão:** a Estreia e os 2 Grandes Prêmios (contando as 8 casas como versões da mesma corrida). As opcionais, os Desafios e os objetivos 2 e 4 usam o gerador de corridas.
 - Rivais com nome só nas casas da tabela §3.1.
 
 **Fica para depois**
-- **Magnitude** (§10). Ela só faz sentido depois que o jogador já venceu carreiras, e as maldições precisam de balanceamento próprio. A semente e os amuletos do MVP já deixam espaço para ela.
+- **Magnitude** (§10).
 - Efeito do **vento** na corrida (§4.4).
+
+**Estado do protótipo:** o projeto Godot ainda roda a versão de **48 turnos** com objetivos 2 e 4 sorteados (calendário v0.3). Migrar para 72 turnos é uma tarefa de código separada: `data/calendario.json`, o gerador do mapa, a tela de carreira e os testes.

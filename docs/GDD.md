@@ -1,20 +1,21 @@
 # Nekomusume: Corrida Purrfeita — Game Design Document
 
-> Versão 0.3 — 2026-11-17.
+> Versão 0.4 — 2026-11-17.
+> Na v0.4 a carreira passou para **3 anos (72 turnos)** com semestre de base só de treino, **campanha única** por garota com ponto de virada e 2 finais, **calendário fixo** de corridas com séries e **olheiro** (§4.1), e entraram 6 melhorias sobre o gênero (§4.9, §5.6, §5.7).
 > Na v0.3 as garotas viraram **garotas gato**, a arte passou a ser **3D low-poly** (§11) e entraram ideias das referências do gênero: legado (§3.6), afobação na corrida (§5.5) e o amuleto Sete Vidas.
 > Na v0.2 entrou o [calendário da carreira](calendario.md), com mapa de rotas e amuletos.
 > Valores marcados com **(inicial)** são pontos de partida para balanceamento, não decisões finais.
 
 ## 1. Visão geral
 
-**Pitch:** simulador de treino e corrida de **garotas gato**. Você conhece as garotas, treina cada uma numa carreira de 2 anos e monta o melhor elenco para vencer copas de estilos diferentes, como os ginásios de um jogo de monstrinhos.
+**Pitch:** simulador de treino e corrida de **garotas gato**. Você conhece as garotas, treina cada uma numa carreira de 3 anos com história própria e monta o melhor elenco para vencer copas de estilos diferentes, como os ginásios de um jogo de monstrinhos.
 
 **Pilares**
 1. **Relações importam.** Os encontros mexem no humor, e o humor mexe em treinos e corridas.
 2. **Treino é dilema.** Cada turno troca energia e humor por atributos.
-3. **A corrida é o resultado.** O jogador não controla a corrida, só assiste ao que construiu.
+3. **A corrida é o resultado.** O jogador não controla a corrida. Ele dá uma instrução antes da largada e assiste ao que construiu, e depois o relatório mostra por que ganhou ou perdeu.
 4. **Colecionar sem pagar.** Não há dinheiro real. A pool semanal usa só moeda do jogo.
-5. **Cada carreira é diferente.** Entre os objetivos, o caminho é um mapa sorteado, e os amuletos mudam a build.
+5. **Cada garota tem sua história, e cada carreira é diferente.** Cada garota tem uma campanha própria com 2 finais. Entre os objetivos, o caminho é um mapa sorteado, e os amuletos mudam a build.
 
 **Plataforma:** PC (Windows), single-player, offline.
 **Motor:** Godot 4, GDScript.
@@ -29,7 +30,7 @@
 ## 2. Loop principal
 
 ```
-Pool semanal ──► Elenco ──► Carreira (48 turnos) ──► Garota treinada salva
+Pool semanal ──► Elenco ──► Carreira (72 turnos) ──► Garota treinada salva
      ▲                                                   │
      └──── moeda ◄──── Circuito (copas) ◄────────────────┘
 ```
@@ -111,8 +112,9 @@ Nas referências do gênero, o sistema que mais faz o jogador repetir carreiras 
 
 - No começo da carreira, o jogador pode escolher **1 garota salva** do elenco como madrinha (não pode ser a própria garota).
 - A madrinha dá **+5% dos atributos finais dela** como bônus inicial (inicial; teto de +40 por atributo).
-- Nos turnos **13 e 37** acontece um encontro de **inspiração** com a madrinha: chance de ganhar atributos e de subir em 1 nível a aptidão de distância ou piso da casa da madrinha (inicial: 20% por aptidão).
+- Nos turnos **25 e 49** (começo dos anos 2 e 3) acontece um encontro de **inspiração** com a madrinha: chance de ganhar atributos e de subir em 1 nível a aptidão de distância ou piso da casa da madrinha (inicial: 20% por aptidão).
 - Quanto melhor a nota geral da madrinha (§3.1), maiores as chances.
+- **Previsível de propósito:** o bônus inicial é fixo e aparece antes de começar. A sorte fica só nas inspirações, para a herança não virar farm de sorte, que é uma reclamação comum no gênero.
 - Isso dá uso às garotas salvas fora do circuito e soma com o vínculo e os amuletos liberados na progressão entre carreiras.
 - **Fica para depois do MVP**, mas o save já deve guardar a nota e a casa de cada garota salva.
 
@@ -120,17 +122,20 @@ Nas referências do gênero, o sistema que mais faz o jogador repetir carreiras 
 
 ### 4.1 Estrutura
 
-- **48 turnos**: 2 anos de jogo, 1 turno = meio mês (Início e Fim de cada mês). O ano vai de março a fevereiro.
-- **Férias de verão** em janeiro (turnos 21–22 e 45–46): acampamento sem corridas, com treino reforçado.
-- Um **Grande Prêmio** no fim de cada ano (turnos 24 e 48).
-- **5 objetivos**, nos mesmos turnos em toda carreira, quase sempre na casa da garota (melhor distância e piso). Os objetivos 2 e 4 são **sorteados** de uma lista de candidatos. Se falhar um, **a carreira acaba ali**, mas a garota ainda pode ser salva como estava.
-- **Calendário roguelike:** entre um objetivo e outro, o jogador escolhe uma rota num **mapa sorteado**. Cada nó dura 1 mês e muda o contexto (treino focado, circuito de corridas, festival, recuperação, biblioteca, desafio, mistério). Corridas opcionais só aparecem nos nós de circuito.
-- **Amuletos:** cada objetivo cumprido dá 1 amuleto (escolha entre 3), um modificador que vale até o fim da carreira. Não passam para a garota salva. Proposta nova: o amuleto raro **Sete Vidas**, que deixa refazer uma vez um objetivo falhado ([calendário](calendario.md) §5.2).
+- **72 turnos**: 3 anos de jogo, 1 turno = meio mês (Início e Fim de cada mês). O ano vai de março a fevereiro.
+- **Semestre de base:** os turnos 1 a 12 são **só treino, encontros e história**. A primeira corrida é a **Estreia, no turno 13**.
+- **Campanha única:** cada garota tem **8 objetivos** (turnos 13, 20, 24, 32, 40, 48, 60 e 72). Os 3 **Grandes Prêmios** (fim de cada ano) são comuns. Os outros 5 são da história dela. Se falhar um, **a carreira acaba ali**, mas a garota ainda pode ser salva como estava.
+- **Ponto de virada:** depois do GP do ano 2, a história se divide em **2 caminhos**, conforme resultados e escolhas, cada um com objetivo 7, meta do GP final e **final** próprios. Ver os 2 finais é o motivo para rejogar a garota.
+- **Calendário roguelike:** entre um objetivo e outro, o jogador escolhe uma rota num **mapa sorteado**. Cada nó dura 2 turnos e muda o contexto (treino focado, circuito de corridas, festival, recuperação, biblioteca, desafio, mistério).
+- **Corridas opcionais em duas camadas:** um **calendário fixo** de corridas Prata e Ouro com nome, igual em toda carreira e com **séries** que dão títulos, mais as corridas **geradas** nos nós de Circuito.
+- **Olheiro:** antes de cada corrida, a tela mostra a força do pelotão e uma etiqueta de chance (Favorita, Disputada ou Azarão). A rota segura existe, mas rende menos fama.
+- **Férias de verão** em janeiro dos 3 anos: acampamento sem corridas, com treino reforçado.
+- **Amuletos:** cada objetivo cumprido dá 1 amuleto (escolha entre 3), um modificador que vale até o fim da carreira. Não passam para a garota salva. O raro **Sete Vidas** deixa refazer uma vez um objetivo falhado.
 - **Clima do mês** (tempo bom, chuva, calor, frio, vento, noite de estrelas), seguindo as estações. Ele mexe no treino e, na chuva e no calor, na corrida.
-- **Magnitude** (0 a 5): dificuldade por garota, liberada vencendo o Grande Prêmio final. Fica para depois do MVP.
+- **Magnitude** (0 a 5): dificuldade por garota, liberada vencendo o GP final. Fica para depois do MVP.
 - Uma **semente** por carreira guarda todos os sorteios: recarregar o save e repetir a ação dá o mesmo resultado.
 - Corridas têm **categorias** (Estreia, Aberta, Prata, Ouro, Grande Prêmio). As mais altas pedem **fama** para entrar.
-- O detalhe está no [calendário](calendario.md).
+- O detalhe está no [calendário](calendario.md), e a campanha de exemplo (Lira) está no [elenco](elenco.md#campanha-da-lira).
 
 ### 4.2 Ações por turno
 
@@ -139,7 +144,7 @@ Nas referências do gênero, o sistema que mais faz o jogador repetir carreiras 
 | **Treinar** | Escolhe um dos 5 treinos, ganha atributos e gasta energia |
 | **Descansar** | Recupera energia |
 | **Sair** | Recupera humor e pode gerar encontro |
-| **Correr** | Corrida opcional (só em nós de circuito): dá moeda, pontos de habilidade e fama ([calendário](calendario.md) §7) |
+| **Correr** | Corrida opcional (calendário fixo em qualquer nó, ou gerada nos nós de Circuito): dá moeda, pontos de habilidade e fama ([calendário](calendario.md) §7) |
 | **Enfermaria** | Cura lesão (só aparece quando ela está lesionada) |
 
 ### 4.3 Treinos
@@ -164,6 +169,7 @@ Nas referências do gênero, o sistema que mais faz o jogador repetir carreiras 
 - Energia vai de **0 a 100**.
 - Abaixo de um limite (inicial: 40), a chance de **falha** cresce conforme a energia cai.
 - Uma falha faz perder atributo e humor, com chance de **lesão leve**.
+- **A chance de falha exata aparece em cada treino** (ex.: "Falha: 18%"), nunca só uma cor ou um ícone. Uma falha sozinha nunca encerra a carreira.
 - Correr gasta energia (inicial: 15).
 
 ### 4.5 Lesão
@@ -193,14 +199,24 @@ Muda com encontros, descanso, saídas, vitórias, derrotas e falhas.
 - Repetir encontros sobe a **afinidade** entre o par. Afinidade alta libera o **treino em dupla**.
 - A afinidade vai de **0 a 100**. Alguns pares começam com **afinidade inicial**: amizade (inicial: +20) ou atrito (inicial: −10). Esses pares estão definidos no [elenco](elenco.md).
 - Isso substitui qualquer sistema de "cartas de suporte".
-- No MVP: **encontros genéricos** (servem para qualquer par) + **2 ou 3 eventos únicos por garota**.
+- No MVP: **encontros genéricos** (servem para qualquer par) + os **capítulos de história** da campanha de cada garota ([calendário](calendario.md) §3.2).
 
 ### 4.8 Fim da carreira
 
+- O jogo mostra o **final** do caminho que ela seguiu, e ele fica registrado na ficha dela.
 - Ela recebe **moeda** com bônus por desempenho.
 - O jogador escolhe: **substituir** a versão salva da garota ou **descartar** o resultado.
 - Fica **1 versão salva por garota**.
 - A pool gira.
+
+### 4.9 Qualidade de vida
+
+Melhorias para as reclamações mais comuns do gênero:
+
+- **Repetir a última ação** com um botão (ou tecla), para os turnos de rotina andarem rápido.
+- **Pular diálogos já vistos.** Eventos que o jogador já leu em outra carreira aparecem resumidos, com opção de abrir o texto.
+- **Aviso antes do objetivo:** 6 turnos antes, a tela mostra a etiqueta do olheiro e qual atributo mais aumentaria a chance ([calendário](calendario.md) §3).
+- **Sete Vidas** e o save por turno impedem que um erro no fim apague 50 minutos de carreira sem aviso.
 
 ## 5. Corrida
 
@@ -242,6 +258,29 @@ Ideia vinda das referências: às vezes a corredora **perde a calma** e corre fo
 - Dá uma função clara para a Inteligência nas corridas longas e cria momentos de drama sem controle do jogador.
 - Precisa ser testada no simulador antes de entrar (§12).
 
+### 5.6 Relatório pós-corrida
+
+A reclamação nº 1 do gênero é "perdi e não sei por quê". Depois de cada corrida, o jogo mostra **onde ela ganhou ou perdeu**, com base nos eventos da simulação:
+
+- **Momentos-chave** em linha do tempo: ficou presa no pelotão (bloqueio), o fôlego acabou a X m da chegada, habilidade disparou ou não, ficou afobada, foi ultrapassada no Sprint.
+- **Diagnóstico** em uma frase, com o atributo que mais faltou (ex.: "Faltou Estamina: o fôlego acabou a 320 m. +80 de Estamina teria dado o 2º lugar."). O "teria dado" sai de algumas simulações rápidas com o atributo alterado.
+- **Replay** do trecho decisivo, com a câmera nela.
+- O relatório usa só o que a simulação já calcula, então funciona igual na corrida 3D e no modo headless.
+
+### 5.7 Instrução pré-corrida
+
+Uma decisão simples antes da largada, sem tirar o pilar "a corrida é o resultado":
+
+| Instrução | Efeito (inicial) |
+|---|---|
+| **Poupar** | Ritmo −2% na Largada e no Meio, Sprint +3%. Bom em corridas longas e para Fechadoras. |
+| **Normal** | Ritmo do estilo. |
+| **Forçar** | Ritmo +2% na Largada e no Meio, gasto de fôlego +10%. Bom em corridas curtas e para Ponteiras. |
+
+- A instrução padrão é **Normal**, e o olheiro sugere uma.
+- A Inteligência reduz a chance de afobação (§5.5) mesmo com **Forçar**.
+- Os valores precisam ser testados no simulador para nenhuma instrução ser sempre a melhor (§12).
+
 ## 6. Pool semanal
 
 - A "semana" gira **a cada carreira concluída** (não usa o relógio real, então não dá para burlar).
@@ -276,10 +315,11 @@ Existe **uma única moeda**, sem moeda premium. Fontes:
 **Entra**
 - 6 garotas completas (3 iniciais + 3 na pool), com personalidade e eventos.
 - Mais 42 garotas **só com dados** (estilo, atributos, aptidões) para encher a pool e equilibrar: 6 especialistas por distância × piso ([elenco](elenco.md#elenco-completo-48)).
-- 1 carreira completa de 48 turnos.
+- 1 carreira completa de 72 turnos, com a **campanha única das 6 garotas** (8 objetivos, 2 caminhos e 2 finais cada).
 - 5 atributos, 5 treinos, energia, humor, falha e lesão.
-- Encontros genéricos + 2 ou 3 únicos por garota.
-- Calendário completo com mapa de rotas, 7 tipos de nó, 6 eventos de Mistério e ~15 amuletos. Estreia e 2 Grandes Prêmios escritos à mão, opcionais geradas por modelo ([calendário](calendario.md) §12). Clima do mês e objetivos 2 e 4 sorteados. Simulação em 4 fases, visão top-down.
+- Encontros genéricos + os capítulos de história de cada campanha.
+- Calendário completo com mapa de rotas, 7 tipos de nó, 6 eventos de Mistério e ~15 amuletos. Calendário fixo com 16 corridas com nome e 3 séries, olheiro e Circuitos com corridas geradas ([calendário](calendario.md) §12). Clima do mês. Simulação em 4 fases.
+- Relatório pós-corrida, instrução pré-corrida, chance de falha visível, repetir a última ação e pular diálogos já vistos.
 - Pool semanal com garantia e vínculo.
 - Arte provisória (primitivas 3D) e **1 garota low-poly de referência** para validar o pipeline Blender → Godot (§11.4).
 
@@ -355,13 +395,15 @@ Da análise de UI das referências: personagem grande no centro e informação e
 - Custo da tiragem, valor de N da garantia e moeda por fonte.
 - Limite de energia para falha e chance de lesão.
 - Lista de habilidades genéricas e seus gatilhos.
-- Corrida em nível baixo (150–300): Fechadora forte na Sprint e Ponteira na Longa ([calendário](calendario.md) §11).
+- Corrida em nível baixo (200–330): Fechadora forte na Sprint e Ponteira na Longa ([calendário](calendario.md) §11).
 - Calor na Longa favorece a Ponteira e a Estamina; vento ainda sem efeito na corrida ([calendário](calendario.md) §4.4).
 - Maldições e força das NPCs por magnitude.
 - Afobação (§5.5): chance, duração e custo de fôlego, testados no simulador.
 - **Nome do jogo:** buscar marcas registradas parecidas antes de publicar (§1).
 - Pesos do sorteio do mapa, força dos amuletos e do Desafio.
-- Força das NPCs por categoria, fama por corrida e curva esperada de atributos ([calendário](calendario.md) §2 e §5).
+- **Recalibrar tudo para 72 turnos:** ganhos de treino, força das NPCs por categoria, fama por corrida e curva esperada de atributos ([calendário](calendario.md) §2). O protótipo ainda roda 48 turnos.
+- Instrução pré-corrida (§5.7): nenhuma instrução pode ser sempre a melhor.
+- Olheiro e relatório pós-corrida: custo de rodar ~50 simulações rápidas no Godot sem travar a tela.
 
 ## 13. Documentos relacionados
 

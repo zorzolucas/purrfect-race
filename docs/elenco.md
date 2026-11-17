@@ -1,6 +1,6 @@
 # Nekomusume — Elenco
 
-> Versão 0.4 — 2026-11-17. Na v0.3 as garotas perderam o sobrenome (Lira Alazã → Lira). Na v0.2 todas foram renomeadas com nomes de estrelas: Nina → Nashira, Brisa → Mira, Vega → Capela, Tainá → Antares, Cora → Shaula, Estela → Polaris, Íris → Algol. Complementa o [GDD](GDD.md).
+> Versão 0.5 — 2026-11-17. Na v0.5 entrou o modelo de **campanha única**, com a da Lira como exemplo. Na v0.3 as garotas perderam o sobrenome (Lira Alazã → Lira). Na v0.2 todas foram renomeadas com nomes de estrelas: Nina → Nashira, Brisa → Mira, Vega → Capela, Tainá → Antares, Cora → Shaula, Estela → Polaris, Íris → Algol. Complementa o [GDD](GDD.md).
 > Cada garota tem só o nome de uma **estrela ou constelação**, sem sobrenome (na v0.3 saíram as pelagens). Evitamos nomes usados em outros jogos do gênero (ex.: Vega, Sirius).
 > Na v0.4 (2026-11-17) elas viraram **garotas gato**. Cada uma ganhou uma **pelagem**, que define as cores do modelo 3D (cabelo, orelhas e rabo) e combina com a cor dela na interface. As 42 garotas só com dados ganham pelagem sorteada pelo gerador quando os modelos entrarem.
 > Atributos iniciais e efeitos de habilidade são **(inicial)**, ou seja, valores para balancear.
@@ -58,6 +58,31 @@ As 6 garotas cobrem as 5 copas e o Campeonato Final (5 garotas diferentes) sem s
 3. *Rival declarada*: encontro com Polaris, que abre a rivalidade das duas.
 
 **Afinidades especiais:** amizade natural com **Antares** (as duas são ponteiras e se pegam no treino). Atrito com **Shaula**, porque se acham opostas.
+
+#### Campanha da Lira
+
+*"A chama da largada"*: uma garota que odeia esperar descobre que vencer também é saber esperar. Estrutura do [calendário](calendario.md) §3.
+
+| # | Turno | Corrida | Meta | Dificuldade |
+|---|---|---|---|---|
+| — | 1–12 | *Capítulo 1: "Seis meses?!"* Ela chega querendo correr no primeiro dia e descobre que vai passar um semestre só treinando. Os eventos *Corrida até o refeitório* e *Rival declarada* acontecem aqui. | — | — |
+| 1 | 13 | Estreia, Milha Grama | Top 5 | Normal |
+| 2 | 20 | Aberta gerada, Milha Grama | Top 3 | Normal |
+| 3 | 24 | GP do ano 1, Milha Grama | Top 5 | Normal |
+| 4 | 32 | Prata gerada, **Média Grama** (casa da Polaris) | Chegar **à frente da Polaris** | Normal (rival) |
+| 5 | 40 | **Prêmio Cometa** (Ouro do calendário), Milha Grama | Top 3 | Normal |
+| 6 | 48 | GP do ano 2, Milha Grama | Top 3 | Normal |
+
+**Ponto de virada** (depois do turno 48): se ela **venceu o Prêmio Cometa ou o GP do ano 2**, segue o caminho **Coroa da Milha**. Senão, segue o caminho **Revanche**. O evento *Primeira derrota* pesa: se o jogador escolheu "deixar treinar sozinha", um 2º lugar no GP do ano 2 também leva à Coroa.
+
+| Caminho | Objetivo 7 (turno 60) | GP final (turno 72) | Final |
+|---|---|---|---|
+| **Coroa da Milha** | **Vencer** uma Ouro gerada de Milha Grama (Difícil) | Milha Grama, top 3 | *"Quem espera, vence"*: Lira aprende a segurar o ritmo e vira a referência das novatas. |
+| **Revanche** | Ouro gerada de Média Grama, chegar **à frente da Polaris** | **Versão Média Grama** do GP, top 3 e à frente da Polaris | *"A chama e a estrela"*: a rivalidade vira respeito, e as duas combinam correr juntas no ano seguinte. |
+
+**Série natural:** *Estrela da Milha* (Taça Brisa e Prêmio Cometa, anos 2 e 3). Os objetivos 5 e 6 já empurram para ela.
+
+**As outras 5 campanhas do MVP** (Nashira, Mira, Capela, Antares e Shaula) seguem este modelo e ainda precisam ser escritas.
 
 ---
 

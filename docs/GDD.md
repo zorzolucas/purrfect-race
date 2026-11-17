@@ -1,11 +1,13 @@
 # Galope Estelar — Game Design Document
 
-> Nome provisório. Versão 0.2 — 2026-11-12. Na v0.2 entrou o [calendário da carreira](calendario.md), com mapa de rotas e amuletos.
+> Nome provisório ("Galope" não combina mais com gatas; ver §1). Versão 0.3 — 2026-11-17.
+> Na v0.3 as garotas viraram **garotas gato**, a arte passou a ser **3D low-poly** (§11) e entraram ideias das referências do gênero: legado (§3.6), afobação na corrida (§5.5) e o amuleto Sete Vidas.
+> Na v0.2 entrou o [calendário da carreira](calendario.md), com mapa de rotas e amuletos.
 > Valores marcados com **(inicial)** são pontos de partida para balanceamento, não decisões finais.
 
 ## 1. Visão geral
 
-**Pitch:** simulador de treino e corrida de garotas cavalo. Você conhece as garotas, treina cada uma numa carreira de 2 anos e monta o melhor elenco para vencer copas de estilos diferentes, como os ginásios de um jogo de monstrinhos.
+**Pitch:** simulador de treino e corrida de **garotas gato**. Você conhece as garotas, treina cada uma numa carreira de 2 anos e monta o melhor elenco para vencer copas de estilos diferentes, como os ginásios de um jogo de monstrinhos.
 
 **Pilares**
 1. **Relações importam.** Os encontros mexem no humor, e o humor mexe em treinos e corridas.
@@ -18,7 +20,11 @@
 **Motor:** Godot 4, GDScript.
 **Idioma:** PT-BR, com os textos fora do código para tradução futura.
 
-**Identidade:** universo, academia/liga, personagens, arte, UI e música são **originais**. Nenhuma personagem usa nome de cavalo de corrida real nem é baseada em personagens de outros jogos. Cada garota tem só o nome de uma **estrela ou constelação**, sem sobrenome (ex.: Lira, Shaula).
+**Identidade:** universo, academia/liga, personagens, arte, UI e música são **originais**. Nenhuma personagem é baseada em animais reais famosos nem em personagens de outros jogos. Cada garota tem só o nome de uma **estrela ou constelação**, sem sobrenome (ex.: Lira, Shaula).
+
+**Garotas gato:** são garotas com **orelhas e rabo de gato**, ágeis e curiosas. Cada uma tem uma **pelagem** (laranja rajada, frajola, preta, tricolor…) que define as cores do modelo 3D: cabelo, orelhas e rabo ([elenco](elenco.md)). A pelagem é a identidade visual dela, e os detalhes do visual contam algo da personalidade (lição das referências de design de personagem). O jeito felino aparece nos encontros e nas animações: cochilo no sol, curiosidade, caixas de papelão, orelhas que mostram o humor.
+
+**Nome do jogo:** "Galope Estelar" foi pensado para cavalos. Fica como nome provisório até escolhermos outro (opções: *Patas Estelares*, *Corrida Estelar*, *Felinas Estelares*). O repositório continua `stelar-gallop`.
 
 ## 2. Loop principal
 
@@ -99,6 +105,17 @@ Cada cópia extra sobe o **nível de vínculo** da garota, até no máximo **5**
 
 Não há raridade nem estrelas de personagem: todas as garotas valem o mesmo.
 
+### 3.6 Legado (madrinha)
+
+Nas referências do gênero, o sistema que mais faz o jogador repetir carreiras é **passar parte de uma garota treinada para a próxima**. Aqui isso vira a **madrinha**:
+
+- No começo da carreira, o jogador pode escolher **1 garota salva** do elenco como madrinha (não pode ser a própria garota).
+- A madrinha dá **+5% dos atributos finais dela** como bônus inicial (inicial; teto de +40 por atributo).
+- Nos turnos **13 e 37** acontece um encontro de **inspiração** com a madrinha: chance de ganhar atributos e de subir em 1 nível a aptidão de distância ou piso da casa da madrinha (inicial: 20% por aptidão).
+- Quanto melhor a nota geral da madrinha (§3.1), maiores as chances.
+- Isso dá uso às garotas salvas fora do circuito e soma com o vínculo e os amuletos liberados na progressão entre carreiras.
+- **Fica para depois do MVP**, mas o save já deve guardar a nota e a casa de cada garota salva.
+
 ## 4. Carreira
 
 ### 4.1 Estrutura
@@ -108,7 +125,7 @@ Não há raridade nem estrelas de personagem: todas as garotas valem o mesmo.
 - Um **Grande Prêmio** no fim de cada ano (turnos 24 e 48).
 - **5 objetivos**, nos mesmos turnos em toda carreira, quase sempre na casa da garota (melhor distância e piso). Os objetivos 2 e 4 são **sorteados** de uma lista de candidatos. Se falhar um, **a carreira acaba ali**, mas a garota ainda pode ser salva como estava.
 - **Calendário roguelike:** entre um objetivo e outro, o jogador escolhe uma rota num **mapa sorteado**. Cada nó dura 1 mês e muda o contexto (treino focado, circuito de corridas, festival, recuperação, biblioteca, desafio, mistério). Corridas opcionais só aparecem nos nós de circuito.
-- **Amuletos:** cada objetivo cumprido dá 1 amuleto (escolha entre 3), um modificador que vale até o fim da carreira. Não passam para a garota salva.
+- **Amuletos:** cada objetivo cumprido dá 1 amuleto (escolha entre 3), um modificador que vale até o fim da carreira. Não passam para a garota salva. Proposta nova: o amuleto raro **Sete Vidas**, que deixa refazer uma vez um objetivo falhado ([calendário](calendario.md) §5.2).
 - **Clima do mês** (tempo bom, chuva, calor, frio, vento, noite de estrelas), seguindo as estações. Ele mexe no treino e, na chuva e no calor, na corrida.
 - **Magnitude** (0 a 5): dificuldade por garota, liberada vencendo o Grande Prêmio final. Fica para depois do MVP.
 - Uma **semente** por carreira guarda todos os sorteios: recarregar o save e repetir a ação dá o mesmo resultado.
@@ -211,10 +228,19 @@ Cada estilo tem uma **posição-alvo** e um **ritmo de gasto de fôlego** por fa
 
 ### 5.4 Apresentação (MVP)
 
-- Pista oval 2D vista de cima. Cada corredora é um marcador colorido.
-- Ranking ao vivo na lateral e aviso quando uma habilidade dispara.
+- Corrida em **3D** com câmeras de transmissão (automática, acompanhar, lateral, frente, aérea, tribuna). O protótipo usa primitivas, e os modelos low-poly entram depois (§11).
+- Ranking ao vivo, minimapa e aviso quando uma habilidade dispara.
 - Botões **1x / 2x / pular**.
-- Depois do MVP: visão lateral mais bonita.
+
+### 5.5 Afobação (proposta)
+
+Ideia vinda das referências: às vezes a corredora **perde a calma** e corre fora do plano.
+
+- No começo do Meio, cada corredora tem uma chance de ficar **afobada** (inicial: 15% com Inteligência 0, caindo até 3% com Inteligência 1200).
+- Afobada, ela tenta ir para a frente do pelotão por alguns segundos, ignorando a posição-alvo do estilo, e gasta **+50% de fôlego** nesse tempo.
+- Aparece na tela (orelhas para trás e rabo eriçado) e no ranking ao vivo.
+- Dá uma função clara para a Inteligência nas corridas longas e cria momentos de drama sem controle do jogador.
+- Precisa ser testada no simulador antes de entrar (§12).
 
 ## 6. Pool semanal
 
@@ -255,13 +281,14 @@ Existe **uma única moeda**, sem moeda premium. Fontes:
 - Encontros genéricos + 2 ou 3 únicos por garota.
 - Calendário completo com mapa de rotas, 7 tipos de nó, 6 eventos de Mistério e ~15 amuletos. Estreia e 2 Grandes Prêmios escritos à mão, opcionais geradas por modelo ([calendário](calendario.md) §12). Clima do mês e objetivos 2 e 4 sorteados. Simulação em 4 fases, visão top-down.
 - Pool semanal com garantia e vínculo.
-- Arte provisória (formas e retratos placeholder).
+- Arte provisória (primitivas 3D) e **1 garota low-poly de referência** para validar o pipeline Blender → Godot (§11.4).
 
 **Fica para depois**
 - Mais garotas, mais corridas, circuito completo.
 - Magnitude (dificuldade crescente), ver [calendário](calendario.md) §10.
-- Retratos 2D finais com expressões (quem faz a arte ainda será decidido).
-- Visão lateral da corrida.
+- Modelos low-poly finais das 6 garotas do MVP, rivais e NPCs (§11).
+- Cenários low-poly além da pista e do pátio da academia.
+- Legado/madrinha (§3.6).
 - História principal.
 - Mobile.
 
@@ -273,8 +300,55 @@ Existe **uma única moeda**, sem moeda premium. Fontes:
 - **Save automático a cada turno**, em um único slot.
 - Todo sorteio da carreira sai de `hash(semente, turno, contexto)`, com fluxos separados para mapa, treino, encontros e corrida ([calendário](calendario.md) §6).
 - A simulação da corrida não depende da tela, para poder rodar headless em testes e balanceamento.
+- Modelos 3D feitos no **Blender** e exportados em **glTF (`.glb`)** para o Godot (§11.4).
 
-## 11. Pendências de balanceamento
+## 11. Direção de arte: 3D low-poly
+
+### 11.1 Ideia
+
+Personagens e cenários em **3D low-poly** com cara de anime: poucos polígonos, formas limpas e cor chapada. É mais barato de produzir do que retratos 2D com várias expressões, combina com a corrida 3D que o protótipo já tem e dá uma cara própria ao jogo dentro do gênero.
+
+Referências que o Lucas mandou: modelagem de personagem low-poly anime no Blender a partir de desenhos de frente e perfil, com rig Rigify, e um personagem estilo PS1 (blockout, UV e textura). As duas seguem o mesmo pipeline (§11.4).
+
+**Estilo escolhido (inicial):** low-poly **limpo**, com cores de paleta e sombreamento toon simples. O visual "PS1" (textura serrilhada, vértices tremendo) fica como **filtro opcional** de tela, não como base, porque dificulta ler as expressões.
+
+### 11.2 Personagens
+
+- **Base única** de corpo para todas as garotas (~2.500 a 4.000 triângulos), com variações de cabelo, roupa, orelhas e rabo. Assim 48 garotas não viram 48 modelos do zero.
+- **Orelhas e rabo** têm ossos próprios. O rabo é uma corrente de ossos com balanço físico simples, e as orelhas giram para mostrar emoção (em pé, de lado, para trás).
+- **Cor por paleta:** o modelo usa uma textura pequena de paleta (um quadrado por cor). Trocar a pelagem é trocar a paleta, sem refazer o modelo.
+- **Rosto:** olhos e boca como **textura trocável** (atlas de expressões), não como malha. Expressões do MVP: normal, feliz, determinada, cansada, triste, surpresa.
+- **Animações:** parada, andar, correr (2 ritmos), sprint, comemorar, perder, treinar (1 por treino) e cochilar.
+- **Uniformes:** roupa de treino e roupa de corrida. A roupa de corrida tem a cor e um símbolo da estrela de cada garota.
+- **NPCs:** a base com paleta e cabelo sorteados.
+
+### 11.3 Cenários
+
+| Cenário | Uso | Prioridade |
+|---|---|---|
+| Pista (grama e terra) com arquibancada | Corridas | MVP |
+| Pátio da academia | Tela principal: a garota escolhida aparece grande, parada, e outras garotas passeiam no fundo. Clicar numa delas abre um encontro curto. | MVP |
+| Campo de treino | Animação dos treinos | Depois |
+| Cidade, praia e serra | Saídas, festival e férias | Depois |
+
+Os cenários usam a mesma paleta compartilhada e luz de céu simples. O clima do mês (chuva, neblina, noite de estrelas) aparece no cenário.
+
+### 11.4 Pipeline
+
+1. **Referência:** desenho de frente e de perfil da garota (pode ser rascunho).
+2. **Blockout e modelagem** no Blender, na base compartilhada.
+3. **UV e paleta:** UV de cada parte em cima da cor certa da textura de paleta.
+4. **Rig** com Rigify, mais os ossos de orelha e rabo.
+5. **Exportar** em glTF (`.glb`) para `modelos/` no projeto Godot.
+6. **Godot:** material toon com a paleta, troca de expressão por textura, e a cena da corrida troca as cápsulas pelos modelos.
+
+O MCP do Blender ([mcp-blender.md](mcp-blender.md)) permite que o Claude crie e confira modelos, e o MCP do Godot ([mcp-godot.md](mcp-godot.md)) permite montar as cenas. A primeira tarefa de arte é **1 garota de referência** passando pelo pipeline inteiro, antes de produzir as outras.
+
+### 11.5 Interface
+
+Da análise de UI das referências: personagem grande no centro e informação em cima, botões principais embaixo, cores neutras com destaque de grama e terra, e o mesmo sistema visual em todas as telas. No PC isso vira painel de ações na parte de baixo da tela e atalhos de teclado.
+
+## 12. Pendências de balanceamento
 
 - Corrida: Ponteira forte no nível 400 em Média/Longa (ver [corrida.md](corrida.md) §8).
 - Ganho por treino e por nível de treino.
@@ -284,11 +358,13 @@ Existe **uma única moeda**, sem moeda premium. Fontes:
 - Corrida em nível baixo (150–300): Fechadora forte na Sprint e Ponteira na Longa ([calendário](calendario.md) §11).
 - Calor na Longa favorece a Ponteira e a Estamina; vento ainda sem efeito na corrida ([calendário](calendario.md) §4.4).
 - Maldições e força das NPCs por magnitude.
+- Afobação (§5.5): chance, duração e custo de fôlego, testados no simulador.
 - Pesos do sorteio do mapa, força dos amuletos e do Desafio.
 - Força das NPCs por categoria, fama por corrida e curva esperada de atributos ([calendário](calendario.md) §2 e §5).
 
-## 12. Documentos relacionados
+## 13. Documentos relacionados
 
 - [Elenco](elenco.md): as 6 garotas do MVP com eventos, 2 rivais e o elenco completo de 48.
 - [Calendário da carreira](calendario.md): turnos, objetivos, mapa de rotas, clima, amuletos, semente, magnitude, fama e férias.
+- [MCP do Blender](mcp-blender.md) e [MCP do Godot](mcp-godot.md): ferramentas para modelar e montar o jogo.
 - [Fórmula da corrida](corrida.md): fases, velocidade, fôlego, bloqueio, habilidades e calibração.

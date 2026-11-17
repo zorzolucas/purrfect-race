@@ -298,7 +298,7 @@ func ganho_previsto(t: String) -> Dictionary:
 		"chuva": m *= 0.9 if t == "vel" and not tem_efeito("capa_chuva") else 1.0
 		"vento": m *= 1.1 if t == "int" else 1.0
 	var tr: Dictionary = TREINOS[t]
-	var extra := {}  # bônus por atributo (ex.: Ferradura de Bronze, +5% de Velocidade)
+	var extra := {}  # bônus por atributo (ex.: Guizo de Bronze, +5% de Velocidade)
 	for a in amuletos:
 		var ganhos: Dictionary = Dados.amuleto(a).get("efeito", {}).get("ganho", {})
 		for k in ganhos:

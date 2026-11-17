@@ -87,7 +87,7 @@
     {
       "id": "mira_nuvem",
       "garota": "Mira",
-      "titulo": "Nuvem em forma de cavalo",
+      "titulo": "Nuvem em forma de peixe",
       "texto": "No meio do aquecimento, {nome} para e aponta para o céu. — Olha, aquela nuvem está galopando!",
       "quando": {"turno_min": 3},
       "escolhas": [

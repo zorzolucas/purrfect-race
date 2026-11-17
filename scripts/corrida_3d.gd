@@ -225,7 +225,7 @@ func _corredora(cor: Color, nome: String, jogadora: bool) -> Node3D:
 	cabeca.material_override = _material(COR_PELE)
 	cabeca.position.y = 1.78
 	corpo.add_child(cabeca)
-	# orelhas e rabo (cones e cápsula) para ler como "garota cavalo"
+	# orelhas e rabo (cones e cápsula) para ler como "garota gato"
 	var cabelo := _material(cor.darkened(0.45))
 	for lado in [-1.0, 1.0]:
 		var orelha := MeshInstance3D.new()

@@ -1,21 +1,22 @@
-# Galope Estelar — Elenco
+# Nekomusume — Elenco
 
-> Versão 0.3 — 2026-11-14. Na v0.3 as garotas perderam o sobrenome (Lira Alazã → Lira). Na v0.2 todas foram renomeadas com nomes de estrelas: Nina → Nashira, Brisa → Mira, Vega → Capela, Tainá → Antares, Cora → Shaula, Estela → Polaris, Íris → Algol. Complementa o [GDD](GDD.md).
+> Versão 0.4 — 2026-11-17. Na v0.3 as garotas perderam o sobrenome (Lira Alazã → Lira). Na v0.2 todas foram renomeadas com nomes de estrelas: Nina → Nashira, Brisa → Mira, Vega → Capela, Tainá → Antares, Cora → Shaula, Estela → Polaris, Íris → Algol. Complementa o [GDD](GDD.md).
 > Cada garota tem só o nome de uma **estrela ou constelação**, sem sobrenome (na v0.3 saíram as pelagens). Evitamos nomes usados em outros jogos do gênero (ex.: Vega, Sirius).
+> Na v0.4 (2026-11-17) elas viraram **garotas gato**. Cada uma ganhou uma **pelagem**, que define as cores do modelo 3D (cabelo, orelhas e rabo) e combina com a cor dela na interface. As 42 garotas só com dados ganham pelagem sorteada pelo gerador quando os modelos entrarem.
 > Atributos iniciais e efeitos de habilidade são **(inicial)**, ou seja, valores para balancear.
 
 ## Visão geral
 
-| # | Garota | Papel | Estilo (principal / secundário) | Melhor distância | Melhor piso |
-|---|---|---|---|---|---|
-| 1 | **Lira** | Inicial | Ponteira / — | Milha | Grama |
-| 2 | **Nashira** | Inicial | Perseguidora / Arrancadora | Média | Grama |
-| 3 | **Mira** | Inicial | Fechadora / — | Longa | Grama |
-| 4 | **Capela** | Pool | Arrancadora / Perseguidora | Milha | Grama |
-| 5 | **Antares** | Pool | Ponteira / Perseguidora | Sprint | Grama |
-| 6 | **Shaula** | Pool | Fechadora / Arrancadora | Longa | Terra |
-| R1 | **Polaris** | Rival (NPC) | Ponteira | Média | Grama |
-| R2 | **Algol** | Rival (NPC) | Arrancadora | Sprint | Terra |
+| # | Garota | Papel | Estilo (principal / secundário) | Melhor distância | Melhor piso | Pelagem |
+|---|---|---|---|---|---|---|
+| 1 | **Lira** | Inicial | Ponteira / — | Milha | Grama | Laranja rajada |
+| 2 | **Nashira** | Inicial | Perseguidora / Arrancadora | Média | Grama | Cinza-azulada |
+| 3 | **Mira** | Inicial | Fechadora / — | Longa | Grama | Frajola (preto e branco) |
+| 4 | **Capela** | Pool | Arrancadora / Perseguidora | Milha | Grama | Creme com pontas escuras |
+| 5 | **Antares** | Pool | Ponteira / Perseguidora | Sprint | Grama | Tricolor |
+| 6 | **Shaula** | Pool | Fechadora / Arrancadora | Longa | Terra | Preta |
+| R1 | **Polaris** | Rival (NPC) | Ponteira | Média | Grama | Branca |
+| R2 | **Algol** | Rival (NPC) | Arrancadora | Sprint | Terra | Tigrada cinza |
 
 **Cobertura do circuito** (cada copa precisa de uma garota "Ótima" ou "Boa" diferente):
 
@@ -105,7 +106,7 @@ As 6 garotas cobrem as 5 copas e o Campeonato Final (5 garotas diferentes) sem s
 
 **Eventos únicos**
 1. *Perdida no caminho*: ir buscá-la (+afinidade, −1 ação de treino) ou deixar ela chegar sozinha (+Int dela, −humor).
-2. *Nuvem em forma de cavalo*: sentar junto e olhar (+humor grande, −energia leve) ou puxar de volta pro treino (+Est).
+2. *Nuvem em forma de peixe*: sentar junto e olhar (+humor grande, −energia leve) ou puxar de volta pro treino (+Est).
 3. *A outra Mira*: depois da primeira vitória de virada, ela confessa que gosta de correr no fundo. Isso destrava um bônus de Det.
 
 **Afinidades especiais:** protegida por **Nashira**. Admira **Shaula** em segredo.

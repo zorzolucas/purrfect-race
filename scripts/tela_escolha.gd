@@ -7,7 +7,7 @@ signal escolheu(inicial: Dictionary)
 
 func _ready() -> void:
 	var v := UI.vbox(18)
-	v.add_child(UI.label("Galope Estelar", 40, UI.DESTAQUE))
+	v.add_child(UI.label("Nekomusume: Corrida Purrfeita", 40, UI.DESTAQUE))
 	v.add_child(UI.label("Escolha sua primeira garota. As outras você conhece pela pool semanal.", 20, UI.SUAVE))
 	var linha := UI.hbox(18)
 	linha.size_flags_vertical = Control.SIZE_EXPAND_FILL

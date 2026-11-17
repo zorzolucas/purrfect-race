@@ -1,4 +1,4 @@
-# Galope Estelar — Calendário da Carreira
+# Nekomusume — Calendário da Carreira
 
 > Versão 0.3 — 2026-11-12. Complementa o [GDD](GDD.md) §4.
 > Na v0.3 entraram o clima do mês (§4.4), os objetivos sorteados (§3.2) e a magnitude (§10).
@@ -206,18 +206,19 @@ Amuletos são modificadores que valem **até o fim da carreira**. Eles criam "bu
 
 | Amuleto | Tipo | Efeito |
 |---|---|---|
-| Ferradura de Bronze | Simples | Ganho de Velocidade +5% |
+| Guizo de Bronze | Simples | Ganho de Velocidade +5% |
 | Fita Azul | Simples | +10% de fama em toda corrida |
 | Garrafinha | Simples | Descanso recupera +10 de energia |
 | Sino de Vento | Troca | Treino de Poder conta 1 nível acima, mas Descansar recupera −20% |
 | Coração de Fogo | Troca | Vitória sobe o humor 2 níveis, derrota (fora do top 3) derruba 2 |
 | Mapa Velho | Troca | Vê o mapa do trecho seguinte, mas cada trecho tem 1 Circuito a menos |
 | Lenço da Ponta | Estilo (Ponteira) | Na Largada, +5% de velocidade se estiver no top 3 |
-| Espora de Prata | Estilo (Fechadora) | No Sprint, gasta 10% menos fôlego |
+| Garra de Prata | Estilo (Fechadora) | No Sprint, gasta 10% menos fôlego |
 | Bússola | Estilo (Perseguidora) | Chance de bloqueio −30% |
 | Trevo Torto | Estilo (Arrancadora) | Habilidades do Final disparam com +15% de chance |
 | Estrela Cadente | Raro | Uma vez por carreira, uma falha de treino vira sucesso |
 | Constelação | Raro | Os 2 treinos naturais da garota rendem +20% em vez de +10% |
+| Sete Vidas *(proposta)* | Raro | Uma vez por carreira, se ela falhar um objetivo, pode correr de novo no turno seguinte em vez de encerrar a carreira. O amuleto some depois do uso. |
 
 No MVP: **~15 amuletos**.
 
@@ -321,7 +322,7 @@ Na astronomia, a **magnitude** mede o brilho de uma estrela. Aqui ela é o níve
 
 | Maldição | Efeito |
 |---|---|
-| Ferradura Solta | 5% de chance de falha em todo treino, mesmo com energia cheia |
+| Coleira Frouxa | 5% de chance de falha em todo treino, mesmo com energia cheia |
 | Torcida Exigente | Fama −20% em toda corrida |
 | Insônia | Descanso recupera −15% |
 | Nuvem Carregada | Chuva sai com o dobro da chance |

@@ -44,7 +44,7 @@ func _initialize() -> void:
 	var g0: float = base.ganho_previsto("vel").vel
 	base.amuletos = ["ferradura"]
 	var g1: float = base.ganho_previsto("vel").vel
-	_checar(absf(g1 / g0 - 1.05) < 0.001, "Ferradura +5%% (%.3f)" % (g1 / g0))
+	_checar(absf(g1 / g0 - 1.05) < 0.001, "Guizo +5%% (%.3f)" % (g1 / g0))
 	var d0: int = base.descanso_previsto()
 	base.amuletos = ["garrafinha"]
 	_checar(base.descanso_previsto() == d0 + 10, "Garrafinha +10")

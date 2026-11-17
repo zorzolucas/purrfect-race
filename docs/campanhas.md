@@ -1,5 +1,6 @@
 # Nekomusume — Campanhas e balanceamento
 
+> Versão 0.3 — 2026-11-17. Na v0.3 entraram o olheiro, a instrução pré-corrida, as séries e a madrinha no protótipo, e o bot rodou de novo (§7).
 > Versão 0.2 — 2026-11-17. Na v0.2 entraram os resultados do bot na carreira de 72 turnos (§7) e as regras de virada calibradas.
 > Versão 0.1 — 2026-11-17. Complementa o [calendário](calendario.md) §3 (estrutura da campanha) e o [elenco](elenco.md).
 > Valores marcados com **(inicial)** são pontos de partida para balanceamento.
@@ -542,43 +543,47 @@ Mexer sempre na ordem abaixo, um botão por vez, e rodar de novo:
 
 ## 7. Resultados
 
-Rodada de 2026-11-17 no protótipo de 72 turnos: **20 carreiras por garota e por conta** (sementes 1 a 20), as 48 garotas, 1.920 carreiras.
+Rodada de 2026-11-17 (v0.3), depois de entrarem o **olheiro**, a **instrução pré-corrida**, as **séries** e a **madrinha**: **20 carreiras por garota e por conta** (sementes 1 a 20), as 48 garotas, 1.920 carreiras. O bot agora corre só onde o olheiro diz Favorita ou Disputada e usa a instrução que ele sugere. A rodada anterior (v0.2, sem esses sistemas) deu 34,7% na conta nova e 55,9% na madura.
 
 ### 7.1 Conta nova
 
 | Objetivo | 1 (t13) | 2 (t20) | 3 (t24) | 4 (t32) | 5 (t40) | 6 (t48) | 7 (t60) | 8 (t72) |
 |---|---|---|---|---|---|---|---|---|
-| Passa | 93% | 84% | 75% | 65% | 57% | 48% | 41% | **35%** |
-| Queda de quem chega | 7% | 10% | 11% | 13% | 13% | 16% | 16% | 14% |
+| Passa | 93% | 83% | 72% | 58% | 51% | 45% | 38% | **33%** |
+| Queda de quem chega | 7% | 11% | 14% | 18% | 13% | 11% | 16% | 14% |
 
-- **Carreiras completas: 34,7%** (alvo 30% a 40%). Nenhum objetivo derruba mais de 16% de quem chega nele (teto 25%).
-- **Por casa:** de 31% (Média Grama e Milha Grama) a 38% (Longa Grama). Diferença de 7 pontos.
-- **Por arquétipo:** de 28% (Festeira) a 45% (Perfeccionista). Diferença de 17 pontos, acima da meta, mas cada arquétipo tem só 60 a 80 carreiras (±6 pontos de sorte). Fica para conferir numa rodada maior.
-- **Garotas:** de 25% a 50%, dentro do que a sorte explica com 20 carreiras cada.
-- **Curva de atributos:** 207 / 308 / 407 / 537 / 664 / 799 nos turnos 13, 24, 36, 48, 60 e 72 (alvo 200 / 330 / 460 / 590 / 700 / 800).
-- **18 corridas** por carreira (alvo 14 a 20). Fama média de 3.400 no turno 40.
-- **GP final vencido** em 30% das carreiras: é o ritmo para liberar a Magnitude 1.
-- **Depois da virada**, o caminho A completa 74% e o B 70%.
+- **Carreiras completas: 32,8%** (alvo ~35%, faixa de 30% a 40%). Nenhum objetivo derruba mais de 18% de quem chega nele (teto 25%). O mais duro é o objetivo 4 (turno 32), a primeira Prata.
+- **Por casa:** de 24% (Média Terra) a 40% (Sprint Terra). Diferença de 16 pontos, maior que os 7 da v0.2: a instrução Forçar ajuda muito na Sprint, e o multiplicador de distância da Sprint subiu de ×0,95 para ×0,99 para compensar.
+- **Por arquétipo:** de 26% (Capitã e Estrategista) a 45% (Teimosa). Diferença de 19 pontos, ainda acima da meta de 10.
+- **Garotas:** de 15% (Hamal) a 50%. Com 20 carreiras cada, a sorte explica ±11 pontos.
+- **Curva de atributos:** 207 / 311 / 416 / 551 / 680 / 812 nos turnos 13, 24, 36, 48, 60 e 72 (alvo 200 / 330 / 460 / 590 / 700 / 800).
+- **16,4 corridas** por carreira (alvo 14 a 20). Fama média de 2.840 no turno 40 (era 3.400): o olheiro dá ×0,75 nas corridas em que ela é Favorita.
+- **GP final vencido** em 29% das carreiras. Depois da virada, o caminho A completa 75% e o B 70%.
+- **Olheiro:** nas corridas do bot, 65% Favorita, 34% Disputada e 1% Azarão (o bot evita o Azarão de propósito, então é o jogador que arrisca quem vai ver mais).
+- **Instrução sugerida:** Forçar 42%, Poupar 42%, Normal 16%. Nenhuma é sempre a melhor (GDD §5.7 e `testes/instrucao.gd`).
+- **Títulos por carreira:** Coroa Dupla 0,42, Volta ao Céu 0,15, Tríplice da casa 0,12. A Coroa Dupla sai fácil demais (o bot não planeja rota e mesmo assim consegue), então vale ficar de olho.
 
 ### 7.2 Conta madura
 
 | Objetivo | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 |
 |---|---|---|---|---|---|---|---|---|
-| Passa | 99% | 96% | 92% | 85% | 78% | 71% | 63% | **56%** |
+| Passa | 98% | 94% | 89% | 79% | 74% | 68% | 60% | **55%** |
+| Queda de quem chega | 2% | 4% | 6% | 11% | 6% | 8% | 12% | 8% |
 
-- **Carreiras completas: 55,9%** (alvo 50% a 60%), com o teto de **+25 por atributo** para vínculo + madrinha.
-- Por casa, de 51% a 61%. A curva fica uns 25 a 55 pontos acima da conta nova, e o GP final é vencido em 48% das carreiras.
-- Com o teto anterior (+50), a conta madura completava **73%**: o bônus inicial vira mais corridas, mais fama e mais atributos.
+- **Carreiras completas: 55,4%** (alvo ~55%), com a madrinha de nota ~700, vínculo 3 e o teto de **+25 por atributo**.
+- Por casa, de 50% a 61%. Curva 232 / 336 / 443 / 580 / 712 / 859, 22,7 corridas por carreira e GP final vencido em 50%.
+- Mais títulos: Coroa Dupla 0,86, Volta ao Céu 0,33 e Tríplice 0,29 por carreira.
 
 ### 7.3 Ponto de virada (conta nova)
 
 | Divisão no caminho A | Campanhas |
 |---|---|
-| 35% a 65% (dentro da meta) | Lira, Nashira, Mira, Capela, Antares, Shaula, Capitã, Competitiva, Curiosa, Durona, Estrategista, Estrela, Festeira, Perfeccionista, Sonhadora, Teimosa |
-| Perto do limite | Leal (34%), Misteriosa (34%) |
+| 35% a 65% (dentro da meta) | Capela, Lira, Mira, Shaula, Capitã, Competitiva, Curiosa, Estrategista, Estrela, Festeira, Perfeccionista, Sonhadora, Teimosa |
+| Perto do limite | Antares (67%), Nashira (67%), Leal (31%), Misteriosa (30%) |
+| Fora | Durona (76%) |
 
-- O bot quase não usa Sair e nunca se lesiona, então as regras de **saídas** e de **lesão** são as menos confiáveis aqui. Um jogador que sai mais com a garota vai para o caminho A da Leal e da Shaula com mais frequência.
-- Com conta madura, os caminhos de vitória ficam mais comuns (Durona e Perfeccionista com 80% no A). A meta de 35% a 65% vale para a conta nova.
+- Duas regras mudaram nesta rodada: a **Estrela** pede fama de **6000** (era 7500, porque a fama caiu com o olheiro) e a **Sonhadora** pede **4 vitórias de virada** (eram 2; com Poupar ela vira muito mais corridas e ia 96% para o A).
+- A **Durona** (vencer o GP do ano 2 sem lesão) ficou fácil porque a instrução certa aumenta a chance de vencer o GP. Fica para a próxima rodada, junto com a Leal e a Misteriosa, que dependem de escolhas que o bot faz ao acaso.
 
 ### 7.4 O que mudou para chegar aqui
 
@@ -591,20 +596,20 @@ Rodada de 2026-11-17 no protótipo de 72 turnos: **20 carreiras por garota e por
 | Força das NPCs | Fixa por categoria | Por categoria e por ano, × distância (calendário §2) |
 | Vínculo por nível | +8 | +4 |
 | Madrinha | +5%, teto 40 | +3%, teto 20; com o vínculo, teto 25 |
+| Força das NPCs (v0.3) | Estreia 170, Aberta 215/300/380, Prata 315/420, Ouro 380/455, GP 290/405/620 | Estreia 191, Aberta 241/321/407, Prata 337/449, Ouro 407/487, GP 320/421/663 (calendário §2) |
+| Multiplicador da Sprint (v0.3) | ×0,95 | ×0,99 |
 
 O ganho do treino caiu porque o semestre de base sozinho levava a garota a ~320 na Estreia. O bônus por nível e os atributos por corrida devolvem o crescimento nos anos 2 e 3, quando ela corre mais e treina menos.
 
 ### 7.5 Próximos passos
 
-- Rodar 100 carreiras por arquétipo para confirmar a diferença de 17 pontos entre arquétipos.
+- **Feito em 2026-11-17 (v0.3):** olheiro, séries e títulos, instrução pré-corrida (com o teste de que nenhuma é sempre a melhor), tela da madrinha, visual do elenco em `data/garotas.json` e a nova rodada do bot.
+- Rodar 100 carreiras por arquétipo para confirmar a diferença de 19 pontos entre arquétipos.
+- Recalibrar as viradas da Durona, da Leal e da Misteriosa.
+- Diminuir a distância entre as casas (Média Terra 24% contra Sprint Terra 40%).
+- Decidir se a Coroa Dupla deve ficar mais difícil (sai em 42% das carreiras sem planejar).
 - Testar com jogadores de verdade: o bot não planeja rota nem usa o calendário fixo de propósito.
-- Conferir as regras de virada da Leal e da Misteriosa numa próxima rodada.
-- **Olheiro** no protótipo (calendário §7.3): etiqueta de chance antes de cada corrida e o multiplicador de fama. O bot hoje usa uma conta simples no lugar dele.
-- **Séries e títulos** no protótipo (calendário §7.4): Tríplice da casa, Coroa Dupla e Volta ao Céu, com as recompensas.
-- **Instrução pré-corrida** no protótipo (GDD §5.7): Poupar, Normal e Forçar. Depois, rodar o bot de novo para conferir que nenhuma instrução é sempre a melhor.
-- **Tela da madrinha:** escolher a garota salva no começo da carreira. As regras já estão no código, mas só o bot usa.
-- **Capturas de tela** das telas novas (capítulos, objetivos do caminho, final): o `testes/capturas.gd` precisa de janela, então tem que rodar no PC.
-- Rodar o balanceamento de novo depois dessas entradas, porque o olheiro e as séries mudam quantas corridas a garota faz.
+- Mostrar o encontro de inspiração da madrinha (hoje o bônus dos turnos 25 e 49 acontece em silêncio).
 
 ## 8. Decisões pequenas tomadas aqui
 

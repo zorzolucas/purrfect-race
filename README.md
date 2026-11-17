@@ -115,6 +115,10 @@ Com 30 carreiras por garota, o bot cumpre os objetivos em ~80% / 56% / 45% / 38%
 (~160 / 260 / 425 / 520 / 745). O bot é simples; quem planeja a rota e cuida do humor vai melhor.
 
 ![Escolha](docs/prototipo/1_escolha.png)
+![Madrinha](docs/prototipo/17_madrinha.png)
+![Olheiro e instrução](docs/prototipo/18_olheiro_objetivo.png)
+![Cartões com olheiro e séries](docs/prototipo/19_cartoes_olheiro.png)
+![Olheiro com série](docs/prototipo/20_olheiro_serie.png)
 ![Academia](docs/prototipo/9_academia.png)
 ![Pool](docs/prototipo/10_pool.png)
 ![Fim de carreira](docs/prototipo/11_fim_de_carreira.png)

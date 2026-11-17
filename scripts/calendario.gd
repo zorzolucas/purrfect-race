@@ -1,13 +1,12 @@
 class_name Calendario
 extends RefCounted
 ## Regras do calendário da carreira (docs/calendario.md): datas, trechos, mapa de rotas,
-## clima, objetivos sorteados e corridas geradas. Tudo sai da semente da carreira, com
+## clima, calendário fixo e corridas geradas. Os objetivos vêm da campanha (campanha.gd). Tudo sai da semente da carreira, com
 ## fluxos separados por contexto (§6), então o mesmo save repete os mesmos sorteios.
 ## Funções estáticas que recebem os dados (data/calendario.json) e a semente.
 
-const TURNOS := 48
-const OBJETIVOS_FIXOS := {4: "estreia", 24: "gp1", 48: "gp2"}
-const TURNOS_OBJETIVO := [4, 12, 24, 36, 48]
+const TURNOS := 72
+const TURNOS_OBJETIVO := [13, 20, 24, 32, 40, 48, 60, 72]
 
 
 static func cal() -> Dictionary:
@@ -57,20 +56,20 @@ static func trecho_de(turno: int) -> int:
 	return -1
 
 
-## Linha do mapa (mês dentro do trecho) para este turno.
+## Linha do mapa (nó dentro do trecho) para este turno. Cada nó dura 2 turnos (§4.1).
 static func linha_do_mapa(turno: int, trecho: int) -> int:
-	return mes_idx(turno) - mes_idx(int(cal().trechos[trecho].turnos[0]))
+	return (turno - int(cal().trechos[trecho].turnos[0])) / 2
 
 
 static func e_ferias(turno: int) -> bool:
-	for t in cal().trechos:
-		if t.has("ferias") and turno >= t.ferias[0] and turno <= t.ferias[1]:
+	for f in cal().ferias:
+		if turno >= int(f[0]) and turno <= int(f[1]):
 			return true
 	return false
 
 
 static func e_vespera(turno: int) -> bool:
-	return cal().trechos.any(func(t): return int(t.vespera) == turno)
+	return cal().vesperas.any(func(v): return int(v) == turno)
 
 
 # ---------- clima (§4.4) ----------
@@ -92,9 +91,10 @@ static func gerar_mapa(semente: int, trecho: int) -> Array:
 	var c := cal()
 	var n_linhas: int = c.trechos[trecho].nos
 	var r := rng(semente, ["mapa", trecho])
+	var sem: Array = c.trechos[trecho].get("sem", [])
 	var pesos := {}
 	for tipo in c.nos:
-		if tipo == "desafio" and trecho == 0:
+		if tipo in sem:
 			continue
 		pesos[tipo] = float(c.nos[tipo].peso)
 	var linhas := []
@@ -111,7 +111,7 @@ static func gerar_mapa(semente: int, trecho: int) -> Array:
 		if linha[0].tipo == linha[1].tipo and linha[1].tipo == linha[2].tipo:
 			linha[r.randi() % 3] = _no("recuperacao" if linha[0].tipo != "recuperacao" else "foco", r)
 		linhas.append(linha)
-	if not _caminho_sem_circuito(linhas).is_empty():
+	if not "circuito" in sem and not _caminho_sem_circuito(linhas).is_empty():
 		# o menor "corte" possível: 2 Circuitos numa linha e os 2 do lado oposto na seguinte
 		# (ex.: colunas 0-1 e depois 1-2). Qualquer caminho passa por um deles.
 		var i := r.randi() % (n_linhas - 1)
@@ -169,70 +169,6 @@ static func _caminho_sem_circuito(linhas: Array) -> Array:
 	return []
 
 
-# ---------- objetivos (§3) ----------
-
-static func distancia_vizinha(aptidao: Dictionary, distancia: String) -> String:
-	var ordem: Array = ["sprint", "milha", "media", "longa"]
-	var i := ordem.find(distancia)
-	var opcoes := []
-	for j in [i - 1, i + 1]:
-		if j >= 0 and j < 4:
-			opcoes.append(ordem[j])
-	opcoes.sort_custom(func(a, b): return Dados_APT(aptidao[a]) > Dados_APT(aptidao[b]))
-	return opcoes[0]
-
-
-static func Dados_APT(letra: String) -> float:
-	return {"R": 0.90, "O": 0.95, "B": 1.00, "X": 1.05}[letra]
-
-
-static func outro_piso(piso: String) -> String:
-	return "terra" if piso == "grama" else "grama"
-
-
-## Os 5 objetivos da carreira. Os objetivos 2 e 4 são sorteados (§3.2).
-static func objetivos(semente: int, aptidao: Dictionary, distancia: String, piso: String) -> Array:
-	var c := cal()
-	var lista := []
-	var nome_gp: Array = c.nome_gp
-	lista.append({"turno": 4, "cat": "estreia", "dist": distancia, "piso": piso, "meta": 5,
-		"nome": c.nome_estreia, "texto": "Top 5 na Estreia"})
-	lista.append(_sortear_objetivo(semente, 12, c.objetivos_2, aptidao, distancia, piso))
-	lista.append({"turno": 24, "cat": "gp1", "dist": distancia, "piso": piso, "meta": 5,
-		"nome": nome_gp[0], "texto": "Top 5 no %s" % nome_gp[0]})
-	var o4 := _sortear_objetivo(semente, 36, c.objetivos_4, aptidao, distancia, piso)
-	o4.fama_min = int(c.fama_objetivo_4)
-	lista.append(o4)
-	lista.append({"turno": 48, "cat": "gp2", "dist": distancia, "piso": piso, "meta": 3,
-		"nome": nome_gp[1], "texto": "Top 3 no %s" % nome_gp[1]})
-	for o in lista:
-		o.id = "obj%d" % o.turno
-		if o.cat.begins_with("gp"):
-			var rival: String = c.rivais_gp.get("%s_%s" % [o.dist, o.piso], "")
-			o.rival = rival
-	return lista
-
-
-static func _sortear_objetivo(semente: int, turno: int, candidatos: Array, aptidao: Dictionary, distancia: String, piso: String) -> Dictionary:
-	var r := rng(semente, ["objetivo", turno])
-	var pesos := {}
-	for i in candidatos.size():
-		var cand: Dictionary = candidatos[i]
-		if cand.onde == "outro_piso" and aptidao[outro_piso(piso)] == "R":
-			continue
-		pesos[str(i)] = float(cand.peso)
-	var cand: Dictionary = candidatos[int(sortear_peso(r, pesos))]
-	var o := {"turno": turno, "cat": cand.cat, "dist": distancia, "piso": piso, "meta": int(cand.meta),
-		"texto": cand.texto, "tipo": cand.id, "dificil": cand.get("dificil", false)}
-	match cand.onde:
-		"vizinha": o.dist = distancia_vizinha(aptidao, distancia)
-		"outro_piso": o.piso = outro_piso(piso)
-	if cand.has("maratona"):
-		o.maratona = int(cand.maratona)
-	o.nome = _nome_corrida(r, cand.cat)
-	return o
-
-
 static func _nome_corrida(r: RandomNumberGenerator, cat: String) -> String:
 	var nomes: Array = cal().nomes_corrida.get(cat, ["Corrida"])
 	return nomes[r.randi() % nomes.size()]
@@ -247,9 +183,22 @@ static func categorias_abertas(turno: int, trecho: int) -> Dictionary:
 	for cat in ["aberta", "prata", "ouro"]:
 		if turno >= int(c.categorias[cat].desde):
 			pesos[cat] = 1.0
-	if pesos.has("ouro") and trecho == 2:
-		pesos.ouro = 2.5  # trecho 3: Ouro com mais frequência, por causa do objetivo 4
 	return pesos
+
+
+## Corrida do calendário fixo neste turno (§7.2), ou {}. Acontece nos anos 2 e 3.
+static func corrida_fixa(turno: int) -> Dictionary:
+	if turno <= 24:
+		return {}
+	var t_ano := (turno - 1) % 24 + 1
+	for f in cal().fixas.lista:
+		if int(f.turno_ano) == t_ano and turno >= int(cal().categorias[f.cat].desde):
+			var c: Dictionary = f.duplicate()
+			c.erase("turno_ano")
+			c.id = "f%d" % turno
+			c.fixa = true
+			return c
+	return {}
 
 
 ## As 2 corridas opcionais de um turno de Circuito. Metade das vezes na casa da garota.

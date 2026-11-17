@@ -22,6 +22,14 @@ func _ready() -> void:
 	v.add_child(UI.label(titulo, 36, UI.PERIGO if c.falhou_objetivo else UI.DESTAQUE))
 	if msg != "":
 		v.add_child(UI.label(msg, 18, UI.TEXTO, true))
+	var final := c.final_da_campanha()
+	if not final.is_empty():
+		var pf := UI.painel(Color("#2a3150"), 12)
+		var fv := UI.vbox(4)
+		fv.add_child(UI.label("Final \"%s\" · caminho %s" % [final.titulo, final.caminho], 20, UI.DESTAQUE))
+		fv.add_child(UI.label(final.texto, 16, UI.TEXTO, true))
+		pf.add_child(fv)
+		v.add_child(pf)
 
 	var p := UI.painel()
 	var pv := UI.vbox(8)
@@ -36,7 +44,7 @@ func _ready() -> void:
 	for r in c.resultados.filter(func(r): return r.objetivo > 0):
 		var cor := UI.OK if r.ok else UI.PERIGO
 		var pos := "%dº" % r.posicao if r.posicao > 0 else "não correu"
-		pv.add_child(UI.label("Semana %d · %s: %s (objetivo top %d)" % [r.turno, r.nome, pos, r.objetivo], 16, cor))
+		pv.add_child(UI.label("Turno %d · %s: %s" % [r.turno, r.nome, pos], 16, cor))
 	if not opcionais.is_empty():
 		var vit := opcionais.filter(func(r): return r.posicao == 1).size()
 		pv.add_child(UI.label("%d corrida(s) opcional(is), %d vitória(s). Fama final: %d." % [opcionais.size(), vit, c.fama], 16))

@@ -1,14 +1,19 @@
 extends SceneTree
-## Teste headless de balanceamento: joga carreiras completas (48 turnos) com um bot simples
-## e mede quantas cumprem cada objetivo, a curva de atributos e a fama.
-## Uso: Godot --headless --path . --script res://testes/balanco.gd [-- N [garota]]
+## Teste headless de balanceamento (docs/campanhas.md §6): joga carreiras completas de 72 turnos
+## com um bot simples e mede quantas cumprem cada objetivo, a divisão no ponto de virada,
+## a curva de atributos, a fama e o número de corridas.
+## Uso: Godot --headless --path . --script res://testes/balanco.gd -- N [filtro] [conta] [saida.json]
+##   filtro: "mvp" (padrão), "todas", "modelo" ou o começo do nome de uma garota
+##   conta: "nova" (padrão) ou "madura" (vínculo 3 e madrinha de nota ~700, campanhas.md §1)
 # Carreira é carregada em tempo de execução: no modo --script, os autoloads (Dados) só
 # existem depois que este script compila, e carreira.gd depende deles.
 var CarreiraS: GDScript
 var dd: Node
 
 const PESO_ALVO := {"vel": 1.2, "est": 1.0, "pod": 0.9, "det": 0.8, "int": 0.7}
-const MARCOS := [4, 12, 24, 36, 48]
+const OBJ := [13, 20, 24, 32, 40, 48, 60, 72]
+const CURVA := [13, 24, 36, 48, 60, 72]
+const MADRINHA := {"vel": 760, "est": 700, "pod": 700, "det": 660, "int": 680}
 
 
 func _media(c) -> float:
@@ -21,83 +26,158 @@ func _media(c) -> float:
 func _initialize() -> void:
 	CarreiraS = load("res://scripts/carreira.gd")
 	CarreiraS.CAMINHO_SAVE = "user://teste_balanco.json"
-	var n := 100
-	var so := ""
+	var n := 20
+	var filtro := "mvp"
+	var conta := "nova"
+	var saida := ""
 	var args := OS.get_cmdline_user_args()
 	if args.size() > 0:
 		n = int(args[0])
 	if args.size() > 1:
-		so = args[1]
-	var dados: Node = root.get_node("Dados")
-	dd = dados
-	if dados.iniciais.is_empty():
-		dados._ready()
-	for ini in dados.iniciais:
-		if so != "" and not ini.nome.begins_with(so):
-			continue
-		var passou := [0, 0, 0, 0, 0]
-		var curva := [0.0, 0.0, 0.0, 0.0, 0.0]
-		var fama36 := 0
-		var corridas := 0
-		var falta_fama := 0
-		var amuletos := 0
-		var habs := 0
-		for i in n:
-			var c = CarreiraS.new(dados.garota(ini.nome), ini, i + 1)
-			var peso := PESO_ALVO.duplicate()
-			if c.distancia in ["media", "longa"]:
-				peso.est = 1.3
-			var guard := 0
-			var _habs_antes := 0
-			while not c.terminou and guard < 400:
-				guard += 1
-				var t0: int = c.turno
-				var p: String = c.pendencia()
-				if OS.has_environment("TRACE") and i == 0:
-					print("t%d %s e%d m%.0f fama%d no=%s" % [c.turno, p, c.energia, _media(c), c.fama, c.tipo_no()])
-				if p == "objetivo" and MARCOS.has(c.turno):
-					curva[MARCOS.find(c.turno)] += _media(c)
-				match p:
-					"encontro":
-						c.escolher(hash([i, c.turno]) % c.encontro_atual().escolhas.size())
-					"amuleto":
-						amuletos += 1
-						if c.amuletos.size() < 6:
-							c.escolher_amuleto(c.oferta_amuleto[0])
-						else:
-							c.escolher_amuleto(c.oferta_amuleto[0], c.amuletos[0])
-					"mapa":
-						c.escolher_no(_melhor_no(c))
-					"ferias":
-						c.escolher_acampamento("serra" if c.distancia in ["media", "longa"] else "praia")
-					"corrida", "objetivo":
-						if p == "objetivo" and c.turno == 36:
-							fama36 += c.fama
-						var corrida = c.montar_corrida(dados.garotas)
-						var sim := SimCorrida.new(corrida.field, corrida.distancia, corrida.seed, corrida.clima)
-						var pos: int = sim.rodar_ate_o_fim().find(0) + 1
-						var obj: Dictionary = c.objetivo_do_turno() if p == "objetivo" else {}
-						c.registrar_corrida(pos)
-						corridas += 1
-						if not obj.is_empty() and not c.falhou_objetivo:
-							passou[MARCOS.find(t0)] += 1
-					"sem_fama":
-						falta_fama += 1
-						c.falhar_por_fama()
-					_:
-						_acao(c, peso)
-		var linha := []
-		for j in 5:
-			pass
-		for j in 5:
-			linha.append("%3d%%" % (100 * passou[j] / n))
-		var cv := []
-		for j in 5:
-			var chegaram: int = passou[j - 1] if j > 0 else n
-			cv.append("%d" % (curva[j] / maxi(1, chegaram)))
-		print("%-17s obj %s | média nos objetivos %s | fama no t36 %d | %.1f corridas | %.1f amuletos | sem fama %d" % [
-			ini.nome, " ".join(linha), "/".join(cv), fama36 / maxi(1, passou[2]), float(corridas) / n, float(amuletos) / n, falta_fama])
+		filtro = args[1]
+	if args.size() > 2:
+		conta = args[2]
+	if args.size() > 3:
+		saida = args[3]
+	dd = root.get_node("Dados")
+	if dd.iniciais.is_empty():
+		dd._ready()
+	var nomes := []
+	for g in dd.garotas:
+		var mvp: bool = not dd.inicial(g.nome).is_empty()
+		match filtro:
+			"mvp":
+				if not mvp: continue
+			"modelo":
+				if mvp: continue
+			"todas":
+				pass
+			_:
+				if g.nome != filtro: continue
+		nomes.append(g.nome)
+	var todos := []
+	for nome in nomes:
+		var r := _rodar(nome, n, conta)
+		todos.append(r)
+		_imprimir(r)
+	if saida != "":
+		var f := FileAccess.open(saida, FileAccess.WRITE)
+		f.store_string(JSON.stringify(todos))
 	quit()
+
+
+func _rodar(nome: String, n: int, conta: String) -> Dictionary:
+	var ini: Dictionary = dd.config_carreira(nome)
+	var passou := [0, 0, 0, 0, 0, 0, 0, 0]
+	var curva := [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+	var curva_n := [0, 0, 0, 0, 0, 0]
+	var caminho := {"A": 0, "B": 0}
+	var completou := {"A": 0, "B": 0}
+	var fama32 := 0
+	var fama40 := 0
+	var corridas := 0
+	var gp_final := 0
+	var arquetipo := ""
+	var na_virada := []  # contadores no turno 48, para calibrar as regras de virada
+	var gp2_venceu := 0
+	for i in n:
+		var madrinha := {}
+		var vinculo := 0
+		if conta == "madura":
+			vinculo = 3
+			madrinha = {"attrs": MADRINHA, "dist": Campanha.vizinha(ini.distancia),
+				"piso": Campanha.outro_piso(ini.piso)}
+		var c = CarreiraS.new(dd.garota(nome), ini, i + 1, vinculo, madrinha)
+		arquetipo = c.campanha.arquetipo
+		var peso := PESO_ALVO.duplicate()
+		if c.distancia in ["media", "longa"]:
+			peso.est = 1.3
+		var guard := 0
+		var ultimo_turno := 0
+		while not c.terminou and guard < 600:
+			guard += 1
+			var t0: int = c.turno
+			if t0 != ultimo_turno:
+				ultimo_turno = t0
+				var k := CURVA.find(t0)
+				if k >= 0:
+					curva[k] += _media(c)
+					curva_n[k] += 1
+			var p: String = c.pendencia()
+			if OS.has_environment("TRACE") and i == 0:
+				print("t%d %s e%d m%.0f fama%d no=%s" % [c.turno, p, c.energia, _media(c), c.fama, c.tipo_no()])
+			match p:
+				"encontro":
+					var re := RandomNumberGenerator.new()
+					re.seed = hash([i, c.turno, "esc"])
+					c.escolher(re.randi() % c.encontro_atual().escolhas.size())
+				"amuleto":
+					if c.amuletos.size() < 6:
+						c.escolher_amuleto(c.oferta_amuleto[0])
+					else:
+						c.escolher_amuleto(c.oferta_amuleto[0], c.amuletos[0])
+				"mapa":
+					c.escolher_no(_melhor_no(c))
+				"ferias":
+					c.escolher_acampamento("serra" if c.distancia in ["media", "longa"] else "praia")
+				"corrida", "objetivo":
+					if p == "objetivo" and t0 == 32:
+						fama32 += c.fama
+					if p == "objetivo" and t0 == 40:
+						fama40 += c.fama
+					var corrida = c.montar_corrida(dd.garotas)
+					var sim := SimCorrida.new(corrida.field, corrida.distancia, corrida.seed, corrida.clima)
+					var ordem: Array = sim.rodar_ate_o_fim()
+					var pos: int = ordem.find(0) + 1
+					c.registrar_corrida(pos, CarreiraS.extra_da_corrida(corrida, ordem, sim.ordem_meio))
+					corridas += 1
+					if c.falhou_objetivo and OS.has_environment("CURVA"):
+						# modo curva: segue a carreira depois da falha, só para medir os atributos
+						c.falhou_objetivo = false
+						c.terminou = false
+						c._fim_turno()
+						continue
+					if p == "objetivo" and not c.falhou_objetivo:
+						passou[OBJ.find(t0)] += 1
+						if t0 == 48:
+							caminho[c.caminho] += 1
+							if pos == 1:
+								gp2_venceu += 1
+							var ds := {}
+							for res in c.resultados:
+								ds[res.dist] = true
+							var d3 := {}
+							for res in c.resultados:
+								if res.posicao <= 3:
+									d3[res.dist] = true
+							na_virada.append({"flags": c.flags.size(), "dist_top3": d3.size(), "fama": c.fama, "vitorias": c.resultados.filter(func(x): return x.posicao == 1).size(),
+								"festivais": c.nos_visitados("festival"), "distancias": ds.size(), "saidas": c.saidas,
+								"viradas": c.viradas, "lesao": c.ultima_lesao})
+						if t0 == 72:
+							completou[c.caminho] += 1
+							if pos == 1:
+								gp_final += 1
+				_:
+					_acao(c, peso)
+	var cv := []
+	for j in CURVA.size():
+		cv.append(roundi(curva[j] / maxi(1, curva_n[j])))
+	if arquetipo == "":
+		arquetipo = "(MVP)"
+	return {"nome": nome, "arquetipo": arquetipo, "casa": "%s_%s" % [ini.distancia, ini.piso],
+		"n": n, "conta": conta, "passou": passou, "caminho": caminho, "completou": completou,
+		"curva": cv, "fama32": fama32 / maxi(1, passou[2]), "fama40": fama40 / maxi(1, passou[3]),
+		"corridas": float(corridas) / n, "gp_final": gp_final, "gp2_venceu": gp2_venceu, "na_virada": na_virada}
+
+
+func _imprimir(r: Dictionary) -> void:
+	var linha := []
+	for j in 8:
+		linha.append("%3d" % (100 * r.passou[j] / r.n))
+	var chegou: int = r.caminho.A + r.caminho.B
+	print("%-11s %-14s obj%% %s | virada A %d%% | curva %s | fama t32 %d t40 %d | %.1f corridas | GP final venceu %d" % [
+		r.nome, r.arquetipo, " ".join(linha), 100 * r.caminho.A / maxi(1, chegou),
+		"/".join(r.curva.map(func(x): return str(x))), r.fama32, r.fama40, r.corridas, r.gp_final])
 
 
 func _melhor_no(c) -> int:
@@ -107,8 +187,7 @@ func _melhor_no(c) -> int:
 	var nota := -INF
 	for col in c.opcoes_mapa():
 		var no: Dictionary = c.mapas[t][linha][col]
-		var quer_fama: bool = c.fama < 1700 and t <= 2
-		var v: float = {"circuito": 3.0 if quer_fama else 1.5, "foco": 2.5, "recuperacao": 1.0, "festival": 1.0,
+		var v: float = {"circuito": 2.0, "foco": 2.5, "recuperacao": 1.0, "festival": 1.0,
 			"biblioteca": 1.0, "desafio": 1.5, "misterio": 1.2}[no.tipo]
 		if no.tipo == "recuperacao" and c.energia < 50:
 			v += 1.5
@@ -124,33 +203,30 @@ func _melhor_no(c) -> int:
 
 
 func _acao(c, peso: Dictionary) -> void:
-	# compra habilidades quando dá (primeiro as de referência, depois as outras)
+	# compra habilidades quando dá
 	for h in dd.habilidades.lista:
 		if c.pode_comprar(h.id):
 			c.comprar_habilidade(h.id)
 	if c.lesionada:
 		c.enfermaria()
-		if c.lesionada == false and c.tipo_no() == "recuperacao":
-			return
 		return
 	var media := _media(c)
 	if c.energia >= 50:
 		var melhor := {}
 		for cr in c.corridas_opcionais():
-			var forca: float = dd.calendario.categorias[cr.cat].forca
+			var forca: float = c.forca_categoria(cr.cat, cr.dist)
 			if cr.get("desafio", false):
 				forca *= 1.2
 			var apt: float = dd.APT[c.aptidao[cr.dist]] * dd.APT[c.aptidao[cr.piso]]
-			# corre quando a corrida é acessível; depois de ter fama para o objetivo 4, só as bem fáceis
-			var folga := 0.95 if c.fama < 1700 or c.turno > 36 else 1.15
-			if c.pode_entrar(cr) and media * apt >= forca * folga:
+			# corre quando a corrida é acessível (o olheiro diria Favorita ou Disputada)
+			if c.pode_entrar(cr) and media * apt >= forca * 0.95:
 				if melhor.is_empty() or c.fama_prevista(cr) > c.fama_prevista(melhor):
 					melhor = cr
 		if not melhor.is_empty():
 			c.escolher_corrida(melhor)
 			return
 	if c.energia < 45:
-		if c.humor <= 1:
+		if c.humor <= 2:
 			c.sair()
 		else:
 			c.descansar()

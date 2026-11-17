@@ -26,17 +26,19 @@
 
 Toda corrida tem uma **categoria**. Ela define a força das adversárias, o prêmio e a fama exigida para entrar.
 
-| Categoria | Força das NPCs (média dos atributos, inicial) | Fama para entrar (inicial) | Quando aparece |
+| Categoria | Força das NPCs (média dos atributos) | Fama para entrar (inicial) | Quando aparece |
 |---|---|---|---|
-| **Estreia** | 180 | — | Só no turno 13 (a primeira corrida dela) |
-| **Aberta** | 260 | 0 | A partir do turno 14 |
-| **Prata** | 400 | 600 | A partir do turno 25 (ano 2) |
-| **Ouro** | 560 | 1500 | A partir do turno 37 (2º semestre do ano 2) |
-| **Grande Prêmio** | Ano 1: 320 · Ano 2: 560 · Ano 3: 760 | Por convite (objetivo) | Turnos 24, 48 e 72 |
+| **Estreia** | 170 | — | Só no turno 13 (a primeira corrida dela) |
+| **Aberta** | Ano 1: 215 · Ano 2: 300 · Ano 3: 380 | 0 | A partir do turno 14 |
+| **Prata** | Ano 2: 315 · Ano 3: 420 | 600 | A partir do turno 25 (ano 2) |
+| **Ouro** | Ano 2: 380 · Ano 3: 455 | 1500 | A partir do turno 37 (2º semestre do ano 2) |
+| **Grande Prêmio** | Ano 1: 290 · Ano 2: 405 · Ano 3: 620 | Por convite (objetivo) | Turnos 24, 48 e 72 |
 
+- O pelotão **fica mais forte a cada ano**, como a jogadora. Assim a mesma categoria pede mais no ano 3 do que no ano 2.
+- **Por distância**, a força é multiplicada por: Sprint ×0,95 · Milha ×0,98 · Média ×1,01 · Longa ×1,04. Corrida curta tem mais sorte, e sem isso as garotas de Sprint completavam bem menos carreiras que as de Longa.
 - A força das NPCs varia ±10% de uma corredora para outra, para o pelotão não ser uniforme.
-- No Grande Prêmio, a **rival com nome** da casa corre com +15% sobre a força da categoria.
-- Os números acima foram **reescalados para 72 turnos** a partir dos valores calibrados no protótipo de 48 turnos, e ainda precisam passar pelo bot de `testes/balanco.gd`. O protótipo e o `data/calendario.json` **ainda usam 48 turnos** (§12).
+- Nas corridas de objetivo com meta de rival e em todo Grande Prêmio, a **rival** (com nome ou campeã da casa) corre com +15% sobre a força da categoria.
+- Os números saíram do bot de balanceamento na carreira de 72 turnos ([campanhas](campanhas.md) §7).
 
 ### 2.1 Curva esperada da jogadora
 
@@ -44,7 +46,8 @@ Este é o **alvo** para calibrar os ganhos de treino em 72 turnos:
 
 | Turno | 13 (Estreia) | 24 | 36 | 48 | 60 | 72 |
 |---|---|---|---|---|---|---|
-| Média dos atributos (inicial) | ~200 | ~330 | ~460 | ~590 | ~700 | ~800 |
+| Média dos atributos (alvo) | ~200 | ~330 | ~460 | ~590 | ~700 | ~800 |
+| Média do bot (v0.4 do protótipo) | 207 | 308 | 407 | 537 | 664 | 799 |
 
 Uma jogadora que treina bem chega acima disso, e uma que descansa demais ou se lesiona chega abaixo. Amuletos e rotas boas também empurram a curva para cima, então a força das NPCs deve ser calibrada com uma carreira "média" sem amuletos raros.
 
@@ -284,7 +287,7 @@ As opcionais vêm de duas fontes. As duas juntas deixam o jogador **planejar uma
 | **Circuito** | Corridas **geradas** (categoria × distância × piso, com nome sorteado de uma lista). Cada turno de um nó Circuito oferece **2**. | Só nos nós Circuito (§4.2) e no Desafio. |
 
 Regras que valem para as duas:
-- Correr gasta **15 de energia** (inicial) e não dá ganho de treino naquele turno.
+- Correr gasta **15 de energia** (inicial) e não dá ganho de treino naquele turno, mas **dá atributos**: em cada atributo, Estreia +5, Aberta +6, Prata +9, Ouro e GP do ano 1 +12, GPs dos anos 2 e 3 +15 (inicial). Quem vence ganha tudo, top 3 ganha 80% e o resto 50%. Sem isso, a curva de atributos travava no ano 3, quando a garota corre mais.
 - **Corridas seguidas:** a 3ª corrida em 3 turnos seguidos gasta +10 de energia e tem 30% de chance de baixar o humor 1 nível (inicial).
 - Uma carreira típica deve ter **14 a 20 corridas** contando os objetivos.
 
@@ -450,4 +453,4 @@ Enquanto isso, as campanhas usam exceções: Fechadora de Longa corre o ano 1 na
 - **Magnitude** (§10).
 - Efeito do **vento** na corrida (§4.4).
 
-**Estado do protótipo:** o projeto Godot ainda roda a versão de **48 turnos** com objetivos 2 e 4 sorteados (calendário v0.3). Migrar para 72 turnos é uma tarefa de código separada: `data/calendario.json`, o gerador do mapa, a tela de carreira e os testes.
+**Estado do protótipo:** o projeto Godot roda a carreira de **72 turnos** com as campanhas de `data/campanhas.json`, o calendário fixo, o ponto de virada e os finais. Ainda faltam o olheiro, as séries e a instrução pré-corrida.

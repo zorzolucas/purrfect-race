@@ -69,7 +69,10 @@ func _painel_garota() -> Control:
 	v.add_child(UI.label(" · ".join(apt), 12, UI.SUAVE, true))
 
 	v.add_child(HSeparator.new())
-	v.add_child(UI.label("Objetivos", 15, UI.SUAVE))
+	var titulo_obj := "Objetivos"
+	if c.caminho != "":
+		titulo_obj += " · caminho \"%s\"" % c.campanha.caminhos[c.caminho].nome
+	v.add_child(UI.label(titulo_obj, 15, UI.SUAVE))
 	for o in c.objetivos:
 		var res := c.resultados.filter(func(r): return r.turno == o.turno and r.objetivo > 0)
 		var marca := "○"
@@ -80,8 +83,7 @@ func _painel_garota() -> Control:
 		elif o.turno == c.turno:
 			marca = "►"
 			cor = UI.DESTAQUE
-		var extra := " (fama %d+)" % o.fama_min if o.has("fama_min") else ""
-		var txt := "%s Sem %d · %s%s" % [marca, o.turno, o.texto, extra]
+		var txt := "%s Turno %d · %s · %s %s" % [marca, o.turno, o.texto, Dados.DIST_NOME[o.dist], o.piso]
 		v.add_child(UI.label(txt, 13, cor, true))
 
 	v.add_child(HSeparator.new())
@@ -126,7 +128,7 @@ func _painel_turno() -> VBoxContainer:
 	var data := UI.label(Calendario.data_texto(c.turno), 24, UI.DESTAQUE)
 	data.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	cab.add_child(data)
-	cab.add_child(UI.label("Semana %d de %d" % [c.turno, Carreira.BAL.turnos], 15, UI.SUAVE))
+	cab.add_child(UI.label("Turno %d de %d" % [c.turno, Carreira.BAL.turnos], 15, UI.SUAVE))
 	tv.add_child(cab)
 	var cl: Dictionary = Dados.calendario.climas[c.clima()]
 	tv.add_child(UI.label("%s %s%s" % [cl.icone, cl.nome, ": " + cl.descricao if cl.has("descricao") else ""], 14, UI.TEXTO, true))
@@ -164,10 +166,6 @@ func _painel_turno() -> VBoxContainer:
 			v.add_child(_botao_grande("Ir para a corrida: %s" % c.corrida_atual.nome, func(): ir_correr.emit()))
 		"objetivo":
 			v.add_child(_botao_grande("Correr o objetivo: %s" % c.objetivo_do_turno().nome, func(): ir_correr.emit()))
-		"sem_fama":
-			v.add_child(UI.label("Ela precisa de %d de fama para entrar nesta corrida e tem %d." % [
-				c.objetivo_do_turno().fama_min, c.fama], 18, UI.PERIGO, true))
-			v.add_child(_botao_grande("Encerrar a carreira", func(): atualizou.emit(c.falhar_por_fama())))
 		_:
 			_acoes(v)
 	return v
@@ -311,8 +309,13 @@ func _painel_mapa() -> Control:
 	var opcoes := c.opcoes_mapa()
 	var p := UI.painel(Color("#1d2b3a"), 14)
 	var v := UI.vbox(8)
-	v.add_child(UI.label("Trecho %d · escolha a rota do próximo mês" % (t + 1), 20, UI.DESTAQUE))
-	v.add_child(UI.label("Cada nó dura 1 mês (2 turnos) e liga ao de baixo e às diagonais. Todo caminho passa por pelo menos um Circuito, que é onde há corridas opcionais.", 13, UI.SUAVE, true))
+	v.add_child(UI.label("Trecho %d · escolha a rota dos próximos 2 turnos" % (t + 1), 20, UI.DESTAQUE))
+	var aviso := "Cada nó dura 2 turnos e liga ao de baixo e às diagonais."
+	if not "circuito" in Dados.calendario.trechos[t].get("sem", []):
+		aviso += " Todo caminho passa por pelo menos um Circuito, onde há corridas geradas. As corridas do calendário fixo valem em qualquer nó."
+	else:
+		aviso += " No semestre de base não há corridas: só treino, encontros e história."
+	v.add_child(UI.label(aviso, 13, UI.SUAVE, true))
 	var turno0: int = Dados.calendario.trechos[t].turnos[0]
 	for i in mapa.size():
 		var turno_linha: int = turno0 + i * 2
@@ -341,10 +344,16 @@ func _painel_mapa() -> Control:
 			h.add_child(b)
 		v.add_child(h)
 	var tr: Dictionary = Dados.calendario.trechos[t]
-	var fim := "Depois: Véspera (sem %d)" % tr.vespera
-	if tr.has("ferias"):
-		fim = "Depois: Férias (sem %d–%d), Véspera (sem %d)" % [tr.ferias[0], tr.ferias[1], tr.vespera]
-	v.add_child(UI.label("%s e o objetivo na semana %d." % [fim, tr.objetivo], 13, UI.SUAVE, true))
+	var depois := []
+	for f in Dados.calendario.ferias:
+		if int(f[0]) > int(tr.turnos[1]) and int(f[0]) < int(tr.objetivo):
+			depois.append("Férias (turnos %d–%d)" % [f[0], f[1]])
+	for vs in Dados.calendario.vesperas:
+		if int(vs) > int(tr.turnos[1]) and int(vs) < int(tr.objetivo):
+			depois.append("Véspera (turno %d)" % vs)
+	var fim := "Depois: %s, e o objetivo no turno %d." % [", ".join(depois), tr.objetivo] if not depois.is_empty() \
+		else "Depois: o objetivo no turno %d." % tr.objetivo
+	v.add_child(UI.label(fim, 13, UI.SUAVE, true))
 	p.add_child(v)
 	return p
 
@@ -374,8 +383,9 @@ func _painel_encontro(e: Dictionary) -> Control:
 	var ini := Dados.config_carreira(quem)
 	topo.add_child(UI.retrato(quem, Color(ini.get("cor", "#b07cc6")), 60))
 	var tv := UI.vbox(2)
-	tv.add_child(UI.label({"encontro": "Encontro", "misterio": "Mistério", "vespera": "Véspera"}[tipo], 14, UI.SUAVE))
-	tv.add_child(UI.label(e.titulo, 22, UI.DESTAQUE))
+	tv.add_child(UI.label({"encontro": "Encontro", "misterio": "Mistério", "vespera": "Véspera",
+		"capitulo": "História"}.get(tipo, "Encontro"), 14, UI.SUAVE))
+	tv.add_child(UI.label(c.texto(e.titulo), 22, UI.DESTAQUE))
 	topo.add_child(tv)
 	v.add_child(topo)
 	v.add_child(UI.label(c.texto(e.texto), 17, UI.TEXTO, true))

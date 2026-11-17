@@ -101,7 +101,7 @@ Cada garota tem uma aptidão por **distância** (Sprint, Milha, Média, Longa) e
 
 Cada cópia extra sobe o **nível de vínculo** da garota, até no máximo **5**. Cada nível dá:
 - \+ limite máximo de atributos (de 1000 até 1200 no nível 5);
-- \+ atributos iniciais na carreira (inicial: +4 em cada atributo por nível; com a madrinha, teto de +50 por atributo, ver [campanhas](campanhas.md) §2);
+- \+ atributos iniciais na carreira (inicial: +4 em cada atributo por nível; com a madrinha, teto de +25 por atributo, ver [campanhas](campanhas.md) §2);
 - 1 habilidade nova desbloqueada.
 
 Não há raridade nem estrelas de personagem: todas as garotas valem o mesmo.
@@ -111,7 +111,7 @@ Não há raridade nem estrelas de personagem: todas as garotas valem o mesmo.
 Nas referências do gênero, o sistema que mais faz o jogador repetir carreiras é **passar parte de uma garota treinada para a próxima**. Aqui isso vira a **madrinha**:
 
 - No começo da carreira, o jogador pode escolher **1 garota salva** do elenco como madrinha (não pode ser a própria garota).
-- A madrinha dá **+5% dos atributos finais dela** como bônus inicial (inicial; teto de +40 por atributo).
+- A madrinha dá **+3% dos atributos finais dela** como bônus inicial (teto de +20 por atributo; com o vínculo, +25).
 - Nos turnos **25 e 49** (começo dos anos 2 e 3) acontece um encontro de **inspiração** com a madrinha: chance de ganhar atributos e de subir em 1 nível a aptidão de distância ou piso da casa da madrinha (inicial: 20% por aptidão).
 - Quanto melhor a nota geral da madrinha (§3.1), maiores as chances.
 - **Previsível de propósito:** o bônus inicial é fixo e aparece antes de começar. A sorte fica só nas inspirações, para a herança não virar farm de sorte, que é uma reclamação comum no gênero.
@@ -170,7 +170,7 @@ Nas referências do gênero, o sistema que mais faz o jogador repetir carreiras 
 - Abaixo de um limite (inicial: 40), a chance de **falha** cresce conforme a energia cai.
 - Uma falha faz perder atributo e humor, com chance de **lesão leve**.
 - **A chance de falha exata aparece em cada treino** (ex.: "Falha: 18%"), nunca só uma cor ou um ícone. Uma falha sozinha nunca encerra a carreira.
-- Correr gasta energia (inicial: 15).
+- Correr gasta energia (inicial: 15) e dá um pouco de atributos em todos, mais se ela for bem ([calendário](calendario.md) §7.1).
 
 ### 4.5 Lesão
 
@@ -401,7 +401,7 @@ Da análise de UI das referências: personagem grande no centro e informação e
 - Afobação (§5.5): chance, duração e custo de fôlego, testados no simulador.
 - **Nome do jogo:** buscar marcas registradas parecidas antes de publicar (§1).
 - Pesos do sorteio do mapa, força dos amuletos e do Desafio.
-- **Recalibrar tudo para 72 turnos:** ganhos de treino, força das NPCs por categoria, fama por corrida e curva esperada de atributos ([calendário](calendario.md) §2). O protótipo ainda roda 48 turnos. O plano, as metas e a ordem de ajuste estão em [campanhas](campanhas.md) §6.
+- **72 turnos:** ganho de treino e força das NPCs calibrados com o bot ([campanhas](campanhas.md) §7). Falta a conta madura bater o alvo e testar com jogadores de verdade.
 - Instrução pré-corrida (§5.7): nenhuma instrução pode ser sempre a melhor.
 - Olheiro e relatório pós-corrida: custo de rodar ~50 simulações rápidas no Godot sem travar a tela.
 

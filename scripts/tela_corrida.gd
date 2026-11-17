@@ -54,7 +54,7 @@ func _init(d: Dictionary, cor: Color) -> void:
 func _ready() -> void:
 	var raiz := UI.vbox(12)
 	var topo := UI.hbox(12)
-	var meta := "objetivo top %d" % dados.objetivo if dados.objetivo > 0 else "corrida opcional"
+	var meta := "objetivo: %s" % dados.get("texto_objetivo", "") if dados.objetivo > 0 else "corrida opcional"
 	var clima_txt := ""
 	if dados.get("clima", "") != "":
 		var cl: Dictionary = Dados.calendario.climas[dados.clima]
@@ -256,8 +256,7 @@ func _finalizar() -> void:
 	var meta := ""
 	if dados.objetivo > 0:
 		meta = "
-Objetivo cumprido!" if pos <= dados.objetivo else "
-O objetivo era o top %d." % dados.objetivo
+Objetivo: %s." % dados.get("texto_objetivo", "top %d" % dados.objetivo)
 	resultado_txt.text = "%s terminou em %dº%s" % [dados.field[0].nome.split(" ")[0], pos, meta]
 	resultado.visible = true
 

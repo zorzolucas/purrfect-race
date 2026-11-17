@@ -54,7 +54,7 @@ func _initialize() -> void:
 	# fim de carreira: moeda, versão salva e giro da pool
 	var c = CarreiraS.new(dados.garota("Lira"), dados.config_carreira("Lira"), 7, 2)
 	_checar(c.limite == 1080.0, "limite com vínculo 2")
-	_checar(c.attrs.vel == 110.0 + 16.0, "atributos iniciais com vínculo 2")
+	_checar(c.attrs.vel == 110.0 + 8.0, "atributos iniciais com vínculo 2")
 	c.resultados.append({"turno": 12, "nome": "x", "posicao": 2, "objetivo": 5, "ok": true})
 	c.moeda_corridas = 30
 	var antes: int = q.moeda

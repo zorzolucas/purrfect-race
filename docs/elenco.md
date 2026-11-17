@@ -69,11 +69,13 @@ As 6 garotas cobrem as 5 copas e o Campeonato Final (5 garotas diferentes) sem s
 | 1 | 13 | Estreia, Milha Grama | Top 5 | Normal |
 | 2 | 20 | Aberta gerada, Milha Grama | Top 3 | Normal |
 | 3 | 24 | GP do ano 1, Milha Grama | Top 5 | Normal |
-| 4 | 32 | Prata gerada, **Média Grama** (casa da Polaris) | Chegar **à frente da Polaris** | Normal (rival) |
+| 4 | 32 | Prata gerada, Milha Grama, com a **Polaris** de visitante | Chegar **à frente da Polaris** | Normal (rival) |
 | 5 | 40 | **Prêmio Cometa** (Ouro do calendário), Milha Grama | Top 3 | Normal |
 | 6 | 48 | GP do ano 2, Milha Grama | Top 3 | Normal |
 
-**Ponto de virada** (depois do turno 48): se ela **venceu o Prêmio Cometa ou o GP do ano 2**, segue o caminho **Coroa da Milha**. Senão, segue o caminho **Revanche**. O evento *Primeira derrota* pesa: se o jogador escolheu "deixar treinar sozinha", um 2º lugar no GP do ano 2 também leva à Coroa.
+**Ponto de virada** (depois do turno 48): se ela **venceu o Prêmio Cometa e o GP do ano 2**, segue o caminho **Coroa da Milha**. Senão, segue o caminho **Revanche**. O capítulo *Primeira derrota* pesa: se o jogador escolheu "deixar treinar sozinha", vencer só o GP do ano 2 já leva à Coroa.
+
+*v0.6: o objetivo 4 era na Média Grama, a casa da Polaris, e derrubava 2 de cada 3 carreiras no bot. Agora a Polaris vem correr na Milha ([campanhas](campanhas.md) §7).*
 
 | Caminho | Objetivo 7 (turno 60) | GP final (turno 72) | Final |
 |---|---|---|---|

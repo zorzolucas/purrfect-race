@@ -17,6 +17,7 @@ func _initialize() -> void:
 		dados._ready()
 	var lira: Dictionary = dados.garota("Lira")
 	var c = CarreiraS.new(lira, dados.config_carreira("Lira"), 11)
+	c.encontro_pendente = {}  # o capítulo 1 da campanha abre no turno 1
 
 	# oferta: 3 diferentes, nenhum de estilo errado (Lira é Ponteira)
 	c.oferecer_amuleto(3, false)

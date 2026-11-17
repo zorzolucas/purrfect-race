@@ -1827,7 +1827,7 @@
     "onde": "vizinha"
    },
    "virada": {
-    "fama_min": 7500
+    "fama_min": 6000
    },
    "capitulos": [
     {
@@ -2136,7 +2136,7 @@
     "onde": "casa"
    },
    "virada": {
-    "viradas_min": 2
+    "viradas_min": 4
    },
    "capitulos": [
     {

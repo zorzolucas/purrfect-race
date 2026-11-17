@@ -105,11 +105,15 @@ func _painel_garota() -> Control:
 
 	v.add_child(HSeparator.new())
 	var amu: Array = c.amuletos.map(func(id): return Dados.amuleto(id).nome)
-	var l_amu := UI.label("Amuletos (%d/%d): %s" % [c.amuletos.size(), Dados.amuletos.limite,
+	var l_amu := UI.label("Amuletos (%d/%d): %s" % [c.amuletos.size(), c.limite_amuletos(),
 		", ".join(amu) if not amu.is_empty() else "nenhum ainda"], 13, UI.TEXTO, true)
 	l_amu.tooltip_text = "\n".join(c.amuletos.map(func(id): return "%s: %s" % [Dados.amuleto(id).nome, Dados.amuleto(id).descricao]))
 	l_amu.mouse_filter = Control.MOUSE_FILTER_PASS
 	v.add_child(l_amu)
+	if not c.titulos.is_empty():
+		v.add_child(UI.label("Títulos: %s" % ", ".join(c.titulos.map(func(t): return t.nome)), 13, UI.DESTAQUE, true))
+	if not c.madrinha.is_empty():
+		v.add_child(UI.label("Madrinha: %s (inspira nos turnos 25 e 49)" % c.madrinha.get("nome", "?"), 13, UI.SUAVE, true))
 	var hab: Array = c.habilidades.map(func(id): return Dados.habilidade(id).nome)
 	if c.unica != "":
 		hab.push_front(SimCorrida.UNICAS[c.unica].nome + " ★")
@@ -162,10 +166,8 @@ func _painel_turno() -> VBoxContainer:
 			v.add_child(_painel_mapa())
 		"ferias":
 			v.add_child(_painel_ferias())
-		"corrida":
-			v.add_child(_botao_grande("Ir para a corrida: %s" % c.corrida_atual.nome, func(): ir_correr.emit()))
-		"objetivo":
-			v.add_child(_botao_grande("Correr o objetivo: %s" % c.objetivo_do_turno().nome, func(): ir_correr.emit()))
+		"corrida", "objetivo":
+			v.add_child(_painel_olheiro(c.corrida_da_vez(), c.pendencia() == "objetivo"))
 		_:
 			_acoes(v)
 	return v
@@ -251,7 +253,7 @@ func _painel_amuleto() -> Control:
 	var v := UI.vbox(10)
 	if amuleto_escolhido == "":
 		v.add_child(UI.label("Escolha um amuleto", 22, UI.DESTAQUE))
-		v.add_child(UI.label("Ele vale até o fim da carreira, mas não passa para a versão salva. Máximo de %d." % Dados.amuletos.limite, 14, UI.SUAVE, true))
+		v.add_child(UI.label("Ele vale até o fim da carreira, mas não passa para a versão salva. Máximo de %d." % c.limite_amuletos(), 14, UI.SUAVE, true))
 		for id in c.oferta_amuleto:
 			var a := Dados.amuleto(id)
 			var tipo: String = {"simples": "Simples", "troca": "Troca", "estilo": "Estilo", "raro": "Raro"}[a.tipo]
@@ -263,7 +265,7 @@ func _painel_amuleto() -> Control:
 		v.add_child(UI.botao("Não quero nenhum", func(): atualizou.emit(c.descartar_oferta()), 14))
 	else:
 		v.add_child(UI.label("Os %d espaços estão cheios. Qual amuleto sai para entrar %s?" % [
-			Dados.amuletos.limite, Dados.amuleto(amuleto_escolhido).nome], 18, UI.DESTAQUE, true))
+			c.limite_amuletos(), Dados.amuleto(amuleto_escolhido).nome], 18, UI.DESTAQUE, true))
 		for id in c.amuletos:
 			var a := Dados.amuleto(id)
 			v.add_child(UI.botao("Tirar %s: %s" % [a.nome, a.descricao], func(): atualizou.emit(c.escolher_amuleto(amuleto_escolhido, id)), 14))
@@ -273,7 +275,7 @@ func _painel_amuleto() -> Control:
 
 
 func _escolher_amuleto(id: String) -> void:
-	if c.amuletos.size() < int(Dados.amuletos.limite):
+	if c.amuletos.size() < c.limite_amuletos():
 		atualizou.emit(c.escolher_amuleto(id))
 		return
 	amuleto_escolhido = id
@@ -284,22 +286,102 @@ func _escolher_amuleto(id: String) -> void:
 
 func _cartao_corrida(cr: Dictionary) -> Control:
 	var cat: Dictionary = Dados.calendario.categorias[cr.cat]
-	var linhas := ["%s%s" % ["⚔ " if cr.get("desafio", false) else "", cr.nome],
+	var ol := c.olheiro(cr)
+	var linhas := ["%s%s%s" % ["⚔ " if cr.get("desafio", false) else "", "📅 " if cr.get("fixa", false) else "", cr.nome],
 		"%s · %s %s · %d m" % [cat.nome, Dados.DIST_NOME[cr.dist], cr.piso, Calendario.metros(cr)],
-		"Aptidão %s/%s · fama até %d" % [Dados.APT_NOME[c.aptidao[cr.dist]], Dados.APT_NOME[c.aptidao[cr.piso]], c.fama_prevista(cr)]]
+		"Aptidão %s/%s · fama até %d" % [Dados.APT_NOME[c.aptidao[cr.dist]], Dados.APT_NOME[c.aptidao[cr.piso]], c.fama_prevista(cr, 1, ol.mult)],
+		"Olheiro: %s (%d%%) · fama ×%s" % [Carreira.nome_etiqueta(ol.etiqueta), roundi(ol.chance * 100), _mult_txt(ol.mult)]]
+	if cr.get("fixa", false):
+		var ss := c.series_da_corrida(cr).map(func(x): return "%s %d/%d" % [x.nome, x.feitas, x.total])
+		if not ss.is_empty():
+			linhas.append("Séries: " + ", ".join(ss))
 	var pode := c.pode_entrar(cr)
 	if not pode:
 		linhas.append("Precisa de %d de fama" % cat.fama_entrada)
 	var b := UI.botao("\n".join(linhas), func(): _correr(cr), 14)
 	b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	b.custom_minimum_size.y = 92
+	b.custom_minimum_size.y = 124 if cr.get("fixa", false) else 108
 	b.disabled = not pode
+	b.add_theme_color_override("font_color", _cor_etiqueta(ol.etiqueta))
 	return b
 
 
+## 0.985 -> "−1,5%", 1.12 -> "+12%"
+static func _pct(m: float) -> String:
+	var v := snappedf((m - 1.0) * 100.0, 0.1)
+	var txt := str(absf(v)).replace(".", ",").trim_suffix(",0")
+	return ("+" if v >= 0 else "−") + txt + "%"
+
+
+static func _mult_txt(m: float) -> String:
+	return str(m).replace(".", ",")
+
+
+static func _cor_etiqueta(etq: String) -> Color:
+	return {"favorita": UI.OK, "disputada": UI.TEXTO, "azarao": UI.DESTAQUE}[etq]
+
+
+## Olheiro antes da largada (calendario.md §7.3) e a instrução (GDD §5.7): o botão de cada
+## instrução já leva para a corrida.
+func _painel_olheiro(cr: Dictionary, e_objetivo: bool) -> Control:
+	var ol := c.olheiro(cr)
+	var p := UI.painel(Color("#1d2b3a"), 16)
+	var v := UI.vbox(8)
+	var cat: Dictionary = Dados.calendario.categorias[cr.cat]
+	v.add_child(UI.label("%s: %s" % ["Objetivo" if e_objetivo else "Corrida", cr.nome], 22, UI.DESTAQUE))
+	v.add_child(UI.label("%s · %s %s · %d m" % [cat.nome, Dados.DIST_NOME[cr.dist], cr.piso, Calendario.metros(cr)], 15, UI.SUAVE))
+	if e_objetivo:
+		v.add_child(UI.label("Meta: %s" % cr.texto, 15, UI.TEXTO, true))
+	var rel := UI.painel(Color("#26364a"), 12)
+	var rv := UI.vbox(4)
+	rv.add_child(UI.label("Relatório do olheiro", 16, UI.SUAVE))
+	rv.add_child(UI.label("Força média do pelotão: %d · %s, com aptidão e humor: %d" % [
+		roundi(ol.forca), c.nome, roundi(ol.media)], 15, UI.TEXTO, true))
+	rv.add_child(UI.label("Rival: %s" % ol.rival if ol.rival != "" else "Sem rival com nome nesta corrida.", 15, UI.TEXTO, true))
+	var etq := UI.label("%s · chance de vencer ~%d%% · fama ×%s" % [Carreira.nome_etiqueta(ol.etiqueta),
+		roundi(ol.chance * 100), _mult_txt(ol.mult)], 20, _cor_etiqueta(ol.etiqueta))
+	rv.add_child(etq)
+	rv.add_child(UI.label("Favorita rende menos fama (×0,75); Azarão rende mais (×1,5).", 13, UI.SUAVE, true))
+	if cr.get("fixa", false):
+		for x in c.series_da_corrida(cr):
+			rv.add_child(UI.label("Série %s: %d de %d vitórias" % [x.nome, x.feitas, x.total], 14, UI.DESTAQUE, true))
+	rel.add_child(rv)
+	v.add_child(rel)
+	v.add_child(UI.label("Instrução antes da largada (o olheiro sugere %s)" % SimCorrida.INSTRUCAO_NOME[ol.sugestao], 16, UI.SUAVE, true))
+	var h := UI.hbox(8)
+	var desc := {"normal": "ritmo do estilo"}
+	for ins in ["poupar", "forcar"]:
+		var x: Dictionary = SimCorrida.INSTRUCAO[ins]
+		var partes := ["ritmo %s no começo" % _pct(x.ritmo)]
+		if x.sprint != 1.0:
+			partes.append("Sprint %s" % _pct(x.sprint))
+		partes.append("fôlego %s" % _pct(x.folego))
+		desc[ins] = ",\n".join(partes)
+	for ins in ["poupar", "normal", "forcar"]:
+		var txt := "%s%s\n%s\nchance ~%d%%" % [SimCorrida.INSTRUCAO_NOME[ins], " ★" if ins == ol.sugestao else "",
+			desc[ins], roundi(ol.chances[ins] * 100)]
+		var b := UI.botao(txt, func(): _largar(ins), 15)
+		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		b.custom_minimum_size.y = 96
+		if ins == ol.sugestao:
+			b.add_theme_color_override("font_color", UI.DESTAQUE)
+		h.add_child(b)
+	v.add_child(h)
+	if not e_objetivo:
+		v.add_child(UI.botao("Desistir desta corrida e voltar às ações", func(): atualizou.emit(c.cancelar_corrida()), 14))
+	p.add_child(v)
+	return p
+
+
+func _largar(ins: String) -> void:
+	c.escolher_instrucao(ins)
+	ir_correr.emit()
+
+
+## Escolher a corrida abre o relatório do olheiro, onde se escolhe a instrução e larga.
 func _correr(cr: Dictionary) -> void:
 	c.escolher_corrida(cr)
-	ir_correr.emit()
+	atualizou.emit("Inscrição na %s. Veja o relatório do olheiro e escolha a instrução." % cr.nome)
 
 
 func _painel_mapa() -> Control:

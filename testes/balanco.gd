@@ -3,7 +3,8 @@ extends SceneTree
 ## com um bot simples e mede quantas cumprem cada objetivo, a divisão no ponto de virada,
 ## a curva de atributos, a fama e o número de corridas.
 ## Uso: Godot --headless --path . --script res://testes/balanco.gd -- N [filtro] [conta] [saida.json]
-##   filtro: "mvp" (padrão), "todas", "modelo" ou o começo do nome de uma garota
+##   filtro: "mvp" (padrão), "todas", "modelo", "parte:i/n" (a i-ésima de n fatias de todas, para
+##           rodar em processos paralelos) ou o nome de uma garota
 ##   conta: "nova" (padrão) ou "madura" (vínculo 3 e madrinha de nota ~700, campanhas.md §1)
 # Carreira é carregada em tempo de execução: no modo --script, os autoloads (Dados) só
 # existem depois que este script compila, e carreira.gd depende deles.
@@ -43,7 +44,15 @@ func _initialize() -> void:
 	if dd.iniciais.is_empty():
 		dd._ready()
 	var nomes := []
-	for g in dd.garotas:
+	var parte := [-1, 1]
+	if filtro.begins_with("parte:"):
+		var pn: PackedStringArray = filtro.substr(6).split("/")
+		parte = [int(pn[0]), int(pn[1])]
+		filtro = "todas"
+	for gi in dd.garotas.size():
+		var g: Dictionary = dd.garotas[gi]
+		if parte[0] >= 0 and gi % parte[1] != parte[0]:
+			continue
 		var mvp: bool = not dd.inicial(g.nome).is_empty()
 		match filtro:
 			"mvp":
@@ -80,12 +89,15 @@ func _rodar(nome: String, n: int, conta: String) -> Dictionary:
 	var arquetipo := ""
 	var na_virada := []  # contadores no turno 48, para calibrar as regras de virada
 	var gp2_venceu := 0
+	var instrucoes := {"poupar": 0, "normal": 0, "forcar": 0}
+	var etiquetas := {"favorita": 0, "disputada": 0, "azarao": 0}
+	var titulos := {}
 	for i in n:
 		var madrinha := {}
 		var vinculo := 0
 		if conta == "madura":
 			vinculo = 3
-			madrinha = {"attrs": MADRINHA, "dist": Campanha.vizinha(ini.distancia),
+			madrinha = {"nome": "Madrinha", "attrs": MADRINHA, "dist": Campanha.vizinha(ini.distancia),
 				"piso": Campanha.outro_piso(ini.piso)}
 		var c = CarreiraS.new(dd.garota(nome), ini, i + 1, vinculo, madrinha)
 		arquetipo = c.campanha.arquetipo
@@ -112,7 +124,7 @@ func _rodar(nome: String, n: int, conta: String) -> Dictionary:
 					re.seed = hash([i, c.turno, "esc"])
 					c.escolher(re.randi() % c.encontro_atual().escolhas.size())
 				"amuleto":
-					if c.amuletos.size() < 6:
+					if c.amuletos.size() < c.limite_amuletos():
 						c.escolher_amuleto(c.oferta_amuleto[0])
 					else:
 						c.escolher_amuleto(c.oferta_amuleto[0], c.amuletos[0])
@@ -125,6 +137,11 @@ func _rodar(nome: String, n: int, conta: String) -> Dictionary:
 						fama32 += c.fama
 					if p == "objetivo" and t0 == 40:
 						fama40 += c.fama
+					# instrução sugerida pelo olheiro
+					var ol: Dictionary = c.olheiro(c.corrida_da_vez())
+					c.escolher_instrucao(ol.sugestao)
+					instrucoes[ol.sugestao] += 1
+					etiquetas[ol.etiqueta] += 1
 					var corrida = c.montar_corrida(dd.garotas)
 					var sim := SimCorrida.new(corrida.field, corrida.distancia, corrida.seed, corrida.clima)
 					var ordem: Array = sim.rodar_ate_o_fim()
@@ -159,6 +176,9 @@ func _rodar(nome: String, n: int, conta: String) -> Dictionary:
 								gp_final += 1
 				_:
 					_acao(c, peso)
+		for t in c.titulos:
+			var tipo: String = t.id.split("_")[0]
+			titulos[tipo] = titulos.get(tipo, 0) + 1
 	var cv := []
 	for j in CURVA.size():
 		cv.append(roundi(curva[j] / maxi(1, curva_n[j])))
@@ -167,7 +187,8 @@ func _rodar(nome: String, n: int, conta: String) -> Dictionary:
 	return {"nome": nome, "arquetipo": arquetipo, "casa": "%s_%s" % [ini.distancia, ini.piso],
 		"n": n, "conta": conta, "passou": passou, "caminho": caminho, "completou": completou,
 		"curva": cv, "fama32": fama32 / maxi(1, passou[2]), "fama40": fama40 / maxi(1, passou[3]),
-		"corridas": float(corridas) / n, "gp_final": gp_final, "gp2_venceu": gp2_venceu, "na_virada": na_virada}
+		"corridas": float(corridas) / n, "gp_final": gp_final, "gp2_venceu": gp2_venceu, "na_virada": na_virada,
+		"instrucoes": instrucoes, "etiquetas": etiquetas, "titulos": titulos}
 
 
 func _imprimir(r: Dictionary) -> void:
@@ -175,9 +196,11 @@ func _imprimir(r: Dictionary) -> void:
 	for j in 8:
 		linha.append("%3d" % (100 * r.passou[j] / r.n))
 	var chegou: int = r.caminho.A + r.caminho.B
-	print("%-11s %-14s obj%% %s | virada A %d%% | curva %s | fama t32 %d t40 %d | %.1f corridas | GP final venceu %d" % [
+	print("%-11s %-14s obj%% %s | virada A %d%% | curva %s | fama t32 %d t40 %d | %.1f corridas | GP final venceu %d | ins %s | etq %s | títulos %s" % [
 		r.nome, r.arquetipo, " ".join(linha), 100 * r.caminho.A / maxi(1, chegou),
-		"/".join(r.curva.map(func(x): return str(x))), r.fama32, r.fama40, r.corridas, r.gp_final])
+		"/".join(r.curva.map(func(x): return str(x))), r.fama32, r.fama40, r.corridas, r.gp_final,
+		"/".join([r.instrucoes.poupar, r.instrucoes.normal, r.instrucoes.forcar].map(func(x): return str(x))),
+		"/".join([r.etiquetas.favorita, r.etiquetas.disputada, r.etiquetas.azarao].map(func(x): return str(x))), r.titulos])
 
 
 func _melhor_no(c) -> int:
@@ -213,15 +236,23 @@ func _acao(c, peso: Dictionary) -> void:
 	var media := _media(c)
 	if c.energia >= 50:
 		var melhor := {}
+		var melhor_valor := 0.0
 		for cr in c.corridas_opcionais():
 			var forca: float = c.forca_categoria(cr.cat, cr.dist)
 			if cr.get("desafio", false):
 				forca *= 1.2
 			var apt: float = dd.APT[c.aptidao[cr.dist]] * dd.APT[c.aptidao[cr.piso]]
 			# corre quando a corrida é acessível (o olheiro diria Favorita ou Disputada)
-			if c.pode_entrar(cr) and media * apt >= forca * 0.95:
-				if melhor.is_empty() or c.fama_prevista(cr) > c.fama_prevista(melhor):
-					melhor = cr
+			# filtro barato antes do olheiro; corre quando ele diz Favorita ou Disputada
+			if not c.pode_entrar(cr) or media * apt < forca * 0.85:
+				continue
+			var ol: Dictionary = c.olheiro(cr)
+			if ol.etiqueta == "azarao":
+				continue
+			var valor: float = c.fama_prevista(cr, 1, ol.mult) * (0.5 + ol.chance)
+			if melhor.is_empty() or valor > melhor_valor:
+				melhor = cr
+				melhor_valor = valor
 		if not melhor.is_empty():
 			c.escolher_corrida(melhor)
 			return

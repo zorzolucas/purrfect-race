@@ -21,7 +21,28 @@
    1,
    0
   ],
-  "mvp": true
+  "mvp": true,
+  "signo": "sagitario",
+  "elemento": "fogo",
+  "aniversario": [
+   2,
+   12
+  ],
+  "visual": {
+   "pelagem": "laranja_rajada",
+   "paleta": [
+    "#E8833A",
+    "#B8541E",
+    "#F6D2A8"
+   ],
+   "marca": "o \"M\" das rajadas desenhado na franja, com listras mais escuras",
+   "altura": "media",
+   "porte": "atletica",
+   "cabelo": "Curto e repicado, espetado atrás como se ela tivesse acabado de correr. Listras laranja-escuras nas mechas",
+   "olhos": "Verde-claro, grandes, sempre bem abertos",
+   "orelhas": "Médias, pontudas, quase sempre viradas para frente. A esquerda tem um pequeno entalhe na ponta, de uma corrida de infância em que ela caiu na cerca",
+   "rabo": "Grosso, com anéis laranja-escuros e ponta clara. Fica em pé, curvado em ponto de interrogação"
+  }
  },
  {
   "nome": "Nashira",
@@ -45,7 +66,28 @@
    2,
    0
   ],
-  "mvp": true
+  "mvp": true,
+  "signo": "virgem",
+  "elemento": "terra",
+  "aniversario": [
+   7,
+   9
+  ],
+  "visual": {
+   "pelagem": "cinza_azulada",
+   "paleta": [
+    "#7D8A99",
+    "#5E6976",
+    "#B9C4CF"
+   ],
+   "marca": "pontas do cabelo com brilho prateado, como o pelo do azul-russo na luz",
+   "altura": "alta",
+   "porte": "esguia",
+   "cabelo": "Chanel reto e liso, risca impecável de lado, uma presilha prateada",
+   "olhos": "Verde-esmeralda. Óculos redondos que ela usa só para ler o caderno",
+   "orelhas": "Grandes, finas e bem eretas, levemente abertas para os lados, como dois radares",
+   "rabo": "Longo, fino e liso. Quando ela escreve, ele se enrola no braço dela"
+  }
  },
  {
   "nome": "Mira",
@@ -69,7 +111,28 @@
    3,
    0
   ],
-  "mvp": true
+  "mvp": true,
+  "signo": "peixes",
+  "elemento": "agua",
+  "aniversario": [
+   3,
+   3
+  ],
+  "visual": {
+   "pelagem": "frajola",
+   "paleta": [
+    "#1E1E24",
+    "#F4F4F0",
+    "#3A3A44"
+   ],
+   "marca": "a franja é branca só do lado direito, como a mancha assimétrica de muitos frajolas",
+   "altura": "baixa",
+   "porte": "esguia",
+   "cabelo": "Longo, preto, ondulado e meio bagunçado, com um fio arrepiado no topo que nunca abaixa",
+   "olhos": "Amarelo-dourado, enormes, quase sempre olhando para cima",
+   "orelhas": "Arredondadas e macias, pretas. Caem um pouco para os lados quando ela se distrai",
+   "rabo": "Longo e peludo, preto com a ponta branca. Arrasta no chão quando ela anda devagar"
+  }
  },
  {
   "nome": "Capela",
@@ -93,7 +156,28 @@
    1,
    0
   ],
-  "mvp": true
+  "mvp": true,
+  "signo": "leao",
+  "elemento": "fogo",
+  "aniversario": [
+   8,
+   8
+  ],
+  "visual": {
+   "pelagem": "siamesa",
+   "paleta": [
+    "#EFE2C8",
+    "#4A3426",
+    "#C9B08A"
+   ],
+   "marca": "o degradê do cabelo vai do creme ao castanho quase preto nas pontas, bem marcado",
+   "altura": "media",
+   "porte": "esguia",
+   "cabelo": "Longo, em duas mechas altas e volumosas presas com laços. O degradê aparece nas pontas",
+   "olhos": "Azul-safira, com cílios longos",
+   "orelhas": "Muito grandes e triangulares, de base larga, castanho-escuras",
+   "rabo": "Fino e longo como um chicote, ponta escura. Balança no ritmo de qualquer música"
+  }
  },
  {
   "nome": "Antares",
@@ -117,7 +201,28 @@
    0,
    1
   ],
-  "mvp": true
+  "mvp": true,
+  "signo": "aries",
+  "elemento": "fogo",
+  "aniversario": [
+   10,
+   4
+  ],
+  "visual": {
+   "pelagem": "tricolor",
+   "paleta": [
+    "#F7F3EC",
+    "#E07A2F",
+    "#26201E"
+   ],
+   "marca": "mechas em blocos grandes: laranja do lado esquerdo, preta do direito, branco no meio",
+   "altura": "baixa",
+   "porte": "atletica",
+   "cabelo": "Curto e bagunçado, preso num coque pequeno atrás",
+   "olhos": "Âmbar",
+   "orelhas": "Pequenas e grossas, uma laranja e uma preta",
+   "rabo": "Curto e grosso, quase de gato de rabo curto, com a ponta preta"
+  }
  },
  {
   "nome": "Shaula",
@@ -141,7 +246,28 @@
    3,
    1
   ],
-  "mvp": true
+  "mvp": true,
+  "signo": "escorpiao",
+  "elemento": "agua",
+  "aniversario": [
+   6,
+   11
+  ],
+  "visual": {
+   "pelagem": "preta",
+   "paleta": [
+    "#17151A",
+    "#2E2A33",
+    "#4B4552"
+   ],
+   "marca": "um tufo branco escondido na nuca, como o \"botão\" branco que muitos gatos pretos têm no peito. Ela esconde com o capuz",
+   "altura": "alta",
+   "porte": "esguia",
+   "cabelo": "Longo, liso e preto, com franja cobrindo o olho esquerdo",
+   "olhos": "Amarelo-ouro, intensos",
+   "orelhas": "Médias, quase sempre abertas para os lados (\"orelha de avião\", sinal de desconfiança). Argola prateada na orelha direita",
+   "rabo": "Muito longo e fino, com a ponta curvada para cima, como o ferrão do escorpião (o nome Shaula quer dizer \"o ferrão\")"
+  }
  },
  {
   "nome": "Altair",
@@ -165,7 +291,28 @@
    0,
    0
   ],
-  "mvp": false
+  "mvp": false,
+  "signo": "aries",
+  "elemento": "fogo",
+  "aniversario": [
+   28,
+   3
+  ],
+  "visual": {
+   "pelagem": "abissinia",
+   "paleta": [
+    "#B98A55",
+    "#6E4B2A",
+    "#E2C9A0"
+   ],
+   "marca": "raiz do cabelo bem mais escura que as pontas",
+   "altura": "alta",
+   "porte": "atletica",
+   "cabelo": "Curto jogado para trás pelo vento",
+   "olhos": "Verde-água",
+   "orelhas": "Grandes e altas, puxadas para trás como asas",
+   "rabo": "Longo e afilado, reto como uma flecha quando corre"
+  }
  },
  {
   "nome": "Spica",
@@ -189,7 +336,28 @@
    0,
    0
   ],
-  "mvp": false
+  "mvp": false,
+  "signo": "virgem",
+  "elemento": "terra",
+  "aniversario": [
+   1,
+   9
+  ],
+  "visual": {
+   "pelagem": "ponta_de_chama",
+   "paleta": [
+    "#F5E9D6",
+    "#D9772E",
+    "#E9B985"
+   ],
+   "marca": "pontas do cabelo cor de trigo maduro",
+   "altura": "baixa",
+   "porte": "esguia",
+   "cabelo": "Trança lateral em espiga com uma presilha de ramo de trigo",
+   "olhos": "Azuis",
+   "orelhas": "Médias com pontas ruivas",
+   "rabo": "Longo com a ponta ruiva"
+  }
  },
  {
   "nome": "Adara",
@@ -213,7 +381,28 @@
    0,
    0
   ],
-  "mvp": false
+  "mvp": false,
+  "signo": "libra",
+  "elemento": "ar",
+  "aniversario": [
+   28,
+   9
+  ],
+  "visual": {
+   "pelagem": "siamesa",
+   "paleta": [
+    "#EFE2C8",
+    "#6F7C8C",
+    "#C9B08A"
+   ],
+   "marca": "siamesa de pontas cinza-azuladas (a Capela tem pontas castanhas)",
+   "altura": "alta",
+   "porte": "esguia",
+   "cabelo": "Curto e moderno, em degradê do creme ao cinza",
+   "olhos": "Azul-claro",
+   "orelhas": "Enormes",
+   "rabo": "Fino e muito longo"
+  }
  },
  {
   "nome": "Alcione",
@@ -237,7 +426,28 @@
    0,
    0
   ],
-  "mvp": false
+  "mvp": false,
+  "signo": "touro",
+  "elemento": "terra",
+  "aniversario": [
+   1,
+   5
+  ],
+  "visual": {
+   "pelagem": "tricolor_diluida",
+   "paleta": [
+    "#F4F1EC",
+    "#9AA3B0",
+    "#E9CFA6"
+   ],
+   "marca": "quase toda creme, com só uma mecha cinza atrás da orelha",
+   "altura": "media",
+   "porte": "atletica",
+   "cabelo": "Curto com franja reta",
+   "olhos": "Verdes",
+   "orelhas": "Médias, de pontas arredondadas",
+   "rabo": "Longo e liso"
+  }
  },
  {
   "nome": "Electra",
@@ -261,7 +471,28 @@
    0,
    0
   ],
-  "mvp": false
+  "mvp": false,
+  "signo": "escorpiao",
+  "elemento": "agua",
+  "aniversario": [
+   13,
+   11
+  ],
+  "visual": {
+   "pelagem": "tricolor",
+   "paleta": [
+    "#F7F3EC",
+    "#E07A2F",
+    "#26201E"
+   ],
+   "marca": "mais preto que branco, com um raio laranja que desce pela franja",
+   "altura": "media",
+   "porte": "atletica",
+   "cabelo": "Curto, raspado de um lado",
+   "olhos": "Verdes",
+   "orelhas": "Grandes e pontudas, com os pelos das pontas arrepiados",
+   "rabo": "Médio, sempre meio eriçado"
+  }
  },
  {
   "nome": "Maia",
@@ -285,7 +516,28 @@
    0,
    0
   ],
-  "mvp": false
+  "mvp": false,
+  "signo": "sagitario",
+  "elemento": "fogo",
+  "aniversario": [
+   16,
+   12
+  ],
+  "visual": {
+   "pelagem": "laranja_rajada",
+   "paleta": [
+    "#E8833A",
+    "#B8541E",
+    "#F6D2A8"
+   ],
+   "marca": "a metade de baixo do cabelo é branca (laranja e branca)",
+   "altura": "media",
+   "porte": "esguia",
+   "cabelo": "Duas mechas baixas bagunçadas",
+   "olhos": "Amarelos",
+   "orelhas": "Grandes, viradas para frente",
+   "rabo": "Médio, em pé, com a ponta dobrada"
+  }
  },
  {
   "nome": "Mérope",
@@ -309,7 +561,28 @@
    0,
    1
   ],
-  "mvp": false
+  "mvp": false,
+  "signo": "virgem",
+  "elemento": "terra",
+  "aniversario": [
+   28,
+   8
+  ],
+  "visual": {
+   "pelagem": "escaminha_rajada",
+   "paleta": [
+    "#7A5236",
+    "#C4672B",
+    "#3A281C"
+   ],
+   "marca": "listras ruivas finas sobre o marrom",
+   "altura": "baixa",
+   "porte": "atletica",
+   "cabelo": "Chanel curto, sem um fio fora",
+   "olhos": "Verde-amarelados",
+   "orelhas": "Médias",
+   "rabo": "Médio, sempre enrolado na mesma posição"
+  }
  },
  {
   "nome": "Celeno",
@@ -333,7 +606,28 @@
    0,
    1
   ],
-  "mvp": false
+  "mvp": false,
+  "signo": "gemeos",
+  "elemento": "ar",
+  "aniversario": [
+   2,
+   6
+  ],
+  "visual": {
+   "pelagem": "chocolate",
+   "paleta": [
+    "#5A3826",
+    "#3B2418",
+    "#8A5E44"
+   ],
+   "marca": "ponta do rabo e do cabelo mais clara, cor de café com leite",
+   "altura": "baixa",
+   "porte": "esguia",
+   "cabelo": "Médio com duas tranças laterais e franja",
+   "olhos": "Verde-vivo",
+   "orelhas": "Médias, sempre se mexendo",
+   "rabo": "Médio"
+  }
  },
  {
   "nome": "Bellatrix",
@@ -357,7 +651,28 @@
    0,
    1
   ],
-  "mvp": false
+  "mvp": false,
+  "signo": "escorpiao",
+  "elemento": "agua",
+  "aniversario": [
+   20,
+   11
+  ],
+  "visual": {
+   "pelagem": "preta",
+   "paleta": [
+    "#17151A",
+    "#2E2A33",
+    "#4B4552"
+   ],
+   "marca": "uma cicatriz pequena na sobrancelha e olhos verdes (os da Shaula são amarelos)",
+   "altura": "media",
+   "porte": "atletica",
+   "cabelo": "Curto, raspado na nuca",
+   "olhos": "ver marca",
+   "orelhas": "Pequenas, quase sempre para trás",
+   "rabo": "Com uma dobra no meio, como os gatos de rabo quebrado"
+  }
  },
  {
   "nome": "Mintaka",
@@ -381,7 +696,28 @@
    0,
    1
   ],
-  "mvp": false
+  "mvp": false,
+  "signo": "capricornio",
+  "elemento": "terra",
+  "aniversario": [
+   28,
+   12
+  ],
+  "visual": {
+   "pelagem": "tigrada_cinza",
+   "paleta": [
+    "#8E8C88",
+    "#3F3D3B",
+    "#C8C4BC"
+   ],
+   "marca": "listras grossas e uma pinta branca no queixo",
+   "altura": "baixa",
+   "porte": "atletica",
+   "cabelo": "Num rabo baixo, bem preso",
+   "olhos": "Amarelos",
+   "orelhas": "Pequenas e firmes",
+   "rabo": "Médio e listrado"
+  }
  },
  {
   "nome": "Andrômeda",
@@ -405,7 +741,28 @@
    0,
    1
   ],
-  "mvp": false
+  "mvp": false,
+  "signo": "aquario",
+  "elemento": "ar",
+  "aniversario": [
+   10,
+   2
+  ],
+  "visual": {
+   "pelagem": "pintada",
+   "paleta": [
+    "#EFE4CC",
+    "#3B2817",
+    "#F0DDB5"
+   ],
+   "marca": "pintada clara (fundo marfim, rosetas castanhas)",
+   "altura": "alta",
+   "porte": "atletica",
+   "cabelo": "Curto e armado, com correntinhas de bijuteria (a princesa acorrentada do mito, que ela transformou em estilo)",
+   "olhos": "Azuis",
+   "orelhas": "Pequenas de pontas pretas",
+   "rabo": "Longo e grosso"
+  }
  },
  {
   "nome": "Cassiopeia",
@@ -429,7 +786,28 @@
    1,
    0
   ],
-  "mvp": false
+  "mvp": false,
+  "signo": "libra",
+  "elemento": "ar",
+  "aniversario": [
+   12,
+   10
+  ],
+  "visual": {
+   "pelagem": "prata_rajada",
+   "paleta": [
+    "#C9CBCF",
+    "#2F3033",
+    "#ECEDEF"
+   ],
+   "marca": "listras escuras desenhando uma \"coroa\" no topo da cabeça",
+   "altura": "alta",
+   "porte": "esguia",
+   "cabelo": "Longo, ondulado e sempre arrumado",
+   "olhos": "Verdes",
+   "orelhas": "Grandes e elegantes",
+   "rabo": "Longo com anéis prata e pretos"
+  }
  },
  {
   "nome": "Carina",
@@ -453,7 +831,28 @@
    1,
    0
   ],
-  "mvp": false
+  "mvp": false,
+  "signo": "peixes",
+  "elemento": "agua",
+  "aniversario": [
+   10,
+   3
+  ],
+  "visual": {
+   "pelagem": "bicolor_van",
+   "paleta": [
+    "#F6F4EF",
+    "#7D8A99",
+    "#D8D2C8"
+   ],
+   "marca": "a cor da cabeça e do rabo é cinza-azulada",
+   "altura": "media",
+   "porte": "esguia",
+   "cabelo": "Longo e branco, com as mechas do topo cinza, presas com uma presilha de concha",
+   "olhos": "Azuis",
+   "orelhas": "Cinza, um pouco caídas",
+   "rabo": "Cinza, longo e anelado"
+  }
  },
  {
   "nome": "Vela",
@@ -477,7 +876,28 @@
    1,
    0
   ],
-  "mvp": false
+  "mvp": false,
+  "signo": "cancer",
+  "elemento": "agua",
+  "aniversario": [
+   14,
+   7
+  ],
+  "visual": {
+   "pelagem": "cinza_azulada",
+   "paleta": [
+    "#7D8A99",
+    "#5E6976",
+    "#B9C4CF"
+   ],
+   "marca": "uma mecha branca na franja (o \"medalhão\" branco no peito de alguns gatos cinza)",
+   "altura": "baixa",
+   "porte": "esguia",
+   "cabelo": "Curto com franja reta",
+   "olhos": "Verde-claro",
+   "orelhas": "Médias que caem para trás quando ela fica triste",
+   "rabo": "Médio e fino"
+  }
  },
  {
   "nome": "Auriga",
@@ -501,7 +921,28 @@
    1,
    0
   ],
-  "mvp": false
+  "mvp": false,
+  "signo": "aquario",
+  "elemento": "ar",
+  "aniversario": [
+   28,
+   1
+  ],
+  "visual": {
+   "pelagem": "abissinia",
+   "paleta": [
+    "#B8693E",
+    "#6E4B2A",
+    "#E2C9A0"
+   ],
+   "marca": "abissínia canela (avermelhada)",
+   "altura": "media",
+   "porte": "esguia",
+   "cabelo": "Curto e bagunçado, com óculos de aviador na cabeça",
+   "olhos": "Verdes",
+   "orelhas": "Enormes",
+   "rabo": "Longo e fino"
+  }
  },
  {
   "nome": "Columba",
@@ -525,7 +966,28 @@
    1,
    1
   ],
-  "mvp": false
+  "mvp": false,
+  "signo": "leao",
+  "elemento": "fogo",
+  "aniversario": [
+   27,
+   7
+  ],
+  "visual": {
+   "pelagem": "laranja_rajada",
+   "paleta": [
+    "#E8833A",
+    "#B8541E",
+    "#F6D2A8"
+   ],
+   "marca": "laranja rajada de pelo longo, com uma \"gola\" branca na nuca",
+   "altura": "media",
+   "porte": "atletica",
+   "cabelo": "Cacheado e volumoso, como uma juba",
+   "olhos": "Cobre",
+   "orelhas": "Médias com tufos saindo de dentro",
+   "rabo": "Em pluma"
+  }
  },
  {
   "nome": "Fênix",
@@ -549,7 +1011,28 @@
    1,
    1
   ],
-  "mvp": false
+  "mvp": false,
+  "signo": "peixes",
+  "elemento": "agua",
+  "aniversario": [
+   17,
+   3
+  ],
+  "visual": {
+   "pelagem": "rajada_marrom_classica",
+   "paleta": [
+    "#8A6A4A",
+    "#3E2C1F",
+    "#C9AD8A"
+   ],
+   "marca": "pontas avermelhadas, como brasa",
+   "altura": "media",
+   "porte": "esguia",
+   "cabelo": "Longo e desfiado",
+   "olhos": "Âmbar",
+   "orelhas": "Médias com tufos internos",
+   "rabo": "Longo e peludo, ponta ruiva"
+  }
  },
  {
   "nome": "Hidra",
@@ -573,7 +1056,28 @@
    1,
    1
   ],
-  "mvp": false
+  "mvp": false,
+  "signo": "escorpiao",
+  "elemento": "agua",
+  "aniversario": [
+   30,
+   10
+  ],
+  "visual": {
+   "pelagem": "escaminha",
+   "paleta": [
+    "#2A1D18",
+    "#B5521F",
+    "#6E3A22"
+   ],
+   "marca": "escaminha mesclada fina (a da Mizar é dividida ao meio)",
+   "altura": "alta",
+   "porte": "atletica",
+   "cabelo": "Longo e volumoso, com muitas camadas de preto e ruivo",
+   "olhos": "Laranja",
+   "orelhas": "Grandes",
+   "rabo": "Longo e grosso"
+  }
  },
  {
   "nome": "Tucana",
@@ -597,7 +1101,28 @@
    1,
    1
   ],
-  "mvp": false
+  "mvp": false,
+  "signo": "leao",
+  "elemento": "fogo",
+  "aniversario": [
+   5,
+   8
+  ],
+  "visual": {
+   "pelagem": "frajola",
+   "paleta": [
+    "#1E1E24",
+    "#F4F4F0",
+    "#3A3A44"
+   ],
+   "marca": "\"bigode\" preto logo abaixo do nariz",
+   "altura": "baixa",
+   "porte": "atletica",
+   "cabelo": "Preto com laterais brancas e um topete grande",
+   "olhos": "Verdes",
+   "orelhas": "Grandes e pretas",
+   "rabo": "Todo branco"
+  }
  },
  {
   "nome": "Corona",
@@ -621,7 +1146,28 @@
    1,
    1
   ],
-  "mvp": false
+  "mvp": false,
+  "signo": "leao",
+  "elemento": "fogo",
+  "aniversario": [
+   15,
+   8
+  ],
+  "visual": {
+   "pelagem": "chinchila_dourada",
+   "paleta": [
+    "#F1DDB0",
+    "#6A4E2A",
+    "#F7E8C4"
+   ],
+   "marca": "chinchila dourada clara, quase champanhe",
+   "altura": "media",
+   "porte": "esguia",
+   "cabelo": "Longo e cacheado, com uma tiara",
+   "olhos": "Verdes",
+   "orelhas": "Pequenas com tufos dourados",
+   "rabo": "Peludo e dourado"
+  }
  },
  {
   "nome": "Zaniah",
@@ -645,7 +1191,28 @@
    1,
    1
   ],
-  "mvp": false
+  "mvp": false,
+  "signo": "libra",
+  "elemento": "ar",
+  "aniversario": [
+   20,
+   10
+  ],
+  "visual": {
+   "pelagem": "bicolor_van",
+   "paleta": [
+    "#F6F4EF",
+    "#C4672B",
+    "#D8D2C8"
+   ],
+   "marca": "a cor da cabeça e do rabo é ruiva",
+   "altura": "baixa",
+   "porte": "atletica",
+   "cabelo": "Branco com o topo ruivo, em dois coques",
+   "olhos": "Âmbar",
+   "orelhas": "Médias e ruivas",
+   "rabo": "Todo ruivo e anelado"
+  }
  },
  {
   "nome": "Alya",
@@ -669,7 +1236,28 @@
    2,
    0
   ],
-  "mvp": false
+  "mvp": false,
+  "signo": "cancer",
+  "elemento": "agua",
+  "aniversario": [
+   28,
+   6
+  ],
+  "visual": {
+   "pelagem": "tricolor_diluida",
+   "paleta": [
+    "#F4F1EC",
+    "#9AA3B0",
+    "#E9CFA6"
+   ],
+   "marca": "metade do rosto emoldurada por cinza e a outra por creme",
+   "altura": "media",
+   "porte": "atletica",
+   "cabelo": "Médio, meio preso com um laço",
+   "olhos": "Castanho-mel",
+   "orelhas": "Médias e macias, uma creme e uma cinza",
+   "rabo": "Médio, que ela enrola nas novatas como um abraço"
+  }
  },
  {
   "nome": "Alhena",
@@ -693,7 +1281,28 @@
    2,
    0
   ],
-  "mvp": false
+  "mvp": false,
+  "signo": "gemeos",
+  "elemento": "ar",
+  "aniversario": [
+   25,
+   5
+  ],
+  "visual": {
+   "pelagem": "chocolate",
+   "paleta": [
+    "#5A3826",
+    "#3B2418",
+    "#8A5E44"
+   ],
+   "marca": "mãos e pés brancos, como luvas e meias",
+   "altura": "alta",
+   "porte": "esguia",
+   "cabelo": "Longo e ondulado com um laço grande",
+   "olhos": "Dourados",
+   "orelhas": "Médias e arredondadas",
+   "rabo": "Longo e fofo"
+  }
  },
  {
   "nome": "Mizar",
@@ -717,7 +1326,28 @@
    2,
    0
   ],
-  "mvp": false
+  "mvp": false,
+  "signo": "aries",
+  "elemento": "fogo",
+  "aniversario": [
+   15,
+   4
+  ],
+  "visual": {
+   "pelagem": "escaminha",
+   "paleta": [
+    "#2A1D18",
+    "#B5521F",
+    "#6E3A22"
+   ],
+   "marca": "escaminha de rosto dividido: metade preta e metade ruiva, bem no meio",
+   "altura": "media",
+   "porte": "atletica",
+   "cabelo": "Curto, metade preto e metade ruivo",
+   "olhos": "Laranja",
+   "orelhas": "Pontudas, uma preta e uma ruiva",
+   "rabo": "Médio mesclado"
+  }
  },
  {
   "nome": "Alcor",
@@ -741,7 +1371,28 @@
    2,
    0
   ],
-  "mvp": false
+  "mvp": false,
+  "signo": "aquario",
+  "elemento": "ar",
+  "aniversario": [
+   3,
+   2
+  ],
+  "visual": {
+   "pelagem": "pontas_rajadas",
+   "paleta": [
+    "#EDE4D6",
+    "#7A6A5A",
+    "#B3A390"
+   ],
+   "marca": "tufos de lince nas pontas das orelhas",
+   "altura": "baixa",
+   "porte": "esguia",
+   "cabelo": "Creme com pontas cinza listradas, corte assimétrico",
+   "olhos": "Azul-claro",
+   "orelhas": "Médias com tufos",
+   "rabo": "Curto e anelado"
+  }
  },
  {
   "nome": "Dubhe",
@@ -765,7 +1416,28 @@
    2,
    0
   ],
-  "mvp": false
+  "mvp": false,
+  "signo": "cancer",
+  "elemento": "agua",
+  "aniversario": [
+   20,
+   7
+  ],
+  "visual": {
+   "pelagem": "creme",
+   "paleta": [
+    "#F0D9B5",
+    "#D9B98A",
+    "#FBF0DE"
+   ],
+   "marca": "cabelo sempre amassado de um lado, como quem acabou de acordar",
+   "altura": "alta",
+   "porte": "atletica",
+   "cabelo": "Longo e fofo, presilha de ursinho",
+   "olhos": "Cobre",
+   "orelhas": "Pequenas e arredondadas",
+   "rabo": "Grande e felpudo, que ela usa de travesseiro"
+  }
  },
  {
   "nome": "Deneb",
@@ -789,7 +1461,28 @@
    2,
    1
   ],
-  "mvp": false
+  "mvp": false,
+  "signo": "libra",
+  "elemento": "ar",
+  "aniversario": [
+   4,
+   10
+  ],
+  "visual": {
+   "pelagem": "rajada_marrom_classica",
+   "paleta": [
+    "#8A6A4A",
+    "#3E2C1F",
+    "#C9AD8A"
+   ],
+   "marca": "a espiral de \"borboleta\" das rajadas clássicas desenhada no cabelo, atrás",
+   "altura": "media",
+   "porte": "esguia",
+   "cabelo": "Médio e ondulado",
+   "olhos": "Verde-musgo",
+   "orelhas": "Médias de pontas arredondadas",
+   "rabo": "Longo e elegante com anéis largos (o nome quer dizer \"cauda\", do Cisne)"
+  }
  },
  {
   "nome": "Albireo",
@@ -813,7 +1506,28 @@
    2,
    1
   ],
-  "mvp": false
+  "mvp": false,
+  "signo": "gemeos",
+  "elemento": "ar",
+  "aniversario": [
+   8,
+   6
+  ],
+  "visual": {
+   "pelagem": "branca",
+   "paleta": [
+    "#F8F8F6",
+    "#DADBDF",
+    "#B7B9C0"
+   ],
+   "marca": "branca com heterocromia: olho direito dourado e esquerdo azul, como a estrela dupla Albireo",
+   "altura": "media",
+   "porte": "esguia",
+   "cabelo": "Médio repartido no meio, com duas presilhas de cores diferentes",
+   "olhos": "ver marca",
+   "orelhas": "Médias",
+   "rabo": "Longo e fino"
+  }
  },
  {
   "nome": "Achernar",
@@ -837,7 +1551,28 @@
    2,
    1
   ],
-  "mvp": false
+  "mvp": false,
+  "signo": "sagitario",
+  "elemento": "fogo",
+  "aniversario": [
+   25,
+   11
+  ],
+  "visual": {
+   "pelagem": "prata_rajada",
+   "paleta": [
+    "#C9CBCF",
+    "#2F3033",
+    "#ECEDEF"
+   ],
+   "marca": "prata pintada (pintas em vez de listras)",
+   "altura": "media",
+   "porte": "atletica",
+   "cabelo": "Curto e espetado com gel",
+   "olhos": "Verde-água",
+   "orelhas": "Médias e pontudas",
+   "rabo": "Longo com a ponta preta"
+  }
  },
  {
   "nome": "Mimosa",
@@ -861,7 +1596,28 @@
    2,
    1
   ],
-  "mvp": false
+  "mvp": false,
+  "signo": "touro",
+  "elemento": "terra",
+  "aniversario": [
+   25,
+   4
+  ],
+  "visual": {
+   "pelagem": "creme",
+   "paleta": [
+    "#F0D9B5",
+    "#D9B98A",
+    "#FBF0DE"
+   ],
+   "marca": "rajado clarinho e nariz rosado",
+   "altura": "baixa",
+   "porte": "esguia",
+   "cabelo": "Curto e ondulado com flores amarelas presas",
+   "olhos": "Verde-claro",
+   "orelhas": "Médias e macias",
+   "rabo": "Médio e enrolado"
+  }
  },
  {
   "nome": "Hamal",
@@ -885,7 +1641,28 @@
    2,
    1
   ],
-  "mvp": false
+  "mvp": false,
+  "signo": "aries",
+  "elemento": "fogo",
+  "aniversario": [
+   5,
+   4
+  ],
+  "visual": {
+   "pelagem": "tricolor_diluida",
+   "paleta": [
+    "#F4F1EC",
+    "#9AA3B0",
+    "#E9CFA6"
+   ],
+   "marca": "\"máscara\" cinza só sobre um olho",
+   "altura": "baixa",
+   "porte": "atletica",
+   "cabelo": "Curto, cacheado e fofo",
+   "olhos": "Laranja",
+   "orelhas": "Pequenas, curvadas para trás como chifres de carneiro",
+   "rabo": "Curto e fofo"
+  }
  },
  {
   "nome": "Mirach",
@@ -909,7 +1686,28 @@
    2,
    1
   ],
-  "mvp": false
+  "mvp": false,
+  "signo": "aquario",
+  "elemento": "ar",
+  "aniversario": [
+   18,
+   2
+  ],
+  "visual": {
+   "pelagem": "fumaca",
+   "paleta": [
+    "#3A4250",
+    "#A9A9B1",
+    "#4A4950"
+   ],
+   "marca": "fumaça azul (cinza-azulado escuro com raiz prateada)",
+   "altura": "baixa",
+   "porte": "esguia",
+   "cabelo": "Médio e repicado, com uma mecha prateada aparecendo",
+   "olhos": "Laranja",
+   "orelhas": "Dobradas para frente",
+   "rabo": "Médio"
+  }
  },
  {
   "nome": "Almach",
@@ -933,7 +1731,28 @@
    3,
    0
   ],
-  "mvp": false
+  "mvp": false,
+  "signo": "capricornio",
+  "elemento": "terra",
+  "aniversario": [
+   10,
+   1
+  ],
+  "visual": {
+   "pelagem": "chinchila_dourada",
+   "paleta": [
+    "#E8C98A",
+    "#6A4E2A",
+    "#F7E8C4"
+   ],
+   "marca": "contorno escuro nos olhos, como delineador natural",
+   "altura": "alta",
+   "porte": "esguia",
+   "cabelo": "Longo, liso, dourado de pontas escuras, preso num coque alto e rígido",
+   "olhos": "Verde-azulados",
+   "orelhas": "Pequenas com tufos, viradas para frente",
+   "rabo": "Longo e muito peludo"
+  }
  },
  {
   "nome": "Nunki",
@@ -957,7 +1776,28 @@
    3,
    0
   ],
-  "mvp": false
+  "mvp": false,
+  "signo": "sagitario",
+  "elemento": "fogo",
+  "aniversario": [
+   10,
+   12
+  ],
+  "visual": {
+   "pelagem": "pontas_rajadas",
+   "paleta": [
+    "#EDE4D6",
+    "#7A6A5A",
+    "#B3A390"
+   ],
+   "marca": "linhas escuras saindo dos olhos, como rímel",
+   "altura": "alta",
+   "porte": "esguia",
+   "cabelo": "Longo preso alto com uma fita, sem um fio fora",
+   "olhos": "Azul-escuros",
+   "orelhas": "Altas com tufos curtos",
+   "rabo": "Longo, reto e anelado"
+  }
  },
  {
   "nome": "Ankaa",
@@ -981,7 +1821,28 @@
    3,
    0
   ],
-  "mvp": false
+  "mvp": false,
+  "signo": "cancer",
+  "elemento": "agua",
+  "aniversario": [
+   5,
+   7
+  ],
+  "visual": {
+   "pelagem": "ponta_de_chama",
+   "paleta": [
+    "#F5E9D6",
+    "#D9772E",
+    "#E9B985"
+   ],
+   "marca": "pontas ruivo-vivas, quase vermelhas",
+   "altura": "media",
+   "porte": "esguia",
+   "cabelo": "Longo e solto, com pontas que parecem chamas",
+   "olhos": "Azuis",
+   "orelhas": "Pequenas",
+   "rabo": "Longo, de ponta ruiva em pluma"
+  }
  },
  {
   "nome": "Zosma",
@@ -1005,7 +1866,28 @@
    3,
    0
   ],
-  "mvp": false
+  "mvp": false,
+  "signo": "peixes",
+  "elemento": "agua",
+  "aniversario": [
+   25,
+   2
+  ],
+  "visual": {
+   "pelagem": "fumaca",
+   "paleta": [
+    "#26252B",
+    "#A9A9B1",
+    "#4A4950"
+   ],
+   "marca": "a raiz prateada aparece quando o cabelo se mexe",
+   "altura": "alta",
+   "porte": "esguia",
+   "cabelo": "Longo e preto, solto",
+   "olhos": "Cobre",
+   "orelhas": "Grandes",
+   "rabo": "Longo e esfumado"
+  }
  },
  {
   "nome": "Elnath",
@@ -1029,7 +1911,28 @@
    3,
    0
   ],
-  "mvp": false
+  "mvp": false,
+  "signo": "touro",
+  "elemento": "terra",
+  "aniversario": [
+   5,
+   5
+  ],
+  "visual": {
+   "pelagem": "pintada",
+   "paleta": [
+    "#C99A55",
+    "#3B2817",
+    "#F0DDB5"
+   ],
+   "marca": "as rosetas só aparecem nos ombros e nas pontas do cabelo",
+   "altura": "alta",
+   "porte": "atletica",
+   "cabelo": "Longo e grosso numa trança única e pesada",
+   "olhos": "Verde-dourado",
+   "orelhas": "Pequenas de base larga",
+   "rabo": "Grosso e cilíndrico, ponta preta"
+  }
  },
  {
   "nome": "Saiph",
@@ -1053,7 +1956,28 @@
    3,
    1
   ],
-  "mvp": false
+  "mvp": false,
+  "signo": "virgem",
+  "elemento": "terra",
+  "aniversario": [
+   15,
+   9
+  ],
+  "visual": {
+   "pelagem": "branca",
+   "paleta": [
+    "#F8F8F6",
+    "#DADBDF",
+    "#B7B9C0"
+   ],
+   "marca": "uma mancha cinza no topo da cabeça, o \"boné\" que alguns filhotes brancos têm",
+   "altura": "alta",
+   "porte": "atletica",
+   "cabelo": "Curto e prático",
+   "olhos": "Dourados",
+   "orelhas": "Grandes, uma com mancha cinza",
+   "rabo": "Médio e reto"
+  }
  },
  {
   "nome": "Naos",
@@ -1077,7 +2001,28 @@
    3,
    1
   ],
-  "mvp": false
+  "mvp": false,
+  "signo": "capricornio",
+  "elemento": "terra",
+  "aniversario": [
+   15,
+   1
+  ],
+  "visual": {
+   "pelagem": "cinza_azulada",
+   "paleta": [
+    "#7D8A99",
+    "#5E6976",
+    "#B9C4CF"
+   ],
+   "marca": "pontas mais claras, quase prata",
+   "altura": "alta",
+   "porte": "esguia",
+   "cabelo": "Longo, preso num rabo baixo com uma fita",
+   "olhos": "Verdes",
+   "orelhas": "Grandes",
+   "rabo": "Muito peludo, como uma pluma"
+  }
  },
  {
   "nome": "Avior",
@@ -1101,7 +2046,28 @@
    3,
    1
   ],
-  "mvp": false
+  "mvp": false,
+  "signo": "gemeos",
+  "elemento": "ar",
+  "aniversario": [
+   15,
+   6
+  ],
+  "visual": {
+   "pelagem": "abissinia",
+   "paleta": [
+    "#A89F92",
+    "#5E6976",
+    "#E2C9A0"
+   ],
+   "marca": "abissínia azul (cinza-bege)",
+   "altura": "baixa",
+   "porte": "atletica",
+   "cabelo": "Médio, preso alto com um lenço",
+   "olhos": "Dourados",
+   "orelhas": "Grandes com tufo curto",
+   "rabo": "Médio"
+  }
  },
  {
   "nome": "Atria",
@@ -1125,7 +2091,28 @@
    3,
    1
   ],
-  "mvp": false
+  "mvp": false,
+  "signo": "capricornio",
+  "elemento": "terra",
+  "aniversario": [
+   18,
+   1
+  ],
+  "visual": {
+   "pelagem": "arlequim",
+   "paleta": [
+    "#F7F6F2",
+    "#1C1B1F",
+    "#CFCBC3"
+   ],
+   "marca": "arlequim: quase toda branca, com duas mechas pretas em bloco no cabelo",
+   "altura": "alta",
+   "porte": "esguia",
+   "cabelo": "Longo e liso",
+   "olhos": "Verdes",
+   "orelhas": "Uma branca e uma preta",
+   "rabo": "Todo preto"
+  }
  },
  {
   "nome": "Alnair",
@@ -1149,6 +2136,27 @@
    3,
    1
   ],
-  "mvp": false
+  "mvp": false,
+  "signo": "touro",
+  "elemento": "terra",
+  "aniversario": [
+   14,
+   5
+  ],
+  "visual": {
+   "pelagem": "escaminha_rajada",
+   "paleta": [
+    "#7A5236",
+    "#C4672B",
+    "#3A281C"
+   ],
+   "marca": "listras ruivas largas",
+   "altura": "alta",
+   "porte": "atletica",
+   "cabelo": "Longo em duas tranças grossas",
+   "olhos": "Cobre",
+   "orelhas": "Médias e largas",
+   "rabo": "Médio, peludo e listrado"
+  }
  }
 ]

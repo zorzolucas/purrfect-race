@@ -332,7 +332,7 @@ São **84 textos** no total (12 × 7). As campanhas do MVP têm mais capítulos 
 
 **Estrela** (referência: Capela). *Brilha com plateia e descobre se corre pelos aplausos ou pela pista.*
 - Objetivo 2: Maratona (2 corridas com top 5). Objetivo 4: Prata **fora de casa**, top 5.
-- Virada: fama de **7500 ou mais** no turno 48 → **Holofote**. Senão → **Pista vazia**.
+- Virada: fama de **6000 ou mais** no turno 48 → **Holofote**. Senão → **Pista vazia**.
 - Holofote: Maratona, 2 corridas com top 3 desde o GP do ano 2 (1 Ouro); GP final top 3 e à frente de {rival}. Pista vazia: vencer Ouro na casa (Difícil); GP final top 3.
 - Capítulos: 1 *"Primeira foto"*: {nome} quer ser famosa antes de correr. 2 *"Fã"*: a primeira fã aparece. 3 *"Turnê"*: ela quer correr em todo lugar. 4A *"Palco"*. 4B *"Madrugada"*.
 - Finais: A *"Palco e pista"*. B *"Sem plateia"*.
@@ -355,7 +355,7 @@ São **84 textos** no total (12 × 7). As campanhas do MVP têm mais capítulos 
 
 **Sonhadora** (referência: Mira). *Distraída o ano todo, acorda na reta final.*
 - Objetivo 2: top 3. Objetivo 4: Prata na casa, **à frente de {rival}**.
-- Virada: venceu **2 corridas de virada** (estava fora do top 5 na metade da corrida) até o turno 48 → **Acordada**. Senão → **Céu aberto**.
+- Virada: venceu **4 corridas de virada** (estava fora do top 5 na metade da corrida) até o turno 48 → **Acordada**. Senão → **Céu aberto**.
 - Acordada: vencer Ouro na casa (Difícil); GP final top 3. Céu aberto: Ouro na distância vizinha, top 3; GP final top 3 e à frente de {rival}.
 - Capítulos: 1 *"Nas nuvens"*: {nome} esquece o horário do treino olhando o céu. 2 *"Lá atrás"*: ela larga em último na estreia e ninguém entende. 3 *"Reta final"*. 4A *"Desperta"*. 4B *"Nuvens"*.
 - Finais: A *"Do fundo"*: ela larga em último e cruza em primeiro. B *"Corre porque gosta"*.

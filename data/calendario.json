@@ -31,7 +31,7 @@
   "categorias": {
     "estreia": {
       "nome": "Estreia",
-      "forca": 170,
+      "forca": 191,
       "fama_entrada": 0,
       "fama": 100,
       "desde": 13
@@ -39,9 +39,9 @@
     "aberta": {
       "nome": "Aberta",
       "forca": [
-        215,
-        300,
-        380
+        241,
+        321,
+        407
       ],
       "fama_entrada": 0,
       "fama": 200,
@@ -50,9 +50,9 @@
     "prata": {
       "nome": "Prata",
       "forca": [
-        315,
-        315,
-        420
+        337,
+        337,
+        449
       ],
       "fama_entrada": 600,
       "fama": 400,
@@ -61,9 +61,9 @@
     "ouro": {
       "nome": "Ouro",
       "forca": [
-        380,
-        380,
-        455
+        407,
+        407,
+        487
       ],
       "fama_entrada": 1500,
       "fama": 800,
@@ -71,21 +71,21 @@
     },
     "gp1": {
       "nome": "Grande Prêmio",
-      "forca": 290,
+      "forca": 320,
       "fama_entrada": 0,
       "fama": 1500,
       "desde": 24
     },
     "gp2": {
       "nome": "Grande Prêmio",
-      "forca": 405,
+      "forca": 421,
       "fama_entrada": 0,
       "fama": 1500,
       "desde": 48
     },
     "gp3": {
       "nome": "Grande Prêmio",
-      "forca": 620,
+      "forca": 663,
       "fama_entrada": 0,
       "fama": 1500,
       "desde": 72
@@ -632,9 +632,38 @@
     ]
   },
   "forca_distancia": {
-    "sprint": 0.95,
+    "sprint": 0.99,
     "milha": 0.98,
     "media": 1.01,
     "longa": 1.04
+  },
+  "olheiro": {
+    "_doc": "Olheiro (calendario.md §7.3): etiqueta pela chance de vencer, estimada com 1 rodada da simulação em modo estimativa por instrução e sorteios da sorte por cima. k_sorte calibra a sorte que a estimativa não vê (bloqueio e habilidades). (inicial)",
+    "favorita": 0.4,
+    "azarao": 0.15,
+    "mult": {
+      "favorita": 0.75,
+      "disputada": 1.0,
+      "azarao": 1.5
+    },
+    "sorteios": 400,
+    "k_sorte": 0.9,
+    "margem_sugestao": 0.02
+  },
+  "series": {
+    "_doc": "Séries do calendário fixo (calendario.md §7.4). Tríplice: a Prata e as 2 Ouros (anos 2 e 3) da mesma casa. Coroa Dupla: Ouros da mesma distância nos 2 pisos. Volta ao Céu: uma Ouro em cada distância. Nomes provisórios. (inicial)",
+    "triplice": {
+      "nome_grama": "Estrela da %s",
+      "nome_terra": "Poeira da %s",
+      "fama": 500
+    },
+    "coroa": {
+      "nome": "Coroa Dupla da %s",
+      "fama": 300
+    },
+    "volta": {
+      "nome": "Volta ao Céu",
+      "limite_amuleto": 1
+    }
   }
 }

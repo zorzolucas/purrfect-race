@@ -520,7 +520,7 @@ Ficha curta: casa, estilo, arquétipo, signo e aniversário, visual em uma linha
 
 ## 7. Próximos passos
 
-1. **Dados:** levar signo, aniversário, pelagem, marca, corpo e as cores para `tools/gerar_elenco.py` e `data/garotas.json` (campos `signo`, `aniversario`, `pelagem`, `marca`, `altura`, `porte`), e trocar a pelagem sorteada das 42 pelas daqui.
+1. ~~**Dados:** levar signo, aniversário, pelagem, marca, corpo e as cores para `data/garotas.json`.~~ Feito em 2026-11-17: `tools/importar_visual.py` lê este documento e grava em cada garota (e nas rivais) `signo`, `elemento`, `aniversario` ([dia, mês]) e `visual` (`pelagem`, `paleta`, `marca`, `altura`, `porte`, `cabelo`, `olhos`, `orelhas`, `rabo`). O `tools/gerar_elenco.py` chama o importador no fim. **Este documento é a fonte:** mudou uma ficha, rode `python tools/importar_visual.py`. As variações descritas na ficha (ex.: siamesa de pontas azuladas, abissínia azul) trocam 1 ou 2 cores da paleta da pelagem.
 2. **Protótipo:** encontro "Feliz aniversário" e o +5 de afinidade por elemento.
 3. **Arte:** desenho de frente e perfil da garota de referência (GDD §11.4). Recomendo a **Lira**: tem pelagem rajada (testa listras na paleta), entalhe na orelha e rabo anelado, então valida as partes mais difíceis do pipeline de uma vez.
 4. **Afinidades novas sugeridas** (para o elenco, se o Lucas quiser): Mizar e Alcor como dupla (+20), o dormitório das Plêiades (Maia, Alcione, Electra, Celeno e Mérope, +10 entre elas), e Shaula e Bellatrix (as duas pretas, atrito que vira respeito).

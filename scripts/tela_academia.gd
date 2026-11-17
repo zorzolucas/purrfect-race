@@ -71,5 +71,8 @@ func _cartao(nome: String) -> Control:
 		var a: Dictionary = salva.attrs
 		v.add_child(UI.label("Versão salva: nota %s · %d objetivo(s)" % [salva.nota, salva.objetivos], 14, UI.OK))
 		v.add_child(UI.label("Vel %d · Est %d · Pod %d · Det %d · Int %d" % [a.vel, a.est, a.pod, a.det, a.int], 13, UI.SUAVE))
+		var tit: Array = salva.get("titulos", [])
+		if not tit.is_empty():
+			v.add_child(UI.label("Títulos: " + ", ".join(tit), 13, UI.DESTAQUE, true))
 	v.add_child(UI.botao("Treinar %s" % nome.split(" ")[0], func(): treinar.emit(nome), 16))
 	return p

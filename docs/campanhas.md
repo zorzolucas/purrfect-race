@@ -599,6 +599,12 @@ O ganho do treino caiu porque o semestre de base sozinho levava a garota a ~320 
 - Rodar 100 carreiras por arquétipo para confirmar a diferença de 17 pontos entre arquétipos.
 - Testar com jogadores de verdade: o bot não planeja rota nem usa o calendário fixo de propósito.
 - Conferir as regras de virada da Leal e da Misteriosa numa próxima rodada.
+- **Olheiro** no protótipo (calendário §7.3): etiqueta de chance antes de cada corrida e o multiplicador de fama. O bot hoje usa uma conta simples no lugar dele.
+- **Séries e títulos** no protótipo (calendário §7.4): Tríplice da casa, Coroa Dupla e Volta ao Céu, com as recompensas.
+- **Instrução pré-corrida** no protótipo (GDD §5.7): Poupar, Normal e Forçar. Depois, rodar o bot de novo para conferir que nenhuma instrução é sempre a melhor.
+- **Tela da madrinha:** escolher a garota salva no começo da carreira. As regras já estão no código, mas só o bot usa.
+- **Capturas de tela** das telas novas (capítulos, objetivos do caminho, final): o `testes/capturas.gd` precisa de janela, então tem que rodar no PC.
+- Rodar o balanceamento de novo depois dessas entradas, porque o olheiro e as séries mudam quantas corridas a garota faz.
 
 ## 8. Decisões pequenas tomadas aqui
 

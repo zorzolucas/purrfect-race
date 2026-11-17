@@ -1,4 +1,4 @@
-# Galope Estelar — Calendário da Carreira
+# Nekomusume — Calendário da Carreira
 
 > Versão 0.3 — 2026-11-12. Complementa o [GDD](GDD.md) §4.
 > Na v0.3 entraram o clima do mês (§4.4), os objetivos sorteados (§3.2) e a magnitude (§10).

@@ -1,4 +1,4 @@
-# Galope Estelar (stelar-gallop)
+# Nekomusume: Corrida Purrfeita (stelar-gallop)
 
 Simulador de treino e corrida de garotas gato. O design está em [docs/GDD.md](docs/GDD.md).
 

@@ -1,4 +1,4 @@
-# Galope Estelar — Fórmula da Corrida
+# Nekomusume — Fórmula da Corrida
 
 > Versão 0.5 — 2026-11-12 (teto de velocidade 60–65 km/h). Complementa o [GDD](GDD.md) §5.
 > Todos os números são **(inicial)**, calibrados com [`tools/sim_corrida.py`](../tools/sim_corrida.py) e [`tools/ajustar_ritmo.py`](../tools/ajustar_ritmo.py).

@@ -1,6 +1,6 @@
-# Galope Estelar — Game Design Document
+# Nekomusume: Corrida Purrfeita — Game Design Document
 
-> Nome provisório ("Galope" não combina mais com gatas; ver §1). Versão 0.3 — 2026-11-17.
+> Versão 0.3 — 2026-11-17.
 > Na v0.3 as garotas viraram **garotas gato**, a arte passou a ser **3D low-poly** (§11) e entraram ideias das referências do gênero: legado (§3.6), afobação na corrida (§5.5) e o amuleto Sete Vidas.
 > Na v0.2 entrou o [calendário da carreira](calendario.md), com mapa de rotas e amuletos.
 > Valores marcados com **(inicial)** são pontos de partida para balanceamento, não decisões finais.
@@ -24,7 +24,7 @@
 
 **Garotas gato:** são garotas com **orelhas e rabo de gato**, ágeis e curiosas. Cada uma tem uma **pelagem** (laranja rajada, frajola, preta, tricolor…) que define as cores do modelo 3D: cabelo, orelhas e rabo ([elenco](elenco.md)). A pelagem é a identidade visual dela, e os detalhes do visual contam algo da personalidade (lição das referências de design de personagem). O jeito felino aparece nos encontros e nas animações: cochilo no sol, curiosidade, caixas de papelão, orelhas que mostram o humor.
 
-**Nome do jogo:** "Galope Estelar" foi pensado para cavalos. Fica como nome provisório até escolhermos outro (opções: *Patas Estelares*, *Corrida Estelar*, *Felinas Estelares*). O repositório continua `stelar-gallop`.
+**Nome do jogo:** **Nekomusume: Corrida Purrfeita** (PT-BR) / **Nekomusume: Purrfect Sprint** (EN). "Nekomusume" é o termo japonês genérico para garota gato; "Purrfeita" brinca com *purr* (ronronar). Antes do lançamento, fazer uma busca de marca, porque o nome lembra o de outro jogo do gênero (§12). O repositório continua `stelar-gallop`, e o nome antigo era "Galope Estelar".
 
 ## 2. Loop principal
 
@@ -359,6 +359,7 @@ Da análise de UI das referências: personagem grande no centro e informação e
 - Calor na Longa favorece a Ponteira e a Estamina; vento ainda sem efeito na corrida ([calendário](calendario.md) §4.4).
 - Maldições e força das NPCs por magnitude.
 - Afobação (§5.5): chance, duração e custo de fôlego, testados no simulador.
+- **Nome do jogo:** buscar marcas registradas parecidas antes de publicar (§1).
 - Pesos do sorteio do mapa, força dos amuletos e do Desafio.
 - Força das NPCs por categoria, fama por corrida e curva esperada de atributos ([calendário](calendario.md) §2 e §5).
 

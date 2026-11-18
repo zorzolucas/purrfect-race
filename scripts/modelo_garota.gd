@@ -1,24 +1,39 @@
 class_name ModeloGarota
 extends Node3D
 ## Modelo 3D low-poly de uma garota (GDD §11), importado do Blender em glTF.
-## Aplica o material toon com a paleta, toca as animações e troca a expressão
-## do rosto deslocando a UV no atlas (3 × 2 expressões).
+## Sombra pintada na textura (material sem luz), contorno por casco invertido, rosto 2D
+## trocável pelo atlas (3 × 2 expressões), íris separadas que somem ou aparecem conforme
+## a expressão e se mexem com o olhar, e as animações do Mixamo passadas para o rig dela.
 ## Por enquanto só a Lira tem modelo; as outras continuam de cápsula na corrida.
 
 const MODELOS := {"Lira": "res://modelos/lira.glb"}
-const EXPRESSOES := ["normal", "feliz", "determinada", "cansada", "triste", "surpresa"]
+## Mesma ordem do atlas (tools/blender/lira.py) e das fichas conceituais.
+const EXPRESSOES := ["normal", "fechados", "feliz", "surpresa", "tonta", "piscadinha"]
+## Quais íris aparecem em cada expressão: [direita, esquerda] (lado dela).
+const IRIS_VISIVEL := {
+	"normal": [true, true], "fechados": [false, false], "feliz": [false, false],
+	"surpresa": [true, true], "tonta": [false, false], "piscadinha": [true, false],
+}
+## Animações que tocam uma vez e param no último quadro (o resto fica em loop).
+const UMA_VEZ := ["largada", "pular", "sim", "nao", "concordar", "brava", "irritada", "convencida",
+	"desdenhar", "gesto_feliz", "suspiro", "desviar_olhar", "sarcasmo", "pensativa", "bocejar"]
 const ATLAS_COLS := 3
 const ATLAS_ROWS := 2
-## Altura do modelo no Blender (m). A corrida usa outra escala, ver `altura`.
+## Altura do modelo no Blender (m), até o topo do cabelo.
 const ALTURA_ORIGINAL := 1.6
-## Multiplica a paleta (1 = cores do Blender). A sombra já vem pintada na textura.
+## Multiplica a textura (1 = cores do Blender). A sombra já vem pintada.
 const BRILHO := Color(1, 1, 1)
 const COR_CONTORNO := Color("#2a1a16")
+## Quanto a íris gira (graus) com olhar(±1, ±1).
+const OLHAR_MAX := Vector2(9.0, 6.0)
 
 var nome: String
 var animacao: AnimationPlayer
+var esqueleto: Skeleton3D
 var _rosto: StandardMaterial3D
+var _iris: Array = [null, null]  # [direita, esquerda]
 var _expressao := "normal"
+var _olhar := Vector2.ZERO
 
 
 static func tem_modelo(nome_garota: String) -> bool:
@@ -34,11 +49,15 @@ func _init(nome_garota := "Lira", altura := ALTURA_ORIGINAL) -> void:
 	inst.scale = Vector3.ONE * (altura / ALTURA_ORIGINAL)
 	add_child(inst)
 	_materiais(inst)
+	var esqs := inst.find_children("*", "Skeleton3D", true, false)
+	esqueleto = esqs[0] as Skeleton3D if esqs.size() > 0 else null
 	animacao = inst.find_child("AnimationPlayer", true, false) as AnimationPlayer
 	if animacao:
 		for a in animacao.get_animation_list():
-			animacao.get_animation(a).loop_mode = Animation.LOOP_LINEAR
+			var anim := animacao.get_animation(a)
+			anim.loop_mode = Animation.LOOP_NONE if a in UMA_VEZ else Animation.LOOP_LINEAR
 		tocar("parada")
+	expressao("normal")
 
 
 func _materiais(no: Node) -> void:
@@ -46,34 +65,51 @@ func _materiais(no: Node) -> void:
 		var mi := filho as MeshInstance3D
 		for s in mi.mesh.get_surface_count():
 			var orig := mi.mesh.surface_get_material(s) as BaseMaterial3D
+			var nome_mat: String = orig.resource_name if orig else ""
 			var m := StandardMaterial3D.new()
 			m.albedo_texture = orig.albedo_texture if orig else null
 			m.albedo_color = BRILHO
 			m.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
-			# sombra já vem pintada na paleta (como na série de referência): sem luz do Godot
+			# sombra já vem pintada na textura (PDF de pipeline §3): sem luz do Godot
 			m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-			# a faixa da jaqueta e a calota do cabelo são abertas: desenha os dois lados
+			# a saia da jaqueta e a calota do cabelo são abertas: desenha os dois lados
 			m.cull_mode = BaseMaterial3D.CULL_DISABLED
-			if orig and orig.resource_name.ends_with("Contorno"):
-				# casco invertido: só a parte de trás aparece, como contorno preto
+			if nome_mat.ends_with("Contorno"):
+				# casco invertido: só a parte de trás aparece, como contorno escuro
 				m.albedo_texture = null
 				m.albedo_color = COR_CONTORNO
 				m.cull_mode = BaseMaterial3D.CULL_BACK
-			elif orig and orig.resource_name.ends_with("Rosto"):
+			elif nome_mat.ends_with("Rosto") or nome_mat.contains("Iris"):
 				m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR
 				m.alpha_scissor_threshold = 0.5
 				m.cull_mode = BaseMaterial3D.CULL_BACK
-				_rosto = m
+				if nome_mat.ends_with("Rosto"):
+					_rosto = m
+				elif nome_mat.ends_with("IrisD"):
+					_iris[0] = m
+				else:
+					_iris[1] = m
 			mi.set_surface_override_material(s, m)
 
 
-## Toca uma animação ("parada" ou "correr"). velocidade multiplica o ritmo.
-func tocar(anim: String, velocidade := 1.0) -> void:
+## Toca uma animação (ver `animacoes()`). velocidade multiplica o ritmo.
+func tocar(anim: String, velocidade := 1.0, mistura := 0.2) -> void:
 	if animacao == null or not animacao.has_animation(anim):
 		return
 	if animacao.current_animation != anim:
-		animacao.play(anim, 0.2)
+		animacao.play(anim, mistura)
 	animacao.speed_scale = velocidade
+
+
+func animacoes() -> PackedStringArray:
+	return animacao.get_animation_list() if animacao else PackedStringArray()
+
+
+## Duração de um ciclo (s), para casar o ritmo da passada com a velocidade.
+func duracao(anim: String) -> float:
+	if animacao == null or not animacao.has_animation(anim):
+		return 1.0
+	return animacao.get_animation(anim).length
 
 
 func expressao(qual: String) -> void:
@@ -82,7 +118,31 @@ func expressao(qual: String) -> void:
 		return
 	_expressao = qual
 	_rosto.uv1_offset = Vector3(float(i % ATLAS_COLS) / ATLAS_COLS, float(i / ATLAS_COLS) / ATLAS_ROWS, 0.0)
+	var vis: Array = IRIS_VISIVEL[qual]
+	for k in 2:
+		var mat := _iris[k] as StandardMaterial3D
+		if mat:
+			mat.albedo_color.a = 1.0 if vis[k] else 0.0
 
 
 func expressao_atual() -> String:
 	return _expressao
+
+
+## Direção do olhar, de -1 a 1 em cada eixo (x: para a direita da tela, y: para cima).
+func olhar(direcao: Vector2) -> void:
+	_olhar = direcao.clamp(Vector2(-1, -1), Vector2(1, 1))
+	if esqueleto == null:
+		return
+	for lado in ["L", "R"]:
+		var b := esqueleto.find_bone("eye." + lado)
+		if b < 0:
+			continue
+		# o osso do olho aponta para fora do rosto (+Y local): gira em torno de Z e X locais
+		var rot := Quaternion(Vector3(0, 0, 1), deg_to_rad(-_olhar.x * OLHAR_MAX.x)) \
+			* Quaternion(Vector3(1, 0, 0), deg_to_rad(_olhar.y * OLHAR_MAX.y))
+		esqueleto.set_bone_pose_rotation(b, esqueleto.get_bone_rest(b).basis.get_rotation_quaternion() * rot)
+
+
+func olhar_atual() -> Vector2:
+	return _olhar

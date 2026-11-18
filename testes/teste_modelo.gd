@@ -30,15 +30,17 @@ func _initialize() -> void:
 	_checar(skel != null, "tem Skeleton3D")
 	if skel:
 		for osso in ["hips", "spine", "chest", "neck", "head", "thigh.L", "shin.R", "foot.L",
-				"upper_arm.R", "forearm.L", "hand.R", "ear.L", "ear.R", "tail.001", "tail.006"]:
+				"upper_arm.R", "forearm.L", "hand.R", "ear.L", "ear.R", "tail.001", "tail.006", "eye.L", "eye.R"]:
 			_checar(skel.find_bone(osso) >= 0, "osso " + osso)
 
 	_checar(m.animacao != null, "tem AnimationPlayer")
 	if m.animacao:
-		for a in ["parada", "correr"]:
+		for a in ["parada", "andar", "trote", "correr", "sprint", "comemorar", "perder", "treino_vel",
+				"treino_est", "treino_pod", "treino_det", "treino_int"]:
 			_checar(m.animacao.has_animation(a), "animação " + a)
 			if m.animacao.has_animation(a):
 				_checar(m.animacao.get_animation(a).loop_mode == Animation.LOOP_LINEAR, "loop " + a)
+		_checar(m.animacao.has_animation("sim") and m.animacao.get_animation("sim").loop_mode == Animation.LOOP_NONE, "gesto toca uma vez")
 
 	var tris := 0
 	var superficies := 0
@@ -52,8 +54,8 @@ func _initialize() -> void:
 			_checar(mat != null and mat.shading_mode == BaseMaterial3D.SHADING_MODE_UNSHADED, "material sem luz (sombra pintada)")
 			if mat and mat.cull_mode != BaseMaterial3D.CULL_BACK or (mat and mat.albedo_texture != null):
 				_checar(mat.albedo_texture != null, "textura de paleta/rosto")
-	_checar(superficies == 3, "3 superfícies: paleta, rosto e contorno (veio %d)" % superficies)
-	_checar(tris > 1500 and tris < 4500, "triângulos low-poly (veio %d)" % tris)
+	_checar(superficies == 5, "5 superfícies: textura, rosto, 2 íris e contorno (veio %d)" % superficies)
+	_checar(tris > 1500 and tris < 5000, "triângulos low-poly (veio %d)" % tris)
 
 	# altura: o topo das orelhas fica perto de 1,6 m
 	var aabb := AABB()
@@ -61,9 +63,14 @@ func _initialize() -> void:
 		aabb = aabb.merge(_relativo(mi, m) * mi.get_aabb())
 	_checar(aabb.size.y > 1.45 and aabb.size.y < 1.85, "altura (veio %.2f)" % aabb.size.y)
 
-	m.expressao("surpresa")
-	_checar(m.expressao_atual() == "surpresa", "troca de expressão")
-	_checar(m._rosto != null and m._rosto.uv1_offset.is_equal_approx(Vector3(2.0 / 3.0, 0.5, 0)), "UV da expressão no atlas")
+	m.expressao("tonta")
+	_checar(m.expressao_atual() == "tonta", "troca de expressão")
+	_checar(m._rosto != null and m._rosto.uv1_offset.is_equal_approx(Vector3(1.0 / 3.0, 0.5, 0)), "UV da expressão no atlas")
+	_checar(m._iris[0] != null and m._iris[0].albedo_color.a == 0.0, "íris some na tonta")
+	m.expressao("piscadinha")
+	_checar(m._iris[0].albedo_color.a == 1.0 and m._iris[1].albedo_color.a == 0.0, "piscadinha: só a íris direita")
+	m.olhar(Vector2(1, 0))
+	_checar(m.olhar_atual() == Vector2(1, 0), "olhar")
 
 	print("tris=%d altura=%.2f" % [tris, aabb.size.y])
 	print("MODELO OK" if falhas.is_empty() else "MODELO FALHOU: " + "; ".join(falhas))

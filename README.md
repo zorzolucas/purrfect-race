@@ -126,6 +126,7 @@ A primeira garota em 3D low-poly, a Lira, já corre na pista no lugar da cápsul
 ![Lira em 3D low-poly](docs/prototipo/21_lira_modelo.png)
 ![Expressões da Lira](docs/prototipo/22_lira_expressoes.png)
 ![Lira na pista](docs/prototipo/23_lira_na_pista.png)
+![Ficha conceitual x modelo da Lira](docs/prototipo/24_lira_ficha_vs_modelo.png)
 ![Escolha](docs/prototipo/1_escolha.png)
 ![Madrinha](docs/prototipo/17_madrinha.png)
 ![Olheiro e instrução](docs/prototipo/18_olheiro_objetivo.png)

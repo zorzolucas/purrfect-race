@@ -2,19 +2,19 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://irbjiumiqs7a"
-path="res://.godot/imported/lira_lira_paleta.png-e096e70d1cc4e5d2ad45f9fa18201ddc.ctex"
+uid="uid://b7xvxu7gqf47d"
+path="res://.godot/imported/lira_lira_iris.png-5318251e7460680d8759f45bbeb45ea4.ctex"
 metadata={
 "vram_texture": false
 }
 generator_parameters={
-"md5": "703f8a27cbe6888a07510873a43a8416"
+"md5": "94bf59a50394de2c7c84eeffae21f91e"
 }
 
 [deps]
 
-source_file="res://modelos/lira_lira_paleta.png"
-dest_files=["res://.godot/imported/lira_lira_paleta.png-e096e70d1cc4e5d2ad45f9fa18201ddc.ctex"]
+source_file="res://modelos/lira_lira_iris.png"
+dest_files=["res://.godot/imported/lira_lira_iris.png-5318251e7460680d8759f45bbeb45ea4.ctex"]
 
 [params]
 

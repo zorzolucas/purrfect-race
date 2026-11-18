@@ -1,6 +1,7 @@
 extends Node3D
 ## Vitrine do modelo low-poly: a garota num disco de grama, girando devagar.
-## Teclas: 1–6 trocam a expressão, Espaço alterna parada/correr, setas giram, G pausa o giro.
+## Teclas: 1–6 trocam a expressão, Espaço/Backspace passam pelas animações, setas giram,
+## G pausa o giro, O liga o olhar passeando.
 ## Abra cenas/vitrine_modelo.tscn no editor e aperte F6.
 
 @export var garota := "Lira"
@@ -8,6 +9,9 @@ var modelo: ModeloGarota
 var camera: Camera3D
 var info: Label
 var girar := true
+var olhar_passeando := false
+var _t := 0.0
+var _anim_i := 0
 
 
 func _ready() -> void:
@@ -65,8 +69,11 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
+	_t += delta
 	if girar:
 		modelo.rotation.y += delta * 0.5
+	if olhar_passeando:
+		modelo.olhar(Vector2(sin(_t * 1.3), sin(_t * 0.9) * 0.6))
 
 
 func _unhandled_input(ev: InputEvent) -> void:
@@ -75,8 +82,14 @@ func _unhandled_input(ev: InputEvent) -> void:
 		return
 	if k.keycode >= KEY_1 and k.keycode < KEY_1 + ModeloGarota.EXPRESSOES.size():
 		modelo.expressao(ModeloGarota.EXPRESSOES[k.keycode - KEY_1])
-	elif k.keycode == KEY_SPACE:
-		modelo.tocar("parada" if modelo.animacao.current_animation == "correr" else "correr")
+	elif k.keycode == KEY_SPACE or k.keycode == KEY_BACKSPACE:
+		var lista := modelo.animacoes()
+		_anim_i = (_anim_i + (1 if k.keycode == KEY_SPACE else -1) + lista.size()) % lista.size()
+		modelo.tocar(lista[_anim_i])
+	elif k.keycode == KEY_O:
+		olhar_passeando = not olhar_passeando
+		if not olhar_passeando:
+			modelo.olhar(Vector2.ZERO)
 	elif k.keycode == KEY_LEFT:
 		modelo.rotation.y -= 0.4
 	elif k.keycode == KEY_RIGHT:
@@ -93,8 +106,8 @@ func enquadrar(angulo_graus: float, close_rosto := false) -> void:
 	modelo.rotation.y = deg_to_rad(angulo_graus + 180.0)
 	if close_rosto:
 		camera.fov = 20.0
-		camera.position = Vector3(0, 1.43, 1.7)
-		camera.look_at(Vector3(0, 1.4, 0))
+		camera.position = Vector3(0, 1.38, 1.75)
+		camera.look_at(Vector3(0, 1.33, 0))
 	else:
 		camera.fov = 35.0
 		camera.position = Vector3(0, 1.05, 3.9)
@@ -105,5 +118,5 @@ func _atualizar_info() -> void:
 	if info == null:
 		return
 	var anim: String = modelo.animacao.current_animation if modelo.animacao else "-"
-	info.text = "%s · %s · %s\n1–6 expressão · Espaço anda/corre · setas giram · G pausa" % [
+	info.text = "%s · %s · %s\n1–6 expressão · Espaço/Backspace animação · setas giram · G pausa · O olhar" % [
 		garota, anim, modelo.expressao_atual()]

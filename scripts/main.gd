@@ -55,13 +55,27 @@ func mostrar_pool() -> void:
 	_trocar(t)
 
 
+## Começa a carreira. Se houver garota salva no elenco, antes passa pela escolha da madrinha.
 func _comecar_carreira(nome: String) -> void:
+	if TelaMadrinha.candidatas(perfil, nome).is_empty():
+		_iniciar(nome, {})
+		return
+	var t := TelaMadrinha.new(perfil, nome)
+	t.escolheu.connect(func(md): _iniciar(nome, md))
+	t.voltar.connect(func(): mostrar_academia())
+	_trocar(t)
+
+
+func _iniciar(nome: String, madrinha: Dictionary) -> void:
 	var ini := Dados.config_carreira(nome)
-	carreira = Carreira.new(Dados.garota(nome), ini, 0, perfil.elenco[nome].vinculo)
+	carreira = Carreira.new(Dados.garota(nome), ini, 0, perfil.elenco[nome].vinculo, madrinha)
 	var extra := ""
 	if carreira.vinculo > 0:
 		extra = " Vínculo %d: +%d em cada atributo e limite de %d." % [
 			carreira.vinculo, Carreira.BAL.vinculo_attr * carreira.vinculo, carreira.limite]
+	if not madrinha.is_empty():
+		var leg := Carreira.bonus_legado(carreira.vinculo, madrinha)
+		extra += " Madrinha: %s (bônus inicial de até +%d por atributo)." % [madrinha.nome, roundi(leg.values().max())]
 	mostrar_carreira("Começa a carreira de %s! Três anos, 8 objetivos e um mapa de rotas novo a cada carreira.%s" % [carreira.nome, extra])
 
 

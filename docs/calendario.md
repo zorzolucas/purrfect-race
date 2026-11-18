@@ -28,14 +28,15 @@ Toda corrida tem uma **categoria**. Ela define a força das adversárias, o prê
 
 | Categoria | Força das NPCs (média dos atributos) | Fama para entrar (inicial) | Quando aparece |
 |---|---|---|---|
-| **Estreia** | 170 | — | Só no turno 13 (a primeira corrida dela) |
-| **Aberta** | Ano 1: 215 · Ano 2: 300 · Ano 3: 380 | 0 | A partir do turno 14 |
-| **Prata** | Ano 2: 315 · Ano 3: 420 | 600 | A partir do turno 25 (ano 2) |
-| **Ouro** | Ano 2: 380 · Ano 3: 455 | 1500 | A partir do turno 37 (2º semestre do ano 2) |
-| **Grande Prêmio** | Ano 1: 290 · Ano 2: 405 · Ano 3: 620 | Por convite (objetivo) | Turnos 24, 48 e 72 |
+| **Estreia** | 191 | — | Só no turno 13 (a primeira corrida dela) |
+| **Aberta** | Ano 1: 241 · Ano 2: 321 · Ano 3: 407 | 0 | A partir do turno 14 |
+| **Prata** | Ano 2: 337 · Ano 3: 449 | 600 | A partir do turno 25 (ano 2) |
+| **Ouro** | Ano 2: 407 · Ano 3: 487 | 1500 | A partir do turno 37 (2º semestre do ano 2) |
+| **Grande Prêmio** | Ano 1: 320 · Ano 2: 421 · Ano 3: 663 | Por convite (objetivo) | Turnos 24, 48 e 72 |
 
+- Os valores subiram 5% a 12% em 2026-11-17, quando o olheiro e a instrução pré-corrida deixaram o bot mais esperto ([campanhas](campanhas.md) §7).
 - O pelotão **fica mais forte a cada ano**, como a jogadora. Assim a mesma categoria pede mais no ano 3 do que no ano 2.
-- **Por distância**, a força é multiplicada por: Sprint ×0,95 · Milha ×0,98 · Média ×1,01 · Longa ×1,04. Corrida curta tem mais sorte, e sem isso as garotas de Sprint completavam bem menos carreiras que as de Longa.
+- **Por distância**, a força é multiplicada por: Sprint ×0,99 · Milha ×0,98 · Média ×1,01 · Longa ×1,04. Corrida curta tem mais sorte, e sem isso as garotas de Sprint completavam bem menos carreiras que as de Longa. Com a instrução Forçar (GDD §5.7) a Sprint ficou mais fácil, e o multiplicador subiu de ×0,95 para ×0,99.
 - A força das NPCs varia ±10% de uma corredora para outra, para o pelotão não ser uniforme.
 - Nas corridas de objetivo com meta de rival e em todo Grande Prêmio, a **rival** (com nome ou campeã da casa) corre com +15% sobre a força da categoria.
 - Os números saíram do bot de balanceamento na carreira de 72 turnos ([campanhas](campanhas.md) §7).
@@ -339,6 +340,8 @@ Antes de toda corrida (opcional ou objetivo), a tela mostra:
 
 Assim existe uma **rota segura** (correr só onde ela é Favorita), mas ela rende menos fama. Quem arrisca corridas de Azarão junta fama mais rápido.
 
+**No protótipo** (`Carreira.olheiro`): 50 simulações completas levariam ~3 s por corrida, então o olheiro roda **1 simulação em modo estimativa** por instrução (sem sorte, sem bloqueio, cada habilidade pelo valor esperado, passo de 0,25 s) e sorteia a sorte de cada corredora por cima do tempo esperado (400 sorteios). Leva ~50 a 120 ms para as 3 instruções, e contra 40 corridas reais por caso erra em média 3 a 5 pontos de chance (`testes/instrucao.gd`). A etiqueta usa a chance da instrução sugerida, vale também para os objetivos e é determinística: o mesmo estado dá sempre a mesma etiqueta. Os números ficam em `data/calendario.json` (`olheiro`).
+
 ### 7.4 Séries e títulos
 
 Vencer conjuntos de corridas do calendário fixo dá um **título**, que aparece na ficha da garota salva, mais uma recompensa na hora.
@@ -350,6 +353,8 @@ Vencer conjuntos de corridas do calendário fixo dá um **título**, que aparece
 | **Volta ao Céu** | Vencer uma Ouro em cada uma das 4 distâncias | Título raro e +1 limite de amuleto (7) até o fim da carreira |
 
 As séries são o principal motivo para **planejar a rota** com antecedência: a Tríplice exige estar em forma em 3 turnos conhecidos, espalhados por 2 anos.
+
+**No protótipo** (`Carreira._checar_series`): vale vencer a corrida do calendário fixo também quando ela é objetivo (o Prêmio Cometa da Capela). Cada série sai 1 vez por carreira: a Tríplice e a Coroa Dupla, 1 vez por casa ou distância. Os títulos vão para a versão salva. Nomes (provisórios): Tríplice de Grama = **Estrela da *distância*** (ex.: *Estrela da Milha*), de Terra = **Poeira da *distância***; **Coroa Dupla da *distância***; **Volta ao Céu**. O cartão da corrida e o olheiro mostram o progresso de cada série que ela conta (ex.: *Estrela da Milha 1/3*).
 
 ## 8. Férias de verão
 

@@ -273,11 +273,12 @@ Uma decisão simples antes da largada, sem tirar o pilar "a corrida é o resulta
 
 | Instrução | Efeito (inicial) |
 |---|---|
-| **Poupar** | Ritmo −2% na Largada e no Meio, Sprint +3%. Bom em corridas longas e para Fechadoras. |
-| **Normal** | Ritmo do estilo. |
-| **Forçar** | Ritmo +2% na Largada e no Meio, gasto de fôlego +10%. Bom em corridas curtas e para Ponteiras. |
+| **Poupar** | Ritmo −1% na Largada e no Meio, Sprint +4%, gasto de fôlego −6%. Bom na Longa e quando falta Estamina para a distância. |
+| **Normal** | Ritmo do estilo. Costuma ser a melhor na Média. |
+| **Forçar** | Ritmo +1,5% na Largada e no Meio, gasto de fôlego +12%. Bom em corridas curtas. |
 
-- A instrução padrão é **Normal**, e o olheiro sugere uma.
+- A instrução padrão é **Normal**, e o olheiro sugere uma: a que tem a maior chance estimada de vencer (calendário §7.3).
+- Os valores saíram de `testes/instrucao.gd` (2026-11-17). Com a proposta inicial (Poupar −2%/+3%, Forçar +2%/+10%), Poupar nunca era a melhor e Forçar ganhava até na Milha. Com os valores acima, no bot a sugestão fica em ~40% Forçar, ~40% Poupar e ~20% Normal ([campanhas](campanhas.md) §7).
 - A Inteligência reduz a chance de afobação (§5.5) mesmo com **Forçar**.
 - Os valores precisam ser testados no simulador para nenhuma instrução ser sempre a melhor (§12).
 

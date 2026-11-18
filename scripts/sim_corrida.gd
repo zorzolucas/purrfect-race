@@ -7,6 +7,7 @@ extends RefCounted
 const V0 := 20.0
 const A0 := 0.35
 const DT := 0.1
+const DT_ESTIMATIVA := 0.25
 const K_VEL := 1.2
 const K_HP_D := 0.6
 const K_HP := 1.5
@@ -20,6 +21,15 @@ const ESCALA := 0.66
 const TETO := [60.0, 65.0]  # km/h com Vel 0 e Vel 1200
 
 const KEYS := ["vel", "est", "pod", "det", "int"]
+## Instrução pré-corrida (GDD §5.7): multiplicador do ritmo na Largada e no Meio (fases 0 e 1),
+## no Sprint (fase 3) e do gasto de fôlego. Calibrado com testes/instrucao.gd: Forçar rende nas
+## corridas curtas, Normal na Média e Poupar na Longa ou com pouca Estamina. (inicial)
+static var INSTRUCAO := {
+	"poupar": {"ritmo": 0.99, "sprint": 1.04, "folego": 0.94},
+	"normal": {"ritmo": 1.0, "sprint": 1.0, "folego": 1.0},
+	"forcar": {"ritmo": 1.015, "sprint": 1.0, "folego": 1.12},
+}
+const INSTRUCAO_NOME := {"poupar": "Poupar", "normal": "Normal", "forcar": "Forçar"}
 const PESOS := {
 	"pon": {"vel": 1.0, "est": 1.0, "pod": 0.95, "det": 0.95, "int": 1.1},
 	"per": {"vel": 1.0, "est": 1.0, "pod": 1.0, "det": 1.0, "int": 1.0},
@@ -64,14 +74,22 @@ var ordem_meio: Array = []  # classificação quando a corredora 0 passa da meta
 ## calor tira 2% do fôlego. Os outros climas não mexem na corrida.
 var mult_acel := 1.0
 var mult_bloqueio := 1.0
+## Modo estimativa (olheiro, calendario.md §7.3): sem sorte, sem bloqueio e com cada habilidade
+## aplicada pela chance dela (valor esperado), num passo maior. Uma rodada só dá o tempo
+## "esperado" de cada uma; a Carreira sorteia a sorte por cima (Carreira.olheiro).
+var estimativa := false
+var dt := DT
 
 
 ## field: lista de Dictionary {nome, estilo, attrs: {vel..int}, mult, unica?, habilidades?, amuletos?}.
 ## habilidades: lista de {nome, fase, tipo, val, dur, cond?} (data/habilidades.json). Sem ela,
 ## a corredora usa as 5 genéricas de referência. amuletos: efeitos de corrida da jogadora
 ## ("lenco", "espora", "bussola", "trevo"; calendario.md §5.2).
-func _init(field: Array, distancia: float, seed: int = 0, clima: String = "") -> void:
+func _init(field: Array, distancia: float, seed: int = 0, clima: String = "", estimativa_: bool = false) -> void:
 	D = distancia
+	estimativa = estimativa_
+	if estimativa:
+		dt = DT_ESTIMATIVA
 	if clima == "chuva":
 		mult_acel = 0.85
 		mult_bloqueio = 1.5
@@ -87,7 +105,7 @@ func _init(field: Array, distancia: float, seed: int = 0, clima: String = "") ->
 		for key in KEYS:
 			e[key] = float(g.attrs[key]) * PESOS[st][key] * float(g.get("mult", 1.0))
 		var hpmax: float = (K_HP_D * D + K_HP * e.est) * (0.98 if clima == "calor" else 1.0)
-		var noise := rng.randfn(0.0, SORTE * (1.0 - e.int / 2400.0))
+		var noise := 0.0 if estimativa else rng.randfn(0.0, SORTE * (1.0 - e.int / 2400.0))
 		var chance := minf(0.9, e.int / 1000.0)
 		var vmax: float = (TETO[0] + (TETO[1] - TETO[0]) * clampf(e.vel, 0.0, 1200.0) / 1200.0) / 3.6
 		rs.append({
@@ -97,6 +115,7 @@ func _init(field: Array, distancia: float, seed: int = 0, clima: String = "") ->
 			"unica": g.get("unica", ""),
 			"skills": g.get("habilidades", REFERENCIA),
 			"amuletos": g.get("amuletos", []),
+			"ins": INSTRUCAO[g.get("instrucao", "normal")],
 		})
 
 
@@ -144,7 +163,10 @@ func _tenta_unica(r: Dictionary, p: int, pos: int, n: int, ev: Array) -> void:
 		"holofote": ok = pos >= 2           # precisa ter quem passar
 		"explosiva": ok = true
 		"nunca": ok = r.hp < 0.3 * r.hpmax
-	if ok and rng.randf() < minf(0.95, r.chance + 0.2):
+	var chance := minf(0.95, r.chance + 0.2)
+	if estimativa and ok:
+		val *= chance  # valor esperado
+	if ok and (estimativa or rng.randf() < chance):
 		r.buff = val * ESCALA
 		r.buff_t = u.dur / ESCALA
 		if r.unica == "explosiva" and D <= 1400.0:
@@ -155,7 +177,7 @@ func _tenta_unica(r: Dictionary, p: int, pos: int, n: int, ev: Array) -> void:
 ## Avança um passo de DT. Retorna as habilidades disparadas: [{idx, nome, unica}].
 func step() -> Array:
 	var ev := []
-	t += DT
+	t += dt
 	var k := ESCALA
 	var v0 := V0 * k
 	var order := _por_posicao()
@@ -173,15 +195,20 @@ func step() -> Array:
 				var chance: float = r.chance
 				if p == 2 and "trevo" in r.amuletos:
 					chance += 0.15
-				if rng.randf() < chance:
+				var forca := 1.0
+				if estimativa:
+					forca = minf(1.0, chance)  # valor esperado
+				if estimativa or rng.randf() < chance:
 					if s.tipo == "hp":
-						r.hp += float(s.val) * r.hpmax
+						r.hp += float(s.val) * forca * r.hpmax
 					else:
-						r.buff = float(s.val) * k
+						r.buff = float(s.val) * forca * k
 						r.buff_t = float(s.dur) / k
 					ev.append({"idx": r.idx, "nome": s.nome, "unica": false})
 			_tenta_unica(r, p, i, order.size(), ev)
-		var vt: float = (V0 + K_VEL * e.vel / 1000.0) * k * RITMO[r.st][p] * (1.0 + r.noise)
+		var ins: Dictionary = r.ins
+		var ritmo: float = RITMO[r.st][p] * (ins.ritmo if p <= 1 else (ins.sprint if p == 3 else 1.0))
+		var vt: float = (V0 + K_VEL * e.vel / 1000.0) * k * ritmo * (1.0 + r.noise)
 		if p == 2:
 			vt += k * (K_DET_FINAL * e.det + K_INT_FINAL * e.int) / 1000.0
 		if p == 3:
@@ -194,13 +221,13 @@ func step() -> Array:
 			vt = v0 * (0.80 + 0.15 * e.det / 1000.0)
 		if r.buff_t > 0.0:
 			vt += r.buff
-			r.buff_t -= DT
+			r.buff_t -= dt
 		if p == 0 and i < 3 and "lenco" in r.amuletos:
 			vt *= 1.05
 		if i > 0 and p >= 1:
 			var f: Dictionary = order[i - 1]
 			var gap: float = f.x - r.x
-			if gap > 0.0 and gap < 2.0 and f.v < vt and r.blk <= 0.0:
+			if gap > 0.0 and gap < 2.0 and f.v < vt and r.blk <= 0.0 and not estimativa:
 				var bloq: float = k * BLOCK * mult_bloqueio * (1.0 - e.pod / 1500.0) * (1.0 - e.int / 2000.0)
 				if "bussola" in r.amuletos:
 					bloq *= 0.7
@@ -208,24 +235,26 @@ func step() -> Array:
 					r.blk = 1.0 / k
 			if r.blk > 0.0:
 				vt = minf(vt, f.v)
-				r.blk -= DT
+				r.blk -= dt
 		vt = minf(vt, r.vmax)
 		var a: float = A0 * k * k * (0.8 + e.pod / 1000.0) * (5.0 if p == 0 else 1.0) * mult_acel
 		if r.v < vt:
-			r.v = minf(vt, r.v + a * DT)
+			r.v = minf(vt, r.v + a * dt)
 		else:
-			r.v = maxf(vt, r.v - 0.8 * k * k * DT)
-		var cost: float = 20.0 * k * pow(r.v / v0, 2)
+			r.v = maxf(vt, r.v - 0.8 * k * k * dt)
+		var cost: float = 20.0 * k * pow(r.v / v0, 2) * ins.folego
 		if p == 1:
 			cost *= 1.2 - e.int / 1500.0
 		if p == 3:
 			cost *= 1.1 - e.det / 2000.0
 			if "espora" in r.amuletos:
 				cost *= 0.9
-		r.hp -= cost * DT
-		r.x += r.v * DT
+		r.hp -= cost * dt
+		var x0: float = r.x
+		r.x += r.v * dt
 		if r.x >= D:
-			r.t = t
+			# interpola o instante exato da chegada (importa no passo maior da estimativa)
+			r.t = t - dt + dt * (D - x0) / maxf(0.001, r.x - x0)
 	done = rs.all(func(r): return r.t >= 0.0)
 	if ordem_meio.is_empty() and rs[0].x >= D * 0.5:
 		ordem_meio = classificacao()

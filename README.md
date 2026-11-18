@@ -36,6 +36,15 @@ meio mês), seguindo o [calendário](docs/calendario.md) e as [campanhas](docs/c
 - **Habilidades:** corridas dão um pouco de atributos e pontos de habilidade, que compram genéricas na loja da
   carreira (10 no total, até 6 equipadas; a Biblioteca dá 30% de desconto). Ela começa com
   Fôlego Extra e Reta Decisiva, e a versão salva guarda as habilidades.
+- **Olheiro e instrução:** antes de toda corrida o olheiro mostra a força média do pelotão, se
+  há rival e a etiqueta **Favorita / Disputada / Azarão** pela chance estimada de vencer. A fama
+  vale ×0,75 / ×1 / ×1,5, então arriscar rende mais. Antes da largada você escolhe **Poupar,
+  Normal ou Forçar**, e o olheiro sugere a que tem mais chance.
+- **Séries e títulos:** vencer conjuntos de corridas do calendário fixo dá títulos (Estrela da
+  *distância*, Coroa Dupla, Volta ao Céu) com fama, amuleto, aptidão ou +1 espaço de amuleto.
+  Os títulos ficam na versão salva.
+- **Madrinha:** com garotas salvas no elenco, a carreira começa pela escolha da madrinha, que dá
+  um bônus inicial (teto de +25 por atributo com o vínculo) e inspira nos turnos 25 e 49.
 - **Semente:** todos os sorteios saem da semente da carreira; recarregar e repetir a mesma
   ação dá o mesmo resultado.
 
@@ -74,14 +83,18 @@ A arte é placeholder (formas coloridas).
 | `scripts/perfil.gd` | Moeda, elenco, vínculo, versão salva de cada garota e a pool. |
 | `scripts/dados.gd` | Autoload que carrega os arquivos de `data/` (elenco, iniciais, rivais, encontros). |
 | `scripts/corrida_3d.gd`, `scripts/pista_geo.gd` | Vista 3D da corrida (pista, corredoras, câmeras) e a geometria da pista em metros. |
-| `scripts/tela_*.gd`, `scripts/main.gd` | Telas montadas em código (escolha, carreira, corrida, fim). |
+| `scripts/tela_*.gd`, `scripts/main.gd` | Telas montadas em código (escolha, madrinha, carreira com olheiro, corrida, fim). |
 | `testes/balanco.gd` | Joga carreiras completas com um bot (conta nova ou madura) e mede objetivos, virada, curva de atributos e fama. |
 | `testes/teste_campanhas.gd` | Monta as 48 campanhas e confere turnos, rivais, aptidões e o save depois da virada. |
 | `testes/teste_amuletos.gd` | Testa oferta, limite e efeitos dos amuletos e a loja de habilidades. |
 | `testes/teste_mapa.gd` | Gera 1400 mapas e confere as regras do sorteio. |
 | `testes/teste_perfil.gd` | Testa a pool, a garantia, o vínculo, a moeda do fim de carreira e o save do perfil. |
 | `testes/teste_save.gd` | Salva uma carreira, carrega de volta e confere se o estado é o mesmo. |
+| `testes/teste_series.gd` | Testa o olheiro, a instrução, as séries e títulos, o teto da madrinha e o visual do elenco. |
+| `testes/instrucao.gd` | Compara as 3 instruções em corridas equilibradas e mede o erro do olheiro contra corridas reais. |
 | `testes/capturas.gd` | Passa pelas telas sozinho e salva capturas em `testes/capturas/`. |
+| `testes/capturas_novas.gd` | Capturas da madrinha, do olheiro, dos cartões de corrida e dos títulos. |
+| `tools/importar_visual.py` | Lê as fichas de [visual-elenco.md](docs/visual-elenco.md) e grava signo, aniversário e visual em `data/garotas.json` e `data/rivais.json`. |
 
 ### Testes
 
@@ -92,6 +105,8 @@ Godot_v4.7.2-stable_win64_console.exe --headless --path . --script res://testes/
 Godot_v4.7.2-stable_win64_console.exe --headless --path . --script res://testes/teste_perfil.gd
 Godot_v4.7.2-stable_win64_console.exe --headless --path . --script res://testes/teste_mapa.gd
 Godot_v4.7.2-stable_win64_console.exe --headless --path . --script res://testes/teste_amuletos.gd
+Godot_v4.7.2-stable_win64_console.exe --headless --path . --script res://testes/teste_series.gd
+Godot_v4.7.2-stable_win64_console.exe --headless --path . --script res://testes/instrucao.gd -- 40
 Godot_v4.7.2-stable_win64_console.exe --path . --script res://testes/capturas.gd
 ```
 
@@ -100,6 +115,10 @@ Com 30 carreiras por garota, o bot cumpre os objetivos em ~80% / 56% / 45% / 38%
 (~160 / 260 / 425 / 520 / 745). O bot é simples; quem planeja a rota e cuida do humor vai melhor.
 
 ![Escolha](docs/prototipo/1_escolha.png)
+![Madrinha](docs/prototipo/17_madrinha.png)
+![Olheiro e instrução](docs/prototipo/18_olheiro_objetivo.png)
+![Cartões com olheiro e séries](docs/prototipo/19_cartoes_olheiro.png)
+![Olheiro com série](docs/prototipo/20_olheiro_serie.png)
 ![Academia](docs/prototipo/9_academia.png)
 ![Pool](docs/prototipo/10_pool.png)
 ![Fim de carreira](docs/prototipo/11_fim_de_carreira.png)

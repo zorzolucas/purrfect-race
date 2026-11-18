@@ -22,7 +22,8 @@ NOMES = ["Altair", "Spica", "Adara", "Alcione", "Electra", "Maia", "Mérope", "C
          "Tucana", "Corona", "Zaniah", "Alya", "Alhena", "Mizar", "Alcor", "Dubhe", "Deneb", "Albireo",
          "Achernar", "Mimosa", "Hamal", "Mirach", "Almach", "Nunki", "Ankaa", "Zosma", "Elnath", "Saiph",
          "Naos", "Avior", "Atria", "Alnair"]
-# pelagens: os nomes não têm mais sobrenome, mas elas ainda servem de semente dos perfis
+# nomes antigos de pelagem: não são mais a pelagem delas (essa vem de docs/visual-elenco.md),
+# mas continuam como semente dos perfis, para os atributos não mudarem
 PELAGENS = ["Castanha", "Gateada", "Ruana", "Oveira", "Melada", "Tobiana", "Douradilha", "Picaça",
             "Preta", "Branca", "Tostada", "Sebruna", "Colorada", "Malacara", "Pangaré", "Bragada"]
 
@@ -81,8 +82,13 @@ if __name__ == "__main__":
     gs = gerar()
     root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     os.makedirs(os.path.join(root, "data"), exist_ok=True)
-    with open(os.path.join(root, "data", "garotas.json"), "w", encoding="utf-8") as f:
-        json.dump(gs, f, ensure_ascii=False, indent=1)
+    # signo, aniversário e visual vêm das fichas de docs/visual-elenco.md
+    import importar_visual
+    rivais = json.load(open(os.path.join(root, "data", "rivais.json"), encoding="utf-8"))
+    importar_visual.importar(gs, rivais)
+    importar_visual.conferir(gs)
+    importar_visual.gravar(os.path.join(root, "data", "garotas.json"), gs, 1)
+    importar_visual.gravar(os.path.join(root, "data", "rivais.json"), rivais, 2)
     from collections import Counter
     assert len(gs) == 48 and len({g["nome"] for g in gs}) == 48
     assert Counter(tuple(g["casa"]) for g in gs) == Counter({(d, p): 6 for d in range(4) for p in range(2)})

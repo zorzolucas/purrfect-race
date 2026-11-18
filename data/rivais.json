@@ -18,7 +18,28 @@
       "terra": "O"
     },
     "unica": "chama",
-    "_doc": "Rival R1 (elenco.md). Corre o Grande Prêmio nas casas Média e Longa Grama (calendario.md §3.1). A habilidade Coroa ainda não existe; usa a Chama da Largada."
+    "_doc": "Rival R1 (elenco.md). Corre o Grande Prêmio nas casas Média e Longa Grama (calendario.md §3.1). A habilidade Coroa ainda não existe; usa a Chama da Largada.",
+    "signo": "capricornio",
+    "elemento": "terra",
+    "aniversario": [
+      3,
+      1
+    ],
+    "visual": {
+      "pelagem": "branca",
+      "paleta": [
+        "#F8F8F6",
+        "#DADBDF",
+        "#B7B9C0"
+      ],
+      "marca": "pelo sem nenhuma mancha e olhos azul-gelo",
+      "altura": "alta",
+      "porte": "esguia",
+      "cabelo": "Longo e liso, preso num coque baixo elegante com dois fios soltos na frente",
+      "olhos": "Azul-gelo, calmos",
+      "orelhas": "Médias, perfeitamente eretas e imóveis. Ela controla as orelhas, então ninguém lê o humor dela",
+      "rabo": "Longo, sedoso, que se move devagar, sempre na mesma cadência"
+    }
   },
   {
     "nome": "Algol",
@@ -39,6 +60,27 @@
       "terra": "X"
     },
     "unica": "holofote",
-    "_doc": "Rival R2 (elenco.md). Corre o Grande Prêmio nas casas Sprint e Milha Terra. A habilidade Poeira na Cara ainda não existe; usa o Holofote."
+    "_doc": "Rival R2 (elenco.md). Corre o Grande Prêmio nas casas Sprint e Milha Terra. A habilidade Poeira na Cara ainda não existe; usa o Holofote.",
+    "signo": "gemeos",
+    "elemento": "ar",
+    "aniversario": [
+      30,
+      5
+    ],
+    "visual": {
+      "pelagem": "tigrada_cinza",
+      "paleta": [
+        "#8E8C88",
+        "#3F3D3B",
+        "#C8C4BC"
+      ],
+      "marca": "a ponta da orelha esquerda cortada reta, como a marca dos gatos de rua castrados",
+      "altura": "baixa",
+      "porte": "esguia",
+      "cabelo": "Curto e desfiado, listrado, com presilhas tortas de tampinha de garrafa",
+      "olhos": "Verde-amarelado, semicerrados",
+      "orelhas": "Médias, viradas para frente quando ela provoca. A esquerda tem a ponta cortada",
+      "rabo": "Médio e listrado, sempre balançando de um lado para o outro, como quem desdenha"
+    }
   }
 ]

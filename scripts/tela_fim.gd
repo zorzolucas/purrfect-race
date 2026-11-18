@@ -48,6 +48,8 @@ func _ready() -> void:
 	if not opcionais.is_empty():
 		var vit := opcionais.filter(func(r): return r.posicao == 1).size()
 		pv.add_child(UI.label("%d corrida(s) opcional(is), %d vitória(s). Fama final: %d." % [opcionais.size(), vit, c.fama], 16))
+	if not c.titulos.is_empty():
+		pv.add_child(UI.label("Títulos: %s" % ", ".join(c.titulos.map(func(t): return t.nome)), 16, UI.DESTAQUE, true))
 	pv.add_child(UI.label("Semente da carreira: %d" % c.semente, 13, UI.SUAVE))
 	var m := c.moeda_total()
 	pv.add_child(UI.label("Moeda: %d dos prêmios + %d de bônus por desempenho = %d" % [m.corridas, m.bonus, m.total], 18, UI.DESTAQUE))

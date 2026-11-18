@@ -122,6 +122,9 @@ var habilidades: Array = []  # ids das genéricas compradas (data/habilidades.js
 var amuletos: Array = []     # ids dos amuletos equipados (data/amuletos.json)
 var oferta_amuleto: Array = []  # amuletos oferecidos, esperando a escolha
 var estrela_usada := false
+var instrucao := "normal"    # instrução da próxima corrida (GDD §5.7)
+var titulos: Array = []      # séries completadas: [{id, nome, turno}] (calendario.md §7.4)
+var _cache_olheiro := {}
 
 
 func _init(g: Dictionary, ini: Dictionary, semente_: int = 0, vinculo_: int = 0, madrinha_: Dictionary = {}) -> void:
@@ -132,11 +135,9 @@ func _init(g: Dictionary, ini: Dictionary, semente_: int = 0, vinculo_: int = 0,
 	vinculo = vinculo_
 	limite = BAL.limite_attr + BAL.vinculo_limite * vinculo
 	madrinha = madrinha_
+	var legado := bonus_legado(vinculo, madrinha)
 	for k in SimCorrida.KEYS:
-		var legado: float = BAL.vinculo_attr * vinculo
-		if not madrinha.is_empty():
-			legado += minf(BAL.madrinha_teto, BAL.madrinha_pct * float(madrinha.attrs[k]))
-		attrs[k] = float(g.atributos[k]) + minf(BAL.legado_teto, legado)
+		attrs[k] = float(g.atributos[k]) + legado[k]
 	aptidao = aptidao.duplicate()
 	naturais = ini.get("naturais", [])
 	unica = ini.get("unica", "")
@@ -156,6 +157,26 @@ func _init(g: Dictionary, ini: Dictionary, semente_: int = 0, vinculo_: int = 0,
 		rota.append([])
 	_sortear_duplas()
 	_abrir_capitulo()
+
+
+## Bônus inicial de cada atributo pelo vínculo e pela madrinha, com o teto (GDD §3.6 e
+## campanhas.md §2.1). A tela da madrinha usa a mesma conta para mostrar a prévia.
+static func bonus_legado(vinculo_: int, madrinha_: Dictionary) -> Dictionary:
+	var b := {}
+	for k in SimCorrida.KEYS:
+		var legado: float = BAL.vinculo_attr * vinculo_
+		if not madrinha_.is_empty():
+			legado += minf(BAL.madrinha_teto, BAL.madrinha_pct * float(madrinha_.attrs[k]))
+		b[k] = minf(BAL.legado_teto, legado)
+	return b
+
+
+## Dados da madrinha a partir da versão salva de uma garota do elenco.
+static func madrinha_de(nome_: String, salva: Dictionary) -> Dictionary:
+	var dd: Node = (Engine.get_main_loop() as SceneTree).root.get_node("Dados")
+	var ini: Dictionary = dd.config_carreira(nome_)
+	return {"nome": nome_, "attrs": salva.attrs, "nota": salva.get("nota", ""),
+		"dist": salva.get("dist", ini.get("distancia", "")), "piso": salva.get("piso", ini.get("piso", ""))}
 
 
 func _rng(contexto: String) -> RandomNumberGenerator:
@@ -466,11 +487,14 @@ func pode_entrar(c: Dictionary) -> bool:
 	return fama >= int(Dados.calendario.categorias[c.cat].fama_entrada)
 
 
-func fama_prevista(c: Dictionary, posicao: int = 1) -> int:
+## Fama por colocação, com o multiplicador do olheiro (mult_olheiro < 0 = calcula agora).
+func fama_prevista(c: Dictionary, posicao: int = 1, mult_olheiro: float = -1.0) -> int:
 	var cal: Dictionary = Dados.calendario
 	var base: float = cal.categorias[c.cat].fama
 	var mult: float = cal.fama_por_posicao[posicao - 1] if posicao <= cal.fama_por_posicao.size() else cal.fama_resto
-	return roundi(base * mult * (1.0 + _soma("fama")))
+	if mult_olheiro < 0.0:
+		mult_olheiro = olheiro(c).mult
+	return roundi(base * mult * mult_olheiro * (1.0 + _soma("fama")))
 
 
 func pontos_previstos(c: Dictionary, posicao: int = 1) -> int:
@@ -493,7 +517,23 @@ func _corrida_seguida() -> bool:
 
 ## Monta a corrida: a jogadora + 11 adversárias do elenco (com a rival, se houver).
 func montar_corrida(elenco: Array) -> Dictionary:
-	var c := corrida_atual if not corrida_atual.is_empty() else objetivo_do_turno()
+	var c := corrida_da_vez()
+	var m := _pelotao(c, elenco)
+	m.field[0].instrucao = instrucao
+	return {"nome": c.nome, "objetivo": int(c.get("meta", 0)), "distancia": Calendario.metros(c),
+		"field": m.field, "clima": clima(), "seed": hash([semente, turno, c.get("id", "x")]),
+		"rival_idx": m.rival_idx, "texto_objetivo": c.get("texto", "") if corrida_atual.is_empty() else "",
+		"instrucao": instrucao}
+
+
+## A corrida que ela vai correr agora: a opcional escolhida ou o objetivo do turno.
+func corrida_da_vez() -> Dictionary:
+	return corrida_atual if not corrida_atual.is_empty() else objetivo_do_turno()
+
+
+## Pelotão de uma corrida neste turno: {field, rival_idx, rival, forca}. Sai da semente,
+## então o olheiro vê exatamente as adversárias que vão correr.
+func _pelotao(c: Dictionary, elenco: Array) -> Dictionary:
 	var cal: Dictionary = Dados.calendario
 	var forca := forca_categoria(c.cat, c.dist)
 	if c.get("desafio", false):
@@ -532,9 +572,93 @@ func montar_corrida(elenco: Array) -> Dictionary:
 	var v: float = cal.variacao_npc
 	for g in pool.slice(0, vagas):
 		field.append(_adversaria(g, forca * r.randf_range(1.0 - v, 1.0 + v), "", c))
-	return {"nome": c.nome, "objetivo": int(c.get("meta", 0)), "distancia": Calendario.metros(c),
-		"field": field, "clima": clima(), "seed": hash([semente, turno, c.get("id", "x")]),
-		"rival_idx": rival_idx, "texto_objetivo": c.get("texto", "") if corrida_atual.is_empty() else ""}
+	return {"field": field, "rival_idx": rival_idx, "rival": rival if rival_idx >= 0 else "", "forca": forca}
+
+
+# ---------- olheiro (calendario.md §7.3) e instrução (GDD §5.7) ----------
+
+## Estimativa antes da corrida: força média do pelotão, rival, chance de vencer com cada
+## instrução, a sugerida e a etiqueta (Favorita, Disputada ou Azarão) com o multiplicador de fama.
+## A chance sai de 1 rodada da simulação em modo estimativa por instrução (tempo esperado de
+## cada uma) e de sorteios da sorte por cima. É determinística: o mesmo estado dá a mesma etiqueta.
+func olheiro(c: Dictionary) -> Dictionary:
+	var chave := "%d|%s|%s|%d|%d|%d|%s" % [turno, c.get("id", "x"), c.get("nome", ""), humor,
+		habilidades.size(), amuletos.size(), str(attrs.values())]
+	if _cache_olheiro.has(chave):
+		return _cache_olheiro[chave]
+	var ol: Dictionary = Dados.calendario.olheiro
+	var p := _pelotao(c, Dados.garotas)
+	var field: Array = p.field
+	var npcs := 0.0
+	for i in range(1, field.size()):
+		var s := 0.0
+		for k in SimCorrida.KEYS:
+			s += field[i].attrs[k]
+		npcs += s / 5.0
+	var chances := {}
+	var melhor := "normal"
+	for ins in ["normal", "poupar", "forcar"]:
+		field[0].instrucao = ins
+		var sim := SimCorrida.new(field, Calendario.metros(c), 1, clima(), true)
+		sim.rodar_ate_o_fim()
+		chances[ins] = _chance_por_sorteio(sim, hash([semente, turno, c.get("id", "x")]), int(ol.sorteios), float(ol.k_sorte))
+		# a sugerida precisa ganhar por uma margem; no empate, fica a Normal
+		if chances[ins] > chances[melhor] + float(ol.margem_sugestao):
+			melhor = ins
+	var chance: float = chances[melhor]
+	var etq := "disputada"
+	if chance >= float(ol.favorita):
+		etq = "favorita"
+	elif chance < float(ol.azarao):
+		etq = "azarao"
+	var r := {"forca": npcs / maxf(1.0, field.size() - 1), "rival": p.rival, "chances": chances,
+		"sugestao": melhor, "chance": chance, "etiqueta": etq, "mult": float(ol.mult[etq]),
+		"media": _media_attrs() * float(field[0].mult)}
+	_cache_olheiro[chave] = r
+	return r
+
+
+## Chance da jogadora (índice 0) vencer: sorteia a sorte de cada uma sobre o tempo esperado.
+static func _chance_por_sorteio(sim: SimCorrida, seed_: int, n: int, k_sorte: float) -> float:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = seed_
+	var tempos := []
+	var sigmas := []
+	for r in sim.rs:
+		tempos.append(float(r.t))
+		sigmas.append(SimCorrida.SORTE * (1.0 - float(r.e.int) / 2400.0) * k_sorte)
+	var vitorias := 0
+	for i in n:
+		var minha: float = tempos[0] * (1.0 - rng.randfn(0.0, sigmas[0]))
+		var venceu := true
+		for j in range(1, tempos.size()):
+			if tempos[j] * (1.0 - rng.randfn(0.0, sigmas[j])) < minha:
+				venceu = false
+				break
+		if venceu:
+			vitorias += 1
+	return float(vitorias) / n
+
+
+func _media_attrs() -> float:
+	var s := 0.0
+	for k in attrs:
+		s += attrs[k]
+	return s / 5.0
+
+
+static func nome_etiqueta(etq: String) -> String:
+	return {"favorita": "Favorita", "disputada": "Disputada", "azarao": "Azarão"}[etq]
+
+
+func cancelar_corrida() -> String:
+	var n: String = corrida_atual.get("nome", "")
+	corrida_atual = {}
+	return "Inscrição na %s cancelada." % n
+
+
+func escolher_instrucao(ins: String) -> void:
+	instrucao = ins
 
 
 ## O que a carreira precisa saber do resultado, além da colocação: onde chegou a rival e
@@ -568,8 +692,10 @@ func registrar_corrida(posicao: int, extra: Dictionary = {}) -> String:
 	var obj := objetivo_do_turno()
 	var c := corrida_atual if not corrida_atual.is_empty() else obj
 	var e_obj := corrida_atual.is_empty()
+	var ol := olheiro(c)
 	corrida_atual = {}
-	var ganho_fama := fama_prevista(c, posicao)
+	instrucao = "normal"
+	var ganho_fama := fama_prevista(c, posicao, ol.mult)
 	fama += ganho_fama
 	var premio := ganho_fama / BAL.moeda_por_fama
 	moeda_corridas += premio
@@ -585,8 +711,9 @@ func registrar_corrida(posicao: int, extra: Dictionary = {}) -> String:
 		custo_e += BAL.energia_seguidas
 	energia = maxi(0, energia - custo_e)
 	turnos_com_corrida.append(turno)
-	var txt := "%s terminou em %dº na %s. +%d de fama, +%d em cada atributo, +%d pontos de habilidade, %d moedas." % [
-		_primeiro_nome(), posicao, c.nome, ganho_fama, roundi(ganho_attr), ganho_pontos, premio]
+	var txt := "%s terminou em %dº na %s. +%d de fama (%s, ×%s), +%d em cada atributo, +%d pontos de habilidade, %d moedas." % [
+		_primeiro_nome(), posicao, c.nome, ganho_fama, nome_etiqueta(ol.etiqueta), str(ol.mult).replace(".", ","),
+		roundi(ganho_attr), ganho_pontos, premio]
 	if seguida and _rng("seguidas").randf() < BAL.humor_seguidas:
 		_mudar_humor(-1)
 		txt += " Três corridas seguidas pesaram no humor."
@@ -620,7 +747,12 @@ func registrar_corrida(posicao: int, extra: Dictionary = {}) -> String:
 			_mudar_humor(-1)
 			txt += " Ficou fora do top 3 no Desafio e o humor caiu."
 	resultados.append({"turno": turno, "nome": c.nome, "cat": c.cat, "posicao": posicao,
-		"objetivo": meta, "ok": ok, "fama": ganho_fama, "dist": c.dist})
+		"objetivo": meta, "ok": ok, "fama": ganho_fama, "dist": c.dist, "piso": c.piso,
+		"etiqueta": ol.etiqueta, "fixa": e_fixa(turno, c.nome)})
+	if posicao == 1:
+		var s_txt := _checar_series()
+		if s_txt != "":
+			txt += " " + s_txt
 	if e_obj and not ok:
 		falhou_objetivo = true
 		terminou = true
@@ -644,6 +776,86 @@ func _turno_objetivo_anterior() -> int:
 		if o.turno < turno:
 			anterior = maxi(anterior, int(o.turno))
 	return anterior
+
+
+# ---------- séries e títulos (calendario.md §7.4) ----------
+
+## A corrida com este nome neste turno é do calendário fixo? (vale também quando é objetivo)
+static func e_fixa(turno_: int, nome_: String) -> bool:
+	var f := Calendario.corrida_fixa(turno_)
+	return not f.is_empty() and f.nome == nome_
+
+
+func tem_titulo(id: String) -> bool:
+	return titulos.any(func(t): return t.id == id)
+
+
+## Vitórias no calendário fixo: [{turno, cat, dist, piso}].
+func vitorias_fixas() -> Array:
+	return resultados.filter(func(r): return r.get("fixa", false) and r.posicao == 1)
+
+
+## Progresso de cada série que esta corrida do calendário ajuda a completar, para o cartão:
+## [{id, nome, feitas, total}]. Sem a corrida, mostra todas as séries já começadas.
+func series_da_corrida(c: Dictionary) -> Array:
+	var v := vitorias_fixas()
+	var cfg: Dictionary = Dados.calendario.series
+	var lista := []
+	var dn: String = Dados.DIST_NOME[c.dist]
+	var id_t := "triplice_%s_%s" % [c.dist, c.piso]
+	if not tem_titulo(id_t):
+		var feitas := (1 if v.any(func(r): return r.cat == "prata" and r.dist == c.dist and r.piso == c.piso) else 0) \
+			+ v.filter(func(r): return r.cat == "ouro" and r.dist == c.dist and r.piso == c.piso).size()
+		lista.append({"id": id_t, "nome": cfg.triplice["nome_" + c.piso] % dn, "feitas": feitas, "total": 3})
+	if c.cat == "ouro":
+		var id_c := "coroa_%s" % c.dist
+		if not tem_titulo(id_c):
+			var pisos := {}
+			for r in v:
+				if r.cat == "ouro" and r.dist == c.dist:
+					pisos[r.piso] = true
+			lista.append({"id": id_c, "nome": cfg.coroa.nome % dn, "feitas": pisos.size(), "total": 2})
+		if not tem_titulo("volta"):
+			var dists := {}
+			for r in v:
+				if r.cat == "ouro":
+					dists[r.dist] = true
+			lista.append({"id": "volta", "nome": cfg.volta.nome, "feitas": dists.size(), "total": 4})
+	return lista
+
+
+## Depois de uma vitória: completa as séries que fecharam e dá as recompensas.
+func _checar_series() -> String:
+	var ultima: Dictionary = resultados[-1]
+	if not ultima.get("fixa", false):
+		return ""
+	var cfg: Dictionary = Dados.calendario.series
+	var partes := []
+	for s in series_da_corrida(ultima):
+		if s.feitas < s.total:
+			continue
+		titulos.append({"id": s.id, "nome": s.nome, "turno": turno})
+		var premio := ""
+		if s.id.begins_with("triplice"):
+			fama += int(cfg.triplice.fama)
+			oferecer_amuleto(4, true)
+			premio = "+%d de fama e um amuleto para escolher" % cfg.triplice.fama
+		elif s.id.begins_with("coroa"):
+			fama += int(cfg.coroa.fama)
+			var fraco := "terra" if Dados.APT[aptidao.terra] < Dados.APT[aptidao.grama] or \
+				(aptidao.terra == aptidao.grama and piso == "grama") else "grama"
+			var subir := {"R": "O", "O": "B", "B": "X", "X": "X"}
+			aptidao[fraco] = subir[aptidao[fraco]]
+			premio = "+%d de fama e aptidão em %s agora é %s" % [cfg.coroa.fama, fraco.capitalize(), Dados.APT_NOME[aptidao[fraco]]]
+		else:
+			premio = "título raro e +%d espaço de amuleto até o fim da carreira" % cfg.volta.limite_amuleto
+		partes.append("Título \"%s\"! %s." % [s.nome, premio.substr(0, 1).to_upper() + premio.substr(1)])
+	return " ".join(partes)
+
+
+## Limite de amuletos, com o espaço extra da Volta ao Céu.
+func limite_amuletos() -> int:
+	return int(Dados.amuletos.limite) + (int(Dados.calendario.series.volta.limite_amuleto) if tem_titulo("volta") else 0)
 
 
 # ---------- campanha (docs/campanhas.md) ----------
@@ -933,7 +1145,7 @@ const CAMPOS_SAVE := ["attrs", "energia", "humor", "lesionada", "turno", "usos_t
 	"serra", "unico_garantido", "terminou", "falhou_objetivo", "afinidade", "vistos",
 	"ultimo_encontro", "ultima_corrida", "duplas", "encontro_pendente", "moeda_corridas",
 	"pontos", "habilidades", "amuletos", "oferta_amuleto", "estrela_usada",
-	"caminho", "flags", "ultima_lesao", "saidas", "viradas", "madrinha", "aptidao"]
+	"caminho", "flags", "ultima_lesao", "saidas", "viradas", "madrinha", "aptidao", "instrucao", "titulos"]
 
 
 ## Salva também a carreira terminada: ela só é apagada depois que o jogador decide
@@ -997,6 +1209,8 @@ static func carregar() -> Carreira:
 	for r in c.resultados:
 		for k in ["turno", "posicao", "objetivo", "fama"]:
 			r[k] = int(r[k])
+	for t in c.titulos:
+		t.turno = int(t.turno)
 	c.rota = c.rota.map(func(l): return l.map(func(x): return int(x)))
 	if c.caminho != "":
 		c.objetivos.append_array(c.campanha.caminhos[c.caminho].objetivos.duplicate(true))
@@ -1030,6 +1244,8 @@ func versao_salva() -> Dictionary:
 		a[k] = roundi(attrs[k])
 	return {"attrs": a, "nota": Dados.nota(attrs), "objetivos": objetivos_cumpridos(),
 		"fama": fama, "habilidades": habilidades.duplicate(), "resultados": resultados.duplicate(true),
+		"titulos": titulos.map(func(t): return t.nome), "estilo": estilo,
+		"dist": distancia, "piso": piso,
 		"vinculo": vinculo, "semente": str(semente)}
 
 
@@ -1085,7 +1301,7 @@ func oferecer_amuleto(n: int, garantir_raro: bool) -> void:
 func escolher_amuleto(id: String, no_lugar_de: String = "") -> String:
 	oferta_amuleto = []
 	var nome_a: String = Dados.amuleto(id).nome
-	if amuletos.size() < int(Dados.amuletos.limite):
+	if amuletos.size() < limite_amuletos():
 		amuletos.append(id)
 		return "%s equipou o amuleto %s." % [_primeiro_nome(), nome_a]
 	var i := amuletos.find(no_lugar_de)

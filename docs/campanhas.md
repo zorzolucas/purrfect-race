@@ -1,5 +1,6 @@
 # Nekomusume — Campanhas e balanceamento
 
+> Versão 0.6 — 2026-11-18. Na v0.6 a diferença entre casas chegou a 9,9 pontos e a entre arquétipos a 11,2, com o objetivo 4 da Teimosa e da Sonhadora, a Misteriosa e a Média Grama acertados (§7).
 > Versão 0.5 — 2026-11-18. Na v0.5 o ano 3 ficou mais forte, a garota cresce mais cedo, as corridas do calendário fixo ficaram mais fortes (a Coroa Dupla caiu de 28% para 14% das carreiras) e o bot passou a usar uma semente por garota (§7).
 > Versão 0.4 — 2026-11-18. Na v0.4 a diferença entre casas e entre arquétipos caiu para ~11 pontos, as viradas da Durona e da Curiosa mudaram, a Coroa Dupla pede as 2 Ouros no mesmo ano e o bot rodou com 40 sementes (§7).
 > Versão 0.3 — 2026-11-17. Na v0.3 entraram o olheiro, a instrução pré-corrida, as séries e a madrinha no protótipo, e o bot rodou de novo (§7).
@@ -251,7 +252,7 @@ As outras **42 garotas** ganham a campanha a partir de **1 dos 12 arquétipos** 
 ### 4.2 Exceções do nível baixo
 
 Até o ritmo ser recalibrado nos níveis 150–300 (calendário §11):
-- **Fechadora de Longa:** objetivos 1 e 2 e o GP do ano 1 na **Média** do mesmo piso (como a Mira e a Shaula).
+- *A **Fechadora de Longa** do modelo corria os objetivos 1 e 2 e o GP do ano 1 na Média até a v0.6. Saiu da exceção porque, com o GP do ano 1 na Média, a Misteriosa (4 Fechadoras, 2 delas de Longa) completava 10 pontos acima dos outros arquétipos. A Mira e a Shaula, do MVP, continuam com o ano 1 na Média, porque a campanha delas foi escrita assim.*
 - **Fechadora de Sprint:** a Estreia pede **top 3** em vez de top 5, porque ela tem vantagem no começo.
 - *A **Ponteira de Longa** saiu desta exceção na v0.4: com top 3, a Estreia derrubava 29% delas (§7).*
 
@@ -262,7 +263,7 @@ Quando a recalibração sair, o bot roda de novo e as exceções que não forem 
 - Se a casa tem rival com nome (calendário §3.1), é ela: **Polaris** em Média e Longa Grama, **Algol** em Sprint e Milha Terra.
 - Senão, é a **campeã da casa**: a garota do elenco da mesma casa com a maior soma de atributos que não seja a jogadora. Ela corre com +15% sobre a força da categoria nas corridas de objetivo e no GP, como as rivais com nome, mas sem encontros no MVP.
 - A rival da campanha **corre sempre com aptidão Ótima** na distância e no piso da corrida (`aptidao_rival` no `data/calendario.json`). Antes da v0.4, Polaris na Longa e Algol na Milha tinham aptidão Boa e eram mais fracas que as campeãs da casa, o que deixava as casas com campeã até 7 pontos mais difíceis.
-- Na **primeira Prata** (objetivo 4, turno 32) dos arquétipos Competitiva, Estrategista e Leal, a rival corre **sem os +15%** (`forca_rival: 1.0` no objetivo): ela ainda está pegando ritmo. Esse objetivo derrubava de 33% a 42% das carreiras desses arquétipos.
+- Na **primeira Prata** (objetivo 4, turno 32) dos arquétipos Competitiva, Estrategista e Leal, a rival corre **sem os +15%** (`forca_rival: 1.0` no objetivo): ela ainda está pegando ritmo. Esse objetivo derrubava de 33% a 42% das carreiras desses arquétipos. Na **Teimosa** e na **Sonhadora** (só Fechadoras), a rival corre com **+7%** (`forca_rival: 1.07`): sem bônus elas iam a 53%, e com +15% o objetivo derrubava de 29% a 36%.
 
 Isso **muda o calendário §3.1**: a "campeã da casa" deixa de ser uma NPC gerada e passa a ser uma garota do elenco. Assim ela tem nome e cara, e o jogador vai conhecendo as 48 aos poucos.
 
@@ -418,7 +419,7 @@ São **84 textos** no total (12 × 7). As campanhas do MVP têm mais capítulos 
 | Elnath | Longa Grama | Ponteira | Competitiva | Polaris | — |
 | Nunki | Longa Grama | Perseguidora | Perfeccionista | Polaris | — |
 | Ankaa | Longa Grama | Arrancadora | Curiosa | Polaris | — |
-| Zosma | Longa Grama | Fechadora | Misteriosa | Polaris | Ano 1 na Média |
+| Zosma | Longa Grama | Fechadora | Misteriosa | Polaris | — |
 | Mintaka | Sprint Terra | Ponteira | Durona | Algol | — |
 | Mérope | Sprint Terra | Perseguidora | Perfeccionista | Algol | — |
 | Celeno | Sprint Terra | Arrancadora | Estrela | Algol | — |
@@ -440,7 +441,7 @@ São **84 textos** no total (12 × 7). As campanhas do MVP têm mais capítulos 
 | Alnair | Longa Terra | Ponteira | Durona | Campeã da casa | — |
 | Naos | Longa Terra | Perseguidora | Estrategista | Campeã da casa | — |
 | Avior | Longa Terra | Arrancadora | Curiosa | Campeã da casa | — |
-| Atria | Longa Terra | Fechadora | Misteriosa | Campeã da casa | Ano 1 na Média |
+| Atria | Longa Terra | Fechadora | Misteriosa | Campeã da casa | — |
 
 Contagem: Competitiva 3, Capitã 4, Durona 3, Estrategista 4, Leal 4, Perfeccionista 3, Estrela 4, Festeira 4, Curiosa 3, Sonhadora 3, Misteriosa 4, Teimosa 3.
 
@@ -548,9 +549,9 @@ Mexer sempre na ordem abaixo, um botão por vez, e rodar de novo:
 
 ## 7. Resultados
 
-Rodada de 2026-11-18 (v0.5), depois de deixar o ano 3 mais forte, adiantar o crescimento da garota e corrigir as sementes do bot (§7.4): **40 carreiras por garota na conta nova** (1.920 carreiras) e **20 na conta madura** (960 carreiras), as 48 garotas. Resumo com `python tools/resumo_balanco.py saida_*.json`.
+Rodada de 2026-11-18 (v0.6), depois de acertar o objetivo 4 da Teimosa e da Sonhadora, a Misteriosa e a Média Grama (§7.4): **40 carreiras por garota na conta nova** (1.920 carreiras) e **20 na conta madura** (960 carreiras), as 48 garotas, cada garota com semente própria. Resumo com `python tools/resumo_balanco.py saida_*.json`.
 
-**As sementes agora são independentes.** Até a v0.4, a carreira *i* de todas as garotas usava a semente *i*. Assim elas dividiam o clima, o pelotão e até o sorteio de sorte da jogadora em cada corrida: na mesma semente, o GP do ano 1 derrubava de 0% a 91% das garotas, conforme a sorte daquela semente. Isso fazia as casas e os arquétipos andarem juntos e escondia parte da diferença entre eles. Agora cada garota tem semente própria (`hash(nome, i)`). Os números da v0.4 (11,7 pontos entre casas, 11 entre arquétipos) estavam subestimados por isso.
+**As sementes são independentes desde a v0.5.** Até a v0.4, a carreira *i* de todas as garotas usava a semente *i*. Assim elas dividiam o clima, o pelotão e até o sorteio de sorte da jogadora em cada corrida: na mesma semente, o GP do ano 1 derrubava de 0% a 91% das garotas, conforme a sorte daquela semente. Isso fazia as casas e os arquétipos andarem juntos e escondia parte da diferença entre eles. Agora cada garota tem semente própria (`hash(nome, i)`).
 
 No jogo, a sorte não é o problema: o olheiro prevê bem o resultado. No GP do ano 1, com chance de vitória de 0,1 a carreira acaba em 40% das vezes; com 0,3, em 14%; com 0,5, em 2%.
 
@@ -558,37 +559,35 @@ No jogo, a sorte não é o problema: o olheiro prevê bem o resultado. No GP do 
 
 | Objetivo | 1 (t13) | 2 (t20) | 3 (t24) | 4 (t32) | 5 (t40) | 6 (t48) | 7 (t60) | 8 (t72) |
 |---|---|---|---|---|---|---|---|---|
-| Passa | 95% | 84% | 72% | 62% | 54% | 50% | 43% | **36%** |
-| Queda de quem chega | 6% | 11% | 14% | 15% | 12% | 9% | 13% | 16% |
+| Passa | 95% | 84% | 73% | 64% | 57% | 52% | 46% | **39%** |
+| Queda de quem chega | 6% | 11% | 14% | 12% | 11% | 8% | 12% | 16% |
 
-- **Carreiras completas: 36,2%** (alvo ~35%, faixa de 30% a 40%). Nenhum objetivo derruba mais de 16% de quem chega nele (teto 25%), e a queda ficou bem distribuída: o ano 3 (objetivos 7 e 8) agora derruba tanto quanto os anos 1 e 2.
-- **Por casa:** de 30,0% (Média Grama) a 42,5% (Milha Terra), diferença de 12,5 pontos. Com 240 carreiras por casa, a sorte explica uns ±3 pontos em cada uma.
-- **Por arquétipo:** de 30,6% (Estrela) a 46,2% (Misteriosa), diferença de 15,6 pontos. Com 120 a 160 carreiras, a sorte explica uns ±4 pontos em cada um. Tirando a Misteriosa, os outros 11 ficam a 10,6 pontos.
-- **Por estilo:** Ponteira 34,2%, Arrancadora 34,2%, Perseguidora 37,9%, Fechadora 38,8%. Diferença de 4,6 pontos (nas rodadas com 20 sementes ela parecia chegar a 12).
-- **Curva de atributos:** 228 / 338 / 450 / 587 / 708 / 819 nos turnos 13, 24, 36, 48, 60 e 72 (alvo 200 / 330 / 460 / 590 / 700 / 800; era 209 / 311 / 414 / 547 / 674 / 804).
-- **16,7 corridas** por carreira. Fama média de 1.670 no turno 32 e 2.730 no turno 40.
-- **GP final vencido** em 29% das carreiras. Depois da virada, o caminho A completa 72% e o B 73%.
-- **Olheiro:** 57% Favorita, 42% Disputada e 1% Azarão nas corridas do bot (era 66% Favorita: o ano 3 tem mais corridas apertadas). **Instrução sugerida:** Forçar 50%, Poupar 35%, Normal 15%.
-- **Títulos:** 14% das carreiras fecham uma Coroa Dupla (era 28%), 5% a Volta ao Céu e 4% uma Tríplice. O bot não planeja rota, então quem planeja deve ir bem melhor.
+- **Carreiras completas: 38,7%** (alvo ~35%, faixa de 30% a 40%). Nenhum objetivo derruba mais de 16% de quem chega nele (teto 25%), e o ano 3 derruba tanto quanto os anos 1 e 2.
+- **Por casa:** de 34,6% (Sprint Grama) a 44,6% (Milha Terra), **diferença de 9,9 pontos** (meta: até 10). Com 240 carreiras por casa, a sorte explica uns ±3 pontos em cada uma.
+- **Por arquétipo:** de 32,5% (Curiosa) a 43,8% (Estrategista), **diferença de 11,2 pontos**. Com 120 a 160 carreiras, a sorte explica uns ±4 pontos em cada um, então isso já é empate técnico com a meta de 10.
+- **Por estilo:** Ponteira 35,8%, Arrancadora 36,9%, Perseguidora 39,6%, Fechadora 42,5%. Diferença de 6,7 pontos.
+- **Curva de atributos:** 228 / 338 / 449 / 586 / 707 / 818 nos turnos 13, 24, 36, 48, 60 e 72 (alvo 200 / 330 / 460 / 590 / 700 / 800).
+- **17,3 corridas** por carreira. **GP final vencido** em 31% das carreiras. Depois da virada, o caminho A completa 74% e o B 75%.
+- **Títulos:** 16% das carreiras fecham uma Coroa Dupla, 5% a Volta ao Céu e 4% uma Tríplice. O bot não planeja rota, então quem planeja deve ir bem melhor.
 
-**Muros por casa e por arquétipo** (queda acima de 25% num objetivo): o objetivo 4 da Teimosa (36%) e da Sonhadora (29%), a Prata à frente da rival. As duas são só de Fechadoras. Fora isso, o pior caso é 25% (objetivo 8 da Média Grama e objetivo 7 da Curiosa).
+**Muros por casa e por arquétipo** (queda acima de 25% num objetivo): só o objetivo 4 da Teimosa, com 26% (era 36%). A Sonhadora caiu de 29% para 16% no mesmo objetivo.
 
 ### 7.2 Conta madura
 
 | Objetivo | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 |
 |---|---|---|---|---|---|---|---|---|
-| Passa | 99% | 94% | 87% | 79% | 73% | 70% | 64% | **58%** |
-| Queda de quem chega | 1% | 5% | 7% | 10% | 7% | 4% | 8% | 11% |
+| Passa | 99% | 93% | 87% | 79% | 74% | 71% | 65% | **59%** |
+| Queda de quem chega | 2% | 5% | 7% | 9% | 7% | 4% | 8% | 10% |
 
-- **Carreiras completas: 57,6%** (alvo ~55%, faixa de 50% a 60%), com a madrinha de nota ~700, vínculo 3 e o teto de +25 por atributo.
-- Por casa, de 49,2% a 64,2%. Por estilo, de 55,0% a 60,4%. Curva 254 / 364 / 476 / 613 / 739 / 866, 22,4 corridas por carreira e GP final vencido em 50%.
-- Títulos: 30% das carreiras fecham uma Coroa Dupla, 13% a Volta ao Céu e 11% uma Tríplice.
+- **Carreiras completas: 59,1%** (alvo ~55%, faixa de 50% a 60%), com a madrinha de nota ~700, vínculo 3 e o teto de +25 por atributo.
+- Diferença de 10,8 pontos entre casas e 6,7 entre estilos. Curva 254 / 364 / 476 / 613 / 739 / 867, 22,6 corridas por carreira e GP final vencido em 51%.
+- Títulos: 31% das carreiras fecham uma Coroa Dupla, 14% a Volta ao Céu e 12% uma Tríplice.
 
 ### 7.3 Ponto de virada (conta nova)
 
-Todas as 12 campanhas de arquétipo ficam entre 35% e 65% no caminho A: Curiosa 38%, Teimosa 40%, Misteriosa 42%, Estrategista 44%, Perfeccionista 45%, Capitã 51%, Leal 52%, Estrela 52%, Competitiva 53%, Sonhadora 55%, Festeira 56% e Durona 58%. Do MVP: Shaula 44%, Mira 48%, Nashira 52% e Lira 63%. Ficam fora a Capela (32%, com 22 carreiras chegando no turno 48) e a Antares (70%, com 10).
+Todas as 12 campanhas de arquétipo ficam entre 35% e 65% no caminho A: Curiosa 40%, Estrategista 41%, Misteriosa 42%, Teimosa 43%, Perfeccionista 44%, Sonhadora 49%, Competitiva 51%, Leal 51%, Capitã 54%, Estrela 55%, Festeira 59% e Durona 60%. Do MVP: Capela 38%, Nashira 43%, Shaula 44%, Mira 50% e Lira 56%. Fica fora só a Antares (70%), com 10 carreiras chegando no turno 48.
 
-O ano 3 novo mudou a fama e o número de vitórias no turno 48, e 5 regras foram recalibradas com as posições e os contadores que o bot guarda:
+Na v0.5, o ano 3 novo mudou a fama e o número de vitórias no turno 48, e 5 regras foram recalibradas com as posições e os contadores que o bot guarda:
 
 | Arquétipo | Antes | Agora |
 |---|---|---|
@@ -598,9 +597,19 @@ O ano 3 novo mudou a fama e o número de vitórias no turno 48, e 5 regras foram
 | Festeira | 1 Festival | 1 Festival **ou 3 saídas** (o bot quase não passa por Festival: só 1 em 3 carreiras) |
 | Competitiva | Venceu o GP do ano 2 e top 2 no objetivo 5 | Venceu o GP do ano 2 **e o objetivo 5** |
 
-Na conta madura, só a Perfeccionista (74%) passa do limite entre os arquétipos.
+Na conta madura, a Perfeccionista (75%) e a Estrela (67%) passam do limite. A meta vale para a conta nova; quem tem a conta madura vence mais e ganha mais fama.
 
-### 7.4 O que mudou nesta rodada
+### 7.4 O que mudou nas últimas rodadas
+
+**v0.6** (a partir da v0.5: 36,2% na conta nova, 12,5 pontos entre casas, 15,6 entre arquétipos):
+
+1. **Objetivo 4 da Teimosa e da Sonhadora** com a rival a +7% (`forca_rival: 1.07`). Com +15% ele derrubava 36% e 29%; com +0%, as duas iam a 53% de carreiras completas.
+2. **Fechadora de Longa sai da exceção do ano 1 na Média** (§4.2). A Misteriosa tem só Fechadoras, 2 delas de Longa, e com o GP do ano 1 na Média ela perdia só 6% ali (média de 14%). Foi de 46,2% para 41,9%.
+3. **Média ×0,99** (era ×1,01). A Média Grama perdia 19% na Ouro do ano 2, que não tem rival. Foi de 30,0% para 39,6%.
+
+A taxa geral subiu de 36,2% para 38,7% com as três mudanças, ainda dentro da faixa.
+
+**v0.5:**
 
 1. **Sementes do bot independentes** por garota (acima). É uma mudança só do bot, mas muda a leitura de tudo.
 2. **Crescimento adiantado:** o treino rende ×(1,25 − 0,45 × atributo/limite). Rende +16% com atributos em 200 e −11% em 800, então a garota cresce mais nos anos 1 e 2 e menos no ano 3.
@@ -630,22 +639,25 @@ Na conta madura, só a Perfeccionista (74%) passa do limite entre os arquétipos
 | Força das NPCs (v0.5) | Estreia 191, Aberta 241/321/407, Prata 337/449, Ouro 407/487, GP 320/421/663 | Estreia 209, Aberta 263/345/455, Prata 364/520, Ouro 434/575, GP 335/480/695 |
 | Calendário fixo (v0.5) | Força da categoria | ×1,08 no ano 2, ×1,1 no ano 3 (`forca_fixa`) |
 | Algol (v0.5) | +15% como as outras rivais | +15% × 1,08 (`forca_rival_extra`) |
+| Rival no objetivo 4 da Teimosa e da Sonhadora (v0.6) | +15% | +7% (`forca_rival: 1.07`) |
+| Ano 1 da Fechadora de Longa do modelo (v0.6) | Na Média | Na Longa |
+| Multiplicador da Média (v0.6) | ×1,01 | ×0,99 |
 
 O ganho do treino caiu porque o semestre de base sozinho levava a garota a ~320 na Estreia. O bônus por nível e os atributos por corrida devolvem o crescimento nos anos 2 e 3, quando ela corre mais e treina menos.
 
 ### 7.6 Próximos passos
 
-- **Testes manuais** em 4 rodadas (primeiras impressões, dificuldade e sorte, rota e ano 3, elenco e estilos), no roteiro que está fora do repo. O resumo de cada rodada entra aqui.
-- **Objetivo 4 da Teimosa e da Sonhadora** (Prata à frente da rival, queda de 29% a 36%): testar a rival com +8%. Com +0% elas iam a 53% de carreiras completas.
-- **Misteriosa** (46%, a 5 pontos do segundo arquétipo): a virada por escolha é 50/50 no bot. Vale olhar objetivo por objetivo onde ela ganha dos outros arquétipos.
-- **Média Grama** (30%, a casa mais difícil): o objetivo 8 derruba 25%. É a casa da Polaris com aptidão Ótima nos dois, e a única dela rende mais que a da Algol.
+- **Testes manuais** em 4 rodadas (primeiras impressões, dificuldade e sorte, rota e ano 3, elenco e estilos). O resumo de cada rodada entra aqui.
+- **Taxa geral em 38,7%**, perto do teto da faixa. Se os testes manuais mostrarem que o jogo está fácil para quem planeja, o primeiro botão é a força das Abertas e Pratas do ano 2.
+- **Objetivo 4 da Teimosa** (26%): está no limite, e com ~100 carreiras chegando nele a sorte explica uns ±4 pontos. Confirmar na próxima rodada antes de mexer.
+- **Fechadoras** completam 6,7 pontos a mais que as Ponteiras. Não passa da meta, mas é o eixo a observar nos testes manuais.
 - Mostrar o encontro de inspiração da madrinha (hoje o bônus dos turnos 25 e 49 acontece em silêncio).
 
 ## 8. Decisões pequenas tomadas aqui
 
 - **Objetivo dá entrada:** a corrida de um objetivo é por convite, mesmo sem a fama da categoria. Sem isso, uma carreira poderia acabar por falta de fama num objetivo que a garota venceria. A fama continua limitando as **opcionais**. (O calendário §3.2 dizia que os objetivos 4 e 5 "pressupõem fama".)
 - **Campeã da casa** vira uma garota do elenco (§4.3).
-- **Fechadoras de Longa** correm o ano 1 na Média (§4.2), como a Mira e a Shaula.
+- **Fechadoras de Longa** do MVP (Mira e Shaula) correm o ano 1 na Média. As do modelo saíram dessa exceção na v0.6 (§4.2).
 - **Correr dá atributos** (calendário §7.1) e o **pelotão fica mais forte a cada ano** (calendário §2). As duas mudanças saíram do balanceamento (§7.5).
 - A **Lira** corre o objetivo 4 na Milha, com a Polaris de visitante, em vez de ir à Média. O antigo derrubava 2 de cada 3 carreiras dela.
 - Os nomes de capítulos e finais são provisórios.

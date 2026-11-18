@@ -122,9 +122,8 @@ static func resolver(o: Dictionary, ctx: Dictionary) -> Dictionary:
 				if ctx.aptidao[p] == "R":  # outro piso Ruim: vira "fora de casa" (§4.1)
 					p = ctx.piso
 					d = vizinha(ctx.distancia)
-		# exceções do nível baixo (§4.2), só para as garotas do modelo
-		if ctx.modelo and turno <= 24 and r.get("onde", "casa") == "casa" and ctx.estilo == "fec" and ctx.distancia == "longa":
-			d = "media"
+		# A Fechadora de Longa corria o ano 1 na Média (§4.2) até a v0.6: com o GP do ano 1 na Média,
+		# a Misteriosa (só Fechadoras) completava 10 pontos acima dos outros arquétipos.
 		r.dist = d
 		r.piso = p
 	r.erase("onde")

@@ -95,6 +95,7 @@ A arte é placeholder (formas coloridas).
 | `testes/capturas.gd` | Passa pelas telas sozinho e salva capturas em `testes/capturas/`. |
 | `testes/capturas_novas.gd` | Capturas da madrinha, do olheiro, dos cartões de corrida e dos títulos. |
 | `tools/importar_visual.py` | Lê as fichas de [visual-elenco.md](docs/visual-elenco.md) e grava signo, aniversário e visual em `data/garotas.json` e `data/rivais.json`. |
+| `tools/resumo_balanco.py` | Junta as saídas JSON do `testes/balanco.gd` e mostra a taxa geral, a queda por objetivo, as taxas por casa e por arquétipo, a divisão no ponto de virada e os títulos ([campanhas](docs/campanhas.md) §7). |
 
 ### Testes
 
@@ -110,9 +111,14 @@ Godot_v4.7.2-stable_win64_console.exe --headless --path . --script res://testes/
 Godot_v4.7.2-stable_win64_console.exe --path . --script res://testes/capturas.gd
 ```
 
-Com 30 carreiras por garota, o bot cumpre os objetivos em ~80% / 56% / 45% / 38% / 26%
-(acumulado), e a média dos atributos nos objetivos fica perto da curva do calendário
-(~160 / 260 / 425 / 520 / 745). O bot é simples; quem planeja a rota e cuida do humor vai melhor.
+Para rodar as 48 garotas em 4 processos e juntar o resultado:
+
+```
+for i in 0 1 2 3; do Godot --headless --path . --script res://testes/balanco.gd -- 20 parte:$i/4 nova nova_$i.json & done; wait
+python tools/resumo_balanco.py nova_*.json
+```
+
+Os resultados da última rodada do bot estão em [campanhas](docs/campanhas.md) §7. O bot é simples; quem planeja a rota e cuida do humor vai melhor.
 
 ![Escolha](docs/prototipo/1_escolha.png)
 ![Madrinha](docs/prototipo/17_madrinha.png)

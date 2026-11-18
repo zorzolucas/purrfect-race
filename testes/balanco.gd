@@ -92,6 +92,7 @@ func _rodar(nome: String, n: int, conta: String) -> Dictionary:
 	var instrucoes := {"poupar": 0, "normal": 0, "forcar": 0}
 	var etiquetas := {"favorita": 0, "disputada": 0, "azarao": 0}
 	var titulos := {}
+	var com_titulo := {}  # carreiras com pelo menos 1 título de cada tipo
 	for i in n:
 		var madrinha := {}
 		var vinculo := 0
@@ -99,7 +100,7 @@ func _rodar(nome: String, n: int, conta: String) -> Dictionary:
 			vinculo = 3
 			madrinha = {"nome": "Madrinha", "attrs": MADRINHA, "dist": Campanha.vizinha(ini.distancia),
 				"piso": Campanha.outro_piso(ini.piso)}
-		var c = CarreiraS.new(dd.garota(nome), ini, i + 1, vinculo, madrinha)
+		var c = CarreiraS.new(dd.garota(nome), ini, i + 1 + int(OS.get_environment("SEMENTE0")), vinculo, madrinha)
 		arquetipo = c.campanha.arquetipo
 		var peso := PESO_ALVO.duplicate()
 		if c.distancia in ["media", "longa"]:
@@ -121,7 +122,9 @@ func _rodar(nome: String, n: int, conta: String) -> Dictionary:
 			match p:
 				"encontro":
 					var re := RandomNumberGenerator.new()
-					re.seed = hash([i, c.turno, "esc"])
+					# a semente inclui a garota: sem isso, todas as garotas da carreira i faziam a
+					# mesma escolha no mesmo turno, e as viradas por escolha mediam só 20 sorteios
+					re.seed = hash([nome, i, c.turno, "esc"])
 					c.escolher(re.randi() % c.encontro_atual().escolhas.size())
 				"amuleto":
 					if c.amuletos.size() < c.limite_amuletos():
@@ -169,16 +172,21 @@ func _rodar(nome: String, n: int, conta: String) -> Dictionary:
 									d3[res.dist] = true
 							na_virada.append({"flags": c.flags.size(), "dist_top3": d3.size(), "fama": c.fama, "vitorias": c.resultados.filter(func(x): return x.posicao == 1).size(),
 								"festivais": c.nos_visitados("festival"), "distancias": ds.size(), "saidas": c.saidas,
-								"viradas": c.viradas, "lesao": c.ultima_lesao})
+								"viradas": c.viradas, "lesao": c.ultima_lesao,
+								"pos_obj": c.resultados.filter(func(x): return x.objetivo > 0).map(func(x): return x.posicao)})
 						if t0 == 72:
 							completou[c.caminho] += 1
 							if pos == 1:
 								gp_final += 1
 				_:
 					_acao(c, peso)
+		var tipos := {}
 		for t in c.titulos:
 			var tipo: String = t.id.split("_")[0]
 			titulos[tipo] = titulos.get(tipo, 0) + 1
+			tipos[tipo] = true
+		for tipo in tipos:
+			com_titulo[tipo] = com_titulo.get(tipo, 0) + 1
 	var cv := []
 	for j in CURVA.size():
 		cv.append(roundi(curva[j] / maxi(1, curva_n[j])))
@@ -188,7 +196,7 @@ func _rodar(nome: String, n: int, conta: String) -> Dictionary:
 		"n": n, "conta": conta, "passou": passou, "caminho": caminho, "completou": completou,
 		"curva": cv, "fama32": fama32 / maxi(1, passou[2]), "fama40": fama40 / maxi(1, passou[3]),
 		"corridas": float(corridas) / n, "gp_final": gp_final, "gp2_venceu": gp2_venceu, "na_virada": na_virada,
-		"instrucoes": instrucoes, "etiquetas": etiquetas, "titulos": titulos}
+		"instrucoes": instrucoes, "etiquetas": etiquetas, "titulos": titulos, "com_titulo": com_titulo}
 
 
 func _imprimir(r: Dictionary) -> void:

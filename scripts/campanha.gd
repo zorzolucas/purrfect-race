@@ -129,7 +129,9 @@ static func resolver(o: Dictionary, ctx: Dictionary) -> Dictionary:
 		r.piso = p
 	r.erase("onde")
 	var meta: Dictionary = r.meta
-	if ctx.modelo and turno == 13 and ((ctx.estilo == "fec" and ctx.distancia == "sprint") or (ctx.estilo == "pon" and ctx.distancia == "longa")):
+	# Fechadora de Sprint: Estreia com top 3 (§4.2). A Ponteira de Longa saiu da exceção na v0.4:
+	# com top 3 a Estreia derrubava 29% delas.
+	if ctx.modelo and turno == 13 and ctx.estilo == "fec" and ctx.distancia == "sprint":
 		meta.max = 3
 	r.meta = int(meta.get("max", 0))
 	if meta.has("maratona"):

@@ -70,6 +70,11 @@ func _initialize() -> void:
 	_vencer_fixa(c, 65)
 	_conferir(c.tem_titulo("coroa_milha"), "Coroa Dupla da Milha não saiu")
 	_conferir(c.aptidao.terra != terra0 or terra0 == "X", "Coroa Dupla deveria subir a aptidão em Terra")
+	# a Coroa Dupla pede as 2 Ouros no mesmo ano: Cometa do ano 2 (t40) + Duna do ano 3 (t65) não fecha
+	var c2 = CarreiraS.new(dd.garota("Lira"), ini, 14)
+	_vencer_fixa(c2, 40)
+	_vencer_fixa(c2, 65)
+	_conferir(not c2.tem_titulo("coroa_milha"), "Coroa Dupla saiu com Ouros de anos diferentes")
 	# Volta ao Céu: Ouros de Sprint (Trovão t62), Média (Equinócio t61) e Longa (Via Láctea t63)
 	_vencer_fixa(c, 61)
 	_vencer_fixa(c, 62)

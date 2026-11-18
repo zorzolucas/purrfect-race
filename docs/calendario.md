@@ -349,12 +349,12 @@ Vencer conjuntos de corridas do calendário fixo dá um **título**, que aparece
 | Série | Como completar | Recompensa (inicial) |
 |---|---|---|
 | **Tríplice da casa** (ex.: *Estrela da Milha*) | Vencer a Prata e as 2 Ouros (anos 2 e 3) da mesma casa | +500 de fama e 1 amuleto (escolha entre 4, 1 raro garantido) |
-| **Coroa Dupla** | Vencer Ouros da mesma distância nos 2 pisos | +300 de fama e +1 nível de aptidão no piso mais fraco |
+| **Coroa Dupla** | Vencer as Ouros da mesma distância nos 2 pisos **no mesmo ano** | +300 de fama e +1 nível de aptidão no piso mais fraco |
 | **Volta ao Céu** | Vencer uma Ouro em cada uma das 4 distâncias | Título raro e +1 limite de amuleto (7) até o fim da carreira |
 
 As séries são o principal motivo para **planejar a rota** com antecedência: a Tríplice exige estar em forma em 3 turnos conhecidos, espalhados por 2 anos.
 
-**No protótipo** (`Carreira._checar_series`): vale vencer a corrida do calendário fixo também quando ela é objetivo (o Prêmio Cometa da Capela). Cada série sai 1 vez por carreira: a Tríplice e a Coroa Dupla, 1 vez por casa ou distância. Os títulos vão para a versão salva. Nomes (provisórios): Tríplice de Grama = **Estrela da *distância*** (ex.: *Estrela da Milha*), de Terra = **Poeira da *distância***; **Coroa Dupla da *distância***; **Volta ao Céu**. O cartão da corrida e o olheiro mostram o progresso de cada série que ela conta (ex.: *Estrela da Milha 1/3*).
+**No protótipo** (`Carreira._checar_series`): vale vencer a corrida do calendário fixo também quando ela é objetivo (o Prêmio Cometa da Capela). Cada série sai 1 vez por carreira: a Tríplice e a Coroa Dupla, 1 vez por casa ou distância. A Coroa Dupla conta só as Ouros do mesmo ano (as duas de cada distância ficam a 1 a 7 turnos uma da outra): sem isso, o bot fechava a Coroa em 42% das carreiras sem planejar a rota. Os títulos vão para a versão salva. Nomes (provisórios): Tríplice de Grama = **Estrela da *distância*** (ex.: *Estrela da Milha*), de Terra = **Poeira da *distância***; **Coroa Dupla da *distância***; **Volta ao Céu**. O cartão da corrida e o olheiro mostram o progresso de cada série que ela conta (ex.: *Estrela da Milha 1/3*).
 
 ## 8. Férias de verão
 
@@ -439,7 +439,7 @@ No começo da carreira, a **Fechadora** é forte na Sprint e a **Ponteira** é f
 - Recalibrar o ritmo também nos níveis 150–300 (o `ajustar_ritmo` hoje usa 500 e 800).
 - Aceitar como "sabor" do começo de carreira e compensar com a meta (top 5 em vez de top 3).
 
-Enquanto isso, as campanhas usam exceções: Fechadora de Longa corre o ano 1 na Média, e Fechadora de Sprint e Ponteira de Longa precisam de top 3 na Estreia ([campanhas](campanhas.md) §4.2). Fica como pendência de balanceamento.
+Enquanto isso, as campanhas usam exceções: Fechadora de Longa corre o ano 1 na Média, e Fechadora de Sprint precisa de top 3 na Estreia ([campanhas](campanhas.md) §4.2). Fica como pendência de balanceamento.
 
 ## 12. Escopo do MVP
 

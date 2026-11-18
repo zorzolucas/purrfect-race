@@ -93,8 +93,8 @@ func enquadrar(angulo_graus: float, close_rosto := false) -> void:
 	modelo.rotation.y = deg_to_rad(angulo_graus + 180.0)
 	if close_rosto:
 		camera.fov = 20.0
-		camera.position = Vector3(0, 1.62, 1.6)
-		camera.look_at(Vector3(0, 1.6, 0))
+		camera.position = Vector3(0, 1.43, 1.7)
+		camera.look_at(Vector3(0, 1.4, 0))
 	else:
 		camera.fov = 35.0
 		camera.position = Vector3(0, 1.05, 3.9)

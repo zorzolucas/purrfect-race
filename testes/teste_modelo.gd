@@ -49,10 +49,11 @@ func _initialize() -> void:
 			var idx: PackedInt32Array = arr[Mesh.ARRAY_INDEX]
 			tris += idx.size() / 3 if idx.size() > 0 else arr[Mesh.ARRAY_VERTEX].size() / 3
 			var mat := mi.get_surface_override_material(s) as StandardMaterial3D
-			_checar(mat != null and mat.diffuse_mode == BaseMaterial3D.DIFFUSE_TOON, "material toon")
-			_checar(mat != null and mat.albedo_texture != null, "textura de paleta/rosto")
-	_checar(superficies == 2, "2 superfícies: paleta e rosto (veio %d)" % superficies)
-	_checar(tris > 800 and tris < 4000, "triângulos low-poly (veio %d)" % tris)
+			_checar(mat != null and mat.shading_mode == BaseMaterial3D.SHADING_MODE_UNSHADED, "material sem luz (sombra pintada)")
+			if mat and mat.cull_mode != BaseMaterial3D.CULL_BACK or (mat and mat.albedo_texture != null):
+				_checar(mat.albedo_texture != null, "textura de paleta/rosto")
+	_checar(superficies == 3, "3 superfícies: paleta, rosto e contorno (veio %d)" % superficies)
+	_checar(tris > 1500 and tris < 4500, "triângulos low-poly (veio %d)" % tris)
 
 	# altura: o topo das orelhas fica perto de 1,6 m
 	var aabb := AABB()

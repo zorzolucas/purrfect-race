@@ -11,8 +11,9 @@ const ATLAS_COLS := 3
 const ATLAS_ROWS := 2
 ## Altura do modelo no Blender (m). A corrida usa outra escala, ver `altura`.
 const ALTURA_ORIGINAL := 1.6
-## O toon acende o lado claro por inteiro; escurece a paleta para não estourar no sol da pista.
-const BRILHO := Color(0.62, 0.62, 0.62)
+## Multiplica a paleta (1 = cores do Blender). A sombra já vem pintada na textura.
+const BRILHO := Color(1, 1, 1)
+const COR_CONTORNO := Color("#2a1a16")
 
 var nome: String
 var animacao: AnimationPlayer
@@ -49,12 +50,16 @@ func _materiais(no: Node) -> void:
 			m.albedo_texture = orig.albedo_texture if orig else null
 			m.albedo_color = BRILHO
 			m.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
-			m.diffuse_mode = BaseMaterial3D.DIFFUSE_TOON
-			m.specular_mode = BaseMaterial3D.SPECULAR_DISABLED
-			m.roughness = 1.0
+			# sombra já vem pintada na paleta (como na série de referência): sem luz do Godot
+			m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 			# a faixa da jaqueta e a calota do cabelo são abertas: desenha os dois lados
 			m.cull_mode = BaseMaterial3D.CULL_DISABLED
-			if orig and orig.resource_name.ends_with("Rosto"):
+			if orig and orig.resource_name.ends_with("Contorno"):
+				# casco invertido: só a parte de trás aparece, como contorno preto
+				m.albedo_texture = null
+				m.albedo_color = COR_CONTORNO
+				m.cull_mode = BaseMaterial3D.CULL_BACK
+			elif orig and orig.resource_name.ends_with("Rosto"):
 				m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR
 				m.alpha_scissor_threshold = 0.5
 				m.cull_mode = BaseMaterial3D.CULL_BACK

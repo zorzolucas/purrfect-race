@@ -101,6 +101,7 @@
   "fama_resto": 0.05,
   "variacao_npc": 0.1,
   "forca_rival": 1.15,
+  "aptidao_rival": 1.1025,
   "forca_desafio": 1.2,
   "distancia_gp": {
     "sprint": 1200,

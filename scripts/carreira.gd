@@ -567,7 +567,12 @@ func _pelotao(c: Dictionary, elenco: Array) -> Dictionary:
 			pool = pool.filter(func(g): return g.nome != rival)
 		if not rv.is_empty():
 			rival_idx = field.size()
-			field.append(_adversaria(rv, forca * cal.forca_rival, rv.get("unica", ""), c))
+			# o objetivo pode pedir a rival mais fraca (ex.: a primeira Prata, campanhas.md §7)
+			var adv := _adversaria(rv, forca * float(c.get("forca_rival", cal.forca_rival)), rv.get("unica", ""), c)
+			# a rival corre sempre como se estivesse em casa: sem isso, Polaris na Longa e Algol
+			# na Milha (aptidão Boa) eram mais fracas que a campeã da casa (Ótima nos dois)
+			adv.mult = float(cal.get("aptidao_rival", adv.mult))
+			field.append(adv)
 			vagas -= 1
 	var v: float = cal.variacao_npc
 	for g in pool.slice(0, vagas):
@@ -810,9 +815,12 @@ func series_da_corrida(c: Dictionary) -> Array:
 	if c.cat == "ouro":
 		var id_c := "coroa_%s" % c.dist
 		if not tem_titulo(id_c):
+			# as 2 Ouros precisam ser do mesmo ano (calendario.md §7.4): sem isso, o bot
+			# fechava a Coroa em 42% das carreiras sem planejar a rota
+			var ano := (int(c.get("turno", turno)) - 1) / 24
 			var pisos := {}
 			for r in v:
-				if r.cat == "ouro" and r.dist == c.dist:
+				if r.cat == "ouro" and r.dist == c.dist and (int(r.turno) - 1) / 24 == ano:
 					pisos[r.piso] = true
 			lista.append({"id": id_c, "nome": cfg.coroa.nome % dn, "feitas": pisos.size(), "total": 2})
 		if not tem_titulo("volta"):

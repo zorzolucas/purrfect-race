@@ -1128,7 +1128,8 @@
     "meta": {
      "rival": true
     },
-    "onde": "casa"
+    "onde": "casa",
+    "forca_rival": 1.0
    },
    "virada": {
     "e": [
@@ -1384,6 +1385,12 @@
       ]
      },
      {
+      "top": [
+       32,
+       3
+      ]
+     },
+     {
       "sem_lesao_desde": 25
      }
     ]
@@ -1486,7 +1493,8 @@
     "meta": {
      "rival": true
     },
-    "onde": "casa"
+    "onde": "casa",
+    "forca_rival": 1.0
    },
    "virada": {
     "e": [
@@ -1617,7 +1625,8 @@
     "meta": {
      "rival": true
     },
-    "onde": "casa"
+    "onde": "casa",
+    "forca_rival": 1.0
    },
    "virada": {
     "saidas_min": 2
@@ -2034,7 +2043,14 @@
     "onde": "outro_piso"
    },
    "virada": {
-    "distancias_top3_min": 4
+    "e": [
+     {
+      "distancias_min": 4
+     },
+     {
+      "distancias_top3_min": 3
+     }
+    ]
    },
    "capitulos": [
     {

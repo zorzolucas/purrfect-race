@@ -1141,7 +1141,7 @@
      {
       "top": [
        40,
-       2
+       1
       ]
      }
     ]
@@ -1732,7 +1732,7 @@
     "onde": "vizinha"
    },
    "virada": {
-    "vitorias_min": 10
+    "vitorias_min": 9
    },
    "capitulos": [
     {
@@ -1836,7 +1836,7 @@
     "onde": "vizinha"
    },
    "virada": {
-    "fama_min": 6000
+    "fama_min": 4800
    },
    "capitulos": [
     {
@@ -1940,7 +1940,14 @@
     "onde": "outro_piso"
    },
    "virada": {
-    "festivais_min": 1
+    "ou": [
+     {
+      "festivais_min": 1
+     },
+     {
+      "saidas_min": 3
+     }
+    ]
    },
    "capitulos": [
     {
@@ -2152,7 +2159,7 @@
     "onde": "casa"
    },
    "virada": {
-    "viradas_min": 4
+    "viradas_min": 3
    },
    "capitulos": [
     {

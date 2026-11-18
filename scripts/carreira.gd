@@ -12,9 +12,10 @@ const BAL := {
 	"ganho_principal": 39.0,
 	"ganho_secundario": 14.0,
 	"bonus_nivel": 0.30,       # por nível de treino acima do 1
-	# ganho cai conforme o atributo sobe: x(retorno_base - retorno_queda * atributo/limite)
-	"retorno_base": 1.0,
-	"retorno_queda": 0.0,
+	# ganho cai conforme o atributo sobe: x(retorno_base - retorno_queda * atributo/limite).
+	# Com 1,25 e 0,45 rende +16% em 200 e -11% em 800: cresce mais nos anos 1 e 2 (campanhas.md §7)
+	"retorno_base": 1.25,
+	"retorno_queda": 0.45,
 	"usos_por_nivel": 3,       # repetições para subir o nível do treino
 	"bonus_natural": 0.10,
 	"custo_energia": 22,
@@ -538,6 +539,11 @@ func _pelotao(c: Dictionary, elenco: Array) -> Dictionary:
 	var forca := forca_categoria(c.cat, c.dist)
 	if c.get("desafio", false):
 		forca *= cal.forca_desafio
+	if c.get("fixa", false):
+		# as corridas do calendário fixo juntam as melhores do ano (campanhas.md §7): é o que
+		# faz as séries (Tríplice, Coroa Dupla, Volta ao Céu) pedirem rota planejada
+		var ff: Array = cal.get("forca_fixa", [1.0])
+		forca *= float(ff[mini(ff.size() - 1, Calendario.mes_idx(turno) / 12)])
 	var r := _rng("corrida:" + c.get("id", "x"))
 	var field := [{
 		"nome": nome, "estilo": estilo, "attrs": attrs.duplicate(),
@@ -568,7 +574,9 @@ func _pelotao(c: Dictionary, elenco: Array) -> Dictionary:
 		if not rv.is_empty():
 			rival_idx = field.size()
 			# o objetivo pode pedir a rival mais fraca (ex.: a primeira Prata, campanhas.md §7)
-			var adv := _adversaria(rv, forca * float(c.get("forca_rival", cal.forca_rival)), rv.get("unica", ""), c)
+			# forca_rival_extra compensa a única de cada rival com nome (a da Algol rende menos que a da Polaris)
+			var extra_rival: float = float(cal.get("forca_rival_extra", {}).get(rival, 1.0))
+			var adv := _adversaria(rv, forca * float(c.get("forca_rival", cal.forca_rival)) * extra_rival, rv.get("unica", ""), c)
 			# a rival corre sempre como se estivesse em casa: sem isso, Polaris na Longa e Algol
 			# na Milha (aptidão Boa) eram mais fracas que a campeã da casa (Ótima nos dois)
 			adv.mult = float(cal.get("aptidao_rival", adv.mult))

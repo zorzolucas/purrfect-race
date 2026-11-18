@@ -28,17 +28,18 @@ Toda corrida tem uma **categoria**. Ela define a força das adversárias, o prê
 
 | Categoria | Força das NPCs (média dos atributos) | Fama para entrar (inicial) | Quando aparece |
 |---|---|---|---|
-| **Estreia** | 191 | — | Só no turno 13 (a primeira corrida dela) |
-| **Aberta** | Ano 1: 241 · Ano 2: 321 · Ano 3: 407 | 0 | A partir do turno 14 |
-| **Prata** | Ano 2: 337 · Ano 3: 449 | 600 | A partir do turno 25 (ano 2) |
-| **Ouro** | Ano 2: 407 · Ano 3: 487 | 1500 | A partir do turno 37 (2º semestre do ano 2) |
-| **Grande Prêmio** | Ano 1: 320 · Ano 2: 421 · Ano 3: 663 | Por convite (objetivo) | Turnos 24, 48 e 72 |
+| **Estreia** | 209 | — | Só no turno 13 (a primeira corrida dela) |
+| **Aberta** | Ano 1: 263 · Ano 2: 345 · Ano 3: 455 | 0 | A partir do turno 14 |
+| **Prata** | Ano 2: 364 · Ano 3: 520 | 600 | A partir do turno 25 (ano 2) |
+| **Ouro** | Ano 2: 434 · Ano 3: 575 | 1500 | A partir do turno 37 (2º semestre do ano 2) |
+| **Grande Prêmio** | Ano 1: 335 · Ano 2: 480 · Ano 3: 695 | Por convite (objetivo) | Turnos 24, 48 e 72 |
 
-- Os valores subiram 5% a 12% em 2026-11-17, quando o olheiro e a instrução pré-corrida deixaram o bot mais esperto ([campanhas](campanhas.md) §7).
+- Os valores subiram 5% a 12% em 2026-11-17, quando o olheiro e a instrução pré-corrida deixaram o bot mais esperto. Em 2026-11-18 (v0.5) subiram de novo, acompanhando a curva nova da jogadora, e o **ano 3 ficou bem mais forte** (Ouro de 487 para 575): antes, a garota do bot chegava ao ano 3 com folga e só o GP final era desafio ([campanhas](campanhas.md) §7).
+- As **corridas do calendário fixo** (§7.2) correm com força ×1,08 no ano 2 e ×1,1 no ano 3 (`forca_fixa`): juntam as melhores do ano, e é isso que faz as séries pedirem rota planejada.
 - O pelotão **fica mais forte a cada ano**, como a jogadora. Assim a mesma categoria pede mais no ano 3 do que no ano 2.
 - **Por distância**, a força é multiplicada por: Sprint ×0,99 · Milha ×0,98 · Média ×1,01 · Longa ×1,04. Corrida curta tem mais sorte, e sem isso as garotas de Sprint completavam bem menos carreiras que as de Longa. Com a instrução Forçar (GDD §5.7) a Sprint ficou mais fácil, e o multiplicador subiu de ×0,95 para ×0,99.
 - A força das NPCs varia ±10% de uma corredora para outra, para o pelotão não ser uniforme.
-- Nas corridas de objetivo com meta de rival e em todo Grande Prêmio, a **rival** (com nome ou campeã da casa) corre com +15% sobre a força da categoria.
+- Nas corridas de objetivo com meta de rival e em todo Grande Prêmio, a **rival** (com nome ou campeã da casa) corre com +15% sobre a força da categoria, sempre com aptidão Ótima. A **Algol** corre com mais 8% (`forca_rival_extra`), porque a habilidade única dela rende menos que a da Polaris e as casas dela ficavam 9 pontos mais fáceis.
 - Os números saíram do bot de balanceamento na carreira de 72 turnos ([campanhas](campanhas.md) §7).
 
 ### 2.1 Curva esperada da jogadora
@@ -48,9 +49,9 @@ Este é o **alvo** para calibrar os ganhos de treino em 72 turnos:
 | Turno | 13 (Estreia) | 24 | 36 | 48 | 60 | 72 |
 |---|---|---|---|---|---|---|
 | Média dos atributos (alvo) | ~200 | ~330 | ~460 | ~590 | ~700 | ~800 |
-| Média do bot (v0.4 do protótipo) | 207 | 308 | 407 | 537 | 664 | 799 |
+| Média do bot (v0.5 do protótipo) | 228 | 338 | 450 | 587 | 708 | 819 |
 
-Uma jogadora que treina bem chega acima disso, e uma que descansa demais ou se lesiona chega abaixo. Amuletos e rotas boas também empurram a curva para cima, então a força das NPCs deve ser calibrada com uma carreira "média" sem amuletos raros.
+O treino rende mais com atributos baixos e menos com atributos altos (retorno de ×1,25 − 0,45 × atributo/limite): a garota cresce mais nos anos 1 e 2 e menos no ano 3. Uma jogadora que treina bem chega acima disso, e uma que descansa demais ou se lesiona chega abaixo. Amuletos e rotas boas também empurram a curva para cima, então a força das NPCs deve ser calibrada com uma carreira "média" sem amuletos raros.
 
 ## 3. Objetivos e campanha única
 

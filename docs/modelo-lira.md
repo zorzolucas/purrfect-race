@@ -1,13 +1,46 @@
 # Lira: a garota de referência em 3D low-poly
 
-> Versão 0.3, 2026-11-18. Feita a partir da ficha conceitual da Lira e do PDF de pipeline
+> Versão 0.4, 2026-11-18. Feita a partir da ficha conceitual da Lira e do PDF de pipeline
 > que o Lucas subiu em `arte/` (estilo chunky retrô). Primeira tarefa de arte do [GDD](GDD.md) §11.4.
 > A ficha escrita dela está no [visual do elenco](visual-elenco.md) §4.1.
 
 ![Ficha x modelo](prototipo/24_lira_ficha_vs_modelo.png)
 ![Lira](prototipo/21_lira_modelo.png)
+![Cabelo](prototipo/27_lira_cabelo.png)
 ![Expressões](prototipo/22_lira_expressoes.png)
 ![Lira na pista](prototipo/23_lira_na_pista.png)
+
+## Precisão: silhueta medida contra a ficha
+
+`tools/blender/comparar_ficha.py` renderiza a silhueta do modelo de frente e de lado e a sobrepõe
+à silhueta da ficha, na mesma escala (chão e altura total alinhados). Azul é só a ficha, vermelho
+só o modelo, roxo os dois; o script também imprime a largura de cada parte a cada 8 cm de altura.
+
+```
+blender --background arte/lira.blend --python tools/blender/comparar_ficha.py -- render <pasta>
+python tools/blender/comparar_ficha.py compor <pasta> "arte/animações/<ficha>.png"
+```
+
+![Silhueta de frente](prototipo/25_lira_silhueta_frente.png) ![Silhueta de lado](prototipo/26_lira_silhueta_lado.png)
+
+Com isso, na v0.4: braços mais curtos e mais perto do corpo (27°), luvas maiores, pernas em A com os
+pés afastados como na ficha, tênis maiores, saia da jaqueta mais aberta, orelhas maiores e mais
+para fora, rabo mais junto das costas e mais alto, e o volume do cabelo 15% mais largo com o topo
+quadrado. O que sobra de diferença na conta é o vão entre as pernas (a ficha fecha esse vão com os
+tênis encostados) e o rabo, que na ficha aparece de frente.
+
+## Cabelo
+
+O cabelo virou um capacete coberto de **mechas facetadas** (`mecha_casca`), como o PDF descreve
+(arestas da borda puxadas e fundidas numa ponta), em vez de espetos soltos:
+
+- cada mecha nasce de um arco da calota e acompanha a curva da cabeça, com um vinco no meio e
+  espessura (de baixo não some e tem a cor de dentro, mais escura e chapada);
+- franja assimétrica de 6 mechas até a linha dos olhos, com o "M" em V por cima;
+- laterais e nuca como **cortinas** (`mecha_cortina`): cobrem a cabeça até a ponta, abrem para fora
+  embaixo, têm a borda serrilhada e listras escuras alternadas, como as rajadas da ficha;
+- atrás, duas fileiras de mechas espetando para trás (o perfil da ficha) e três pontas no topo;
+- tufos nos cantos de cima, que dão a silhueta quadrada da cabeça na ficha.
 
 ## O que entrou da ficha e do PDF
 
@@ -72,7 +105,6 @@ No Godot:
   falta separar o que é base no script e parametrizar cabelo, orelhas, rabo, roupa e paleta.
 - **Expressões:** o GDD listava normal, feliz, determinada, cansada, triste e surpresa; agora valem
   as 6 das fichas. Determinada, cansada e triste podem voltar num segundo atlas.
-- **Cabelo de costas:** os espetos que apontam para trás parecem tachinhas quando vistos direto da nuca.
 - **Escala na pista:** 2,15 m para combinar com as cápsulas (`Corrida3D.ALTURA_MODELO`).
 - **Rigify:** o rig é próprio (nomes no padrão do Rigify sem `DEF-`). Um rig de controle pode vir
   por cima para animar à mão, sem mudar o que o Godot recebe.

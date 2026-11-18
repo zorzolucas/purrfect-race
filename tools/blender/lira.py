@@ -1077,6 +1077,18 @@ def exportar(rig):
     print("[lira] exportado:", caminho, os.path.getsize(caminho), "bytes")
 
 
+def exportar_fbx_mixamo(malha):
+    """Malha sozinha (sem rig e sem contorno) em FBX, para subir no Mixamo e baixar animações."""
+    caminho = os.path.join(RAIZ, "arte", "lira_para_mixamo.fbx")
+    bpy.ops.object.select_all(action="DESELECT")
+    malha.select_set(True)
+    bpy.context.view_layer.objects.active = malha
+    bpy.ops.export_scene.fbx(filepath=caminho, use_selection=True, use_armature_deform_only=True,
+                             add_leaf_bones=False, path_mode="COPY", embed_textures=True,
+                             use_mesh_modifiers=False)
+    print("[lira] fbx para o Mixamo:", caminho)
+
+
 def previas(rig, malha):
     for pb in rig.pose.bones:
         pb.rotation_quaternion = Quaternion()
@@ -1149,6 +1161,7 @@ def main():
     guardar_acoes(rig, acoes)
     bpy.context.scene.render.fps = 24
     exportar(rig)
+    exportar_fbx_mixamo(malha)
     if RENDER:
         previas(rig, malha)
     # arquivo salvo em repouso, com a vista em textura (o Workbench das prévias não tem Material Preview)

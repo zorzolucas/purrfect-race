@@ -37,7 +37,7 @@ Toda corrida tem uma **categoria**. Ela define a força das adversárias, o prê
 - Os valores subiram 5% a 12% em 2026-11-17, quando o olheiro e a instrução pré-corrida deixaram o bot mais esperto. Em 2026-11-18 (v0.5) subiram de novo, acompanhando a curva nova da jogadora, e o **ano 3 ficou bem mais forte** (Ouro de 487 para 575): antes, a garota do bot chegava ao ano 3 com folga e só o GP final era desafio ([campanhas](campanhas.md) §7).
 - As **corridas do calendário fixo** (§7.2) correm com força ×1,08 no ano 2 e ×1,1 no ano 3 (`forca_fixa`): juntam as melhores do ano, e é isso que faz as séries pedirem rota planejada.
 - O pelotão **fica mais forte a cada ano**, como a jogadora. Assim a mesma categoria pede mais no ano 3 do que no ano 2.
-- **Por distância**, a força é multiplicada por: Sprint ×0,99 · Milha ×0,98 · Média ×1,01 · Longa ×1,04. Corrida curta tem mais sorte, e sem isso as garotas de Sprint completavam bem menos carreiras que as de Longa. Com a instrução Forçar (GDD §5.7) a Sprint ficou mais fácil, e o multiplicador subiu de ×0,95 para ×0,99.
+- **Por distância**, a força é multiplicada por: Sprint ×0,99 · Milha ×0,98 · Média ×0,99 · Longa ×1,04. Corrida curta tem mais sorte, e sem isso as garotas de Sprint completavam bem menos carreiras que as de Longa. Com a instrução Forçar (GDD §5.7) a Sprint ficou mais fácil, e o multiplicador subiu de ×0,95 para ×0,99. A Média desceu de ×1,01 para ×0,99 na v0.6: a Ouro do ano 2 derrubava 19% das garotas de Média Grama.
 - A força das NPCs varia ±10% de uma corredora para outra, para o pelotão não ser uniforme.
 - Nas corridas de objetivo com meta de rival e em todo Grande Prêmio, a **rival** (com nome ou campeã da casa) corre com +15% sobre a força da categoria, sempre com aptidão Ótima. A **Algol** corre com mais 8% (`forca_rival_extra`), porque a habilidade única dela rende menos que a da Polaris e as casas dela ficavam 9 pontos mais fáceis.
 - Os números saíram do bot de balanceamento na carreira de 72 turnos ([campanhas](campanhas.md) §7).
@@ -440,7 +440,7 @@ No começo da carreira, a **Fechadora** é forte na Sprint e a **Ponteira** é f
 - Recalibrar o ritmo também nos níveis 150–300 (o `ajustar_ritmo` hoje usa 500 e 800).
 - Aceitar como "sabor" do começo de carreira e compensar com a meta (top 5 em vez de top 3).
 
-Enquanto isso, as campanhas usam exceções: Fechadora de Longa corre o ano 1 na Média, e Fechadora de Sprint precisa de top 3 na Estreia ([campanhas](campanhas.md) §4.2). Fica como pendência de balanceamento.
+Enquanto isso, as campanhas usam uma exceção: a Fechadora de Sprint precisa de top 3 na Estreia ([campanhas](campanhas.md) §4.2). Fica como pendência de balanceamento.
 
 ## 12. Escopo do MVP
 

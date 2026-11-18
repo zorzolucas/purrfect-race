@@ -2156,7 +2156,8 @@
     "meta": {
      "rival": true
     },
-    "onde": "casa"
+    "onde": "casa",
+    "forca_rival": 1.07
    },
    "virada": {
     "viradas_min": 3
@@ -2379,7 +2380,8 @@
     "meta": {
      "rival": true
     },
-    "onde": "casa"
+    "onde": "casa",
+    "forca_rival": 1.07
    },
    "virada": {
     "e": [

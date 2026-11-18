@@ -92,6 +92,8 @@ func _rodar(nome: String, n: int, conta: String) -> Dictionary:
 	var instrucoes := {"poupar": 0, "normal": 0, "forcar": 0}
 	var etiquetas := {"favorita": 0, "disputada": 0, "azarao": 0}
 	var titulos := {}
+	var detalhe := []  # cada corrida de objetivo: semente, turno, clima, posição, média, chance do olheiro
+	var parar_em := int(OS.get_environment("PARAR_EM")) if OS.has_environment("PARAR_EM") else 999
 	var com_titulo := {}  # carreiras com pelo menos 1 título de cada tipo
 	for i in n:
 		var madrinha := {}
@@ -100,14 +102,18 @@ func _rodar(nome: String, n: int, conta: String) -> Dictionary:
 			vinculo = 3
 			madrinha = {"nome": "Madrinha", "attrs": MADRINHA, "dist": Campanha.vizinha(ini.distancia),
 				"piso": Campanha.outro_piso(ini.piso)}
-		var c = CarreiraS.new(dd.garota(nome), ini, i + 1 + int(OS.get_environment("SEMENTE0")), vinculo, madrinha)
+		# semente própria de cada garota: com a mesma semente para todas, elas dividiam o clima,
+		# o pelotão e até o sorteio de sorte da jogadora em cada corrida, e o erro de uma casa ou
+		# de um arquétipo andava junto com o das outras (campanhas.md §7.1)
+		var semente: int = 1 + absi(hash([nome, i + 1 + int(OS.get_environment("SEMENTE0"))])) % 1000000000
+		var c = CarreiraS.new(dd.garota(nome), ini, semente, vinculo, madrinha)
 		arquetipo = c.campanha.arquetipo
 		var peso := PESO_ALVO.duplicate()
 		if c.distancia in ["media", "longa"]:
 			peso.est = 1.3
 		var guard := 0
 		var ultimo_turno := 0
-		while not c.terminou and guard < 600:
+		while not c.terminou and guard < 600 and c.turno < parar_em:
 			guard += 1
 			var t0: int = c.turno
 			if t0 != ultimo_turno:
@@ -149,6 +155,13 @@ func _rodar(nome: String, n: int, conta: String) -> Dictionary:
 					var sim := SimCorrida.new(corrida.field, corrida.distancia, corrida.seed, corrida.clima)
 					var ordem: Array = sim.rodar_ate_o_fim()
 					var pos: int = ordem.find(0) + 1
+					if p == "objetivo":
+						var npc_mult := 0.0
+						for j in range(1, corrida.field.size()):
+							npc_mult += corrida.field[j].mult
+						detalhe.append({"semente": c.semente, "turno": t0, "clima": corrida.clima, "pos": pos,
+							"media": _media(c), "mult": corrida.field[0].mult, "chance": ol.chance, "ins": ol.sugestao,
+							"npc_mult": npc_mult / (corrida.field.size() - 1), "humor": c.humor, "energia": c.energia})
 					c.registrar_corrida(pos, CarreiraS.extra_da_corrida(corrida, ordem, sim.ordem_meio))
 					corridas += 1
 					if c.falhou_objetivo and OS.has_environment("CURVA"):
@@ -196,7 +209,7 @@ func _rodar(nome: String, n: int, conta: String) -> Dictionary:
 		"n": n, "conta": conta, "passou": passou, "caminho": caminho, "completou": completou,
 		"curva": cv, "fama32": fama32 / maxi(1, passou[2]), "fama40": fama40 / maxi(1, passou[3]),
 		"corridas": float(corridas) / n, "gp_final": gp_final, "gp2_venceu": gp2_venceu, "na_virada": na_virada,
-		"instrucoes": instrucoes, "etiquetas": etiquetas, "titulos": titulos, "com_titulo": com_titulo}
+		"instrucoes": instrucoes, "etiquetas": etiquetas, "titulos": titulos, "com_titulo": com_titulo, "detalhe": detalhe}
 
 
 func _imprimir(r: Dictionary) -> void:

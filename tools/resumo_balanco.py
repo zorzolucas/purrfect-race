@@ -5,8 +5,11 @@ Mostra a taxa geral, a queda por objetivo, as taxas por casa e por arquétipo (c
 diferença entre a maior e a menor), a divisão no ponto de virada por campanha e os títulos.
 """
 import json
+import os
 import sys
 from collections import defaultdict
+
+ESTILO_NOME = {"pon": "Ponteira", "per": "Perseguidora", "arr": "Arrancadora", "fec": "Fechadora"}
 
 OBJ = [13, 20, 24, 32, 40, 48, 60, 72]
 
@@ -23,8 +26,17 @@ def pct(a, b):
     return 100.0 * a / b if b else 0.0
 
 
+def estilos():
+    raiz = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    with open(os.path.join(raiz, "data", "garotas.json"), encoding="utf-8-sig") as f:
+        return {g["nome"]: ESTILO_NOME[g["estilo"]] for g in json.load(f)}
+
+
 def main():
     rs = carregar(sys.argv[1:])
+    est = estilos()
+    for r in rs:
+        r["estilo"] = est.get(r["nome"], "?")
     n = sum(r["n"] for r in rs)
     passou = [sum(r["passou"][j] for r in rs) for j in range(8)]
     print(f"{len(rs)} garotas, {n} carreiras ({rs[0]['conta']})")
@@ -44,7 +56,7 @@ def main():
     cam = {k: sum(r["caminho"][k] for r in rs) for k in "AB"}
     print("Depois da virada: A completa %.0f%%, B completa %.0f%%" % (pct(comp["A"], cam["A"]), pct(comp["B"], cam["B"])))
 
-    for chave in ("casa", "arquetipo"):
+    for chave in ("casa", "arquetipo", "estilo"):
         g = defaultdict(lambda: [0, 0])
         for r in rs:
             g[r[chave]][0] += r["passou"][7]
@@ -53,7 +65,7 @@ def main():
         print(f"\nPor {chave}:")
         for t, k, b in taxas:
             print(f"  {k:16s} {t:5.1f}%  ({b} carreiras)")
-        sem_mvp = [t for t, k, _ in taxas if k != "(MVP)"]
+        sem_mvp = [t for t, k, _ in taxas if k != "(MVP)"] or [t for t, _, _ in taxas]
         print(f"  diferença: {max(sem_mvp) - min(sem_mvp):.1f} pontos")
 
     print("\nVirada (% no caminho A entre as que passam do turno 48):")

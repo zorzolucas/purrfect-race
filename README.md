@@ -120,6 +120,12 @@ python tools/resumo_balanco.py nova_*.json
 
 Os resultados da última rodada do bot estão em [campanhas](docs/campanhas.md) §7. O bot é simples; quem planeja a rota e cuida do humor vai melhor.
 
+A primeira garota em 3D low-poly, a Lira, já corre na pista no lugar da cápsula
+(ver [modelo da Lira](docs/modelo-lira.md)).
+
+![Lira em 3D low-poly](docs/prototipo/21_lira_modelo.png)
+![Expressões da Lira](docs/prototipo/22_lira_expressoes.png)
+![Lira na pista](docs/prototipo/23_lira_na_pista.png)
 ![Escolha](docs/prototipo/1_escolha.png)
 ![Madrinha](docs/prototipo/17_madrinha.png)
 ![Olheiro e instrução](docs/prototipo/18_olheiro_objetivo.png)

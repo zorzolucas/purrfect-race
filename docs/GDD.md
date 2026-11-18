@@ -383,7 +383,7 @@ Os cenários usam a mesma paleta compartilhada e luz de céu simples. O clima do
 5. **Exportar** em glTF (`.glb`) para `modelos/` no projeto Godot.
 6. **Godot:** material toon com a paleta, troca de expressão por textura, e a cena da corrida troca as cápsulas pelos modelos.
 
-O MCP do Blender ([mcp-blender.md](mcp-blender.md)) permite que o Claude crie e confira modelos, e o MCP do Godot ([mcp-godot.md](mcp-godot.md)) permite montar as cenas. A primeira tarefa de arte é **1 garota de referência** passando pelo pipeline inteiro, antes de produzir as outras.
+O MCP do Blender ([mcp-blender.md](mcp-blender.md)) permite que o Claude crie e confira modelos, e o MCP do Godot ([mcp-godot.md](mcp-godot.md)) permite montar as cenas. A primeira tarefa de arte é **1 garota de referência** passando pelo pipeline inteiro, antes de produzir as outras. **Feito com a Lira** (2026-11-18), ver [modelo da Lira](modelo-lira.md).
 
 ### 11.5 Interface
 

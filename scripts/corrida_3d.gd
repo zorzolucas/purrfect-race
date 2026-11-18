@@ -11,6 +11,8 @@ const COR_GRAMA_PISTA := Color("#3f7f3c")
 const COR_GRAMA_FORA := Color("#2d5e33")
 const COR_CERCA := Color("#f2f2f2")
 const COR_PELE := Color("#f1c9a5")
+## Altura do modelo low-poly na pista (as cápsulas têm ~2,1 m com as orelhas).
+const ALTURA_MODELO := 2.15
 
 var cores: Array
 var nomes: Array
@@ -209,6 +211,20 @@ func _corredora(cor: Color, nome: String, jogadora: bool) -> Node3D:
 	var corpo := Node3D.new()
 	corpo.name = "Corpo"
 	raiz.add_child(corpo)
+	if ModeloGarota.tem_modelo(nome.split(" ")[0]):
+		# garota com modelo low-poly (GDD §11): no lugar das cápsulas
+		var modelo := ModeloGarota.new(nome.split(" ")[0], ALTURA_MODELO)
+		modelo.name = "Modelo"
+		modelo.expressao("determinada")
+		corpo.add_child(modelo)
+	else:
+		_capsulas(corpo, cor)
+	_etiqueta_e_anel(raiz, nome, jogadora)
+	return raiz
+
+
+## Placeholder de primitivas para as garotas que ainda não têm modelo.
+func _capsulas(corpo: Node3D, cor: Color) -> void:
 	var tronco := MeshInstance3D.new()
 	var cap := CapsuleMesh.new()
 	cap.radius = 0.28
@@ -246,6 +262,9 @@ func _corredora(cor: Color, nome: String, jogadora: bool) -> Node3D:
 	rabo.position = Vector3(0, 0.85, 0.33)
 	rabo.rotation_degrees.x = 35.0
 	corpo.add_child(rabo)
+
+
+func _etiqueta_e_anel(raiz: Node3D, nome: String, jogadora: bool) -> void:
 	var etiqueta := Label3D.new()
 	etiqueta.text = nome.split(" ")[0]
 	etiqueta.billboard = BaseMaterial3D.BILLBOARD_ENABLED
@@ -268,7 +287,6 @@ func _corredora(cor: Color, nome: String, jogadora: bool) -> Node3D:
 		anel.position.y = 0.03
 		anel.scale.y = 0.1
 		raiz.add_child(anel)
-	return raiz
 
 
 # ---------- quadro a quadro ----------
@@ -291,6 +309,14 @@ func atualizar(xs: Array, dist: float, vel: Array, fase: int, lider: int, delta:
 		# balanço da passada: mais rápido quanto maior a velocidade
 		var corpo: Node3D = n.get_node("Corpo")
 		var freq: float = 2.2 + float(vel[i]) * 0.12
+		var modelo := corpo.get_node_or_null("Modelo") as ModeloGarota
+		if modelo:
+			# a animação "correr" dá 3 passadas por segundo em 1x
+			if vel[i] > 1.0:
+				modelo.tocar("correr", freq / 3.0)
+			else:
+				modelo.tocar("parada")
+			continue
 		corpo.position.y = absf(sin((_passada * freq + i * 0.37) * PI)) * 0.12
 		corpo.rotation_degrees.x = -12.0 if vel[i] > 1.0 else 0.0
 	_camera(xs, dist, fase, lider, delta, chegou)

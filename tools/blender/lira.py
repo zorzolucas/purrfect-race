@@ -1024,6 +1024,11 @@ def main():
     exportar(rig)
     if RENDER:
         previas(rig, malha)
+    # arquivo salvo em repouso, com a vista em textura (o Workbench das prévias não tem Material Preview)
+    for pb in rig.pose.bones:
+        pb.rotation_quaternion = Quaternion()
+        pb.location = (0, 0, 0)
+    bpy.context.scene.display.shading.color_type = "TEXTURE"
     bpy.ops.wm.save_as_mainfile(filepath=os.path.join(RAIZ, "arte", "lira.blend"), compress=True)
     print("[lira] ok")
 

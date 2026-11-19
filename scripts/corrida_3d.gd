@@ -215,7 +215,7 @@ func _corredora(cor: Color, nome: String, jogadora: bool) -> Node3D:
 		# garota com modelo low-poly (GDD §11): no lugar das cápsulas
 		var modelo := ModeloGarota.new(nome.split(" ")[0], ALTURA_MODELO)
 		modelo.name = "Modelo"
-		modelo.expressao("determinada")
+		modelo.expressao("normal")
 		corpo.add_child(modelo)
 	else:
 		_capsulas(corpo, cor)
@@ -311,15 +311,25 @@ func atualizar(xs: Array, dist: float, vel: Array, fase: int, lider: int, delta:
 		var freq: float = 2.2 + float(vel[i]) * 0.12
 		var modelo := corpo.get_node_or_null("Modelo") as ModeloGarota
 		if modelo:
-			# a animação "correr" dá 3 passadas por segundo em 1x
-			if vel[i] > 1.0:
-				modelo.tocar("correr", freq / 3.0)
-			else:
-				modelo.tocar("parada")
+			_animar_modelo(modelo, float(vel[i]), freq, fase)
 			continue
 		corpo.position.y = absf(sin((_passada * freq + i * 0.37) * PI)) * 0.12
 		corpo.rotation_degrees.x = -12.0 if vel[i] > 1.0 else 0.0
 	_camera(xs, dist, fase, lider, delta, chegou)
+
+
+## Escolhe trote, corrida ou sprint (animações do Mixamo) e casa o ritmo com a passada:
+## cada ciclo da animação tem 2 passadas.
+func _animar_modelo(modelo: ModeloGarota, v: float, passadas_s: float, fase: int) -> void:
+	if v <= 1.0:
+		modelo.tocar("parada")
+		return
+	var anim := "correr"
+	if fase >= 3:
+		anim = "sprint"
+	elif v < 15.0:
+		anim = "trote"
+	modelo.tocar(anim, passadas_s * modelo.duracao(anim) / 2.0, 0.3)
 
 
 func _camera(xs: Array, dist: float, fase: int, lider: int, delta: float, chegou: bool) -> void:

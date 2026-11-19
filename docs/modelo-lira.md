@@ -1,76 +1,110 @@
 # Lira: a garota de referência em 3D low-poly
 
-> Versão 0.2, 2026-11-18 (estilo revisto a partir dos vídeos de referência, ver "Estudo das referências").
-> Versão 0.1, 2026-11-18. Primeira tarefa de arte do [GDD](GDD.md) §11.4: uma garota passando
-> pelo pipeline inteiro (Blender → glTF → Godot) antes de produzir as outras.
-> A ficha visual dela está no [visual do elenco](visual-elenco.md) §4.1.
+> Versão 0.4, 2026-11-18. Feita a partir da ficha conceitual da Lira e do PDF de pipeline
+> que o Lucas subiu em `arte/` (estilo chunky retrô). Primeira tarefa de arte do [GDD](GDD.md) §11.4.
+> A ficha escrita dela está no [visual do elenco](visual-elenco.md) §4.1.
 
+![Ficha x modelo](prototipo/24_lira_ficha_vs_modelo.png)
 ![Lira](prototipo/21_lira_modelo.png)
+![Cabelo](prototipo/27_lira_cabelo.png)
 ![Expressões](prototipo/22_lira_expressoes.png)
 ![Lira na pista](prototipo/23_lira_na_pista.png)
 
-## Estudo das referências
+## Precisão: silhueta medida contra a ficha
 
-Os dois vídeos que o Lucas mandou (GDD §11.1): a série de 14 vídeos de personagem low-poly anime
-no Blender (modelagem por caixa com espelho, rosto com faca, cabelo em blocos, UV e textura pintada,
-Rigify, pesos e rosto 2D trocável) e o personagem estilo PS1 (textura pequena e serrilhada).
-O que entrou na Lira v0.2:
+`tools/blender/comparar_ficha.py` renderiza a silhueta do modelo de frente e de lado e a sobrepõe
+à silhueta da ficha, na mesma escala (chão e altura total alinhados). Azul é só a ficha, vermelho
+só o modelo, roxo os dois; o script também imprime a largura de cada parte a cada 8 cm de altura.
 
-| Na referência | Na Lira |
+```
+blender --background arte/lira.blend --python tools/blender/comparar_ficha.py -- render <pasta>
+python tools/blender/comparar_ficha.py compor <pasta> "arte/animações/<ficha>.png"
+```
+
+![Silhueta de frente](prototipo/25_lira_silhueta_frente.png) ![Silhueta de lado](prototipo/26_lira_silhueta_lado.png)
+
+Com isso, na v0.4: braços mais curtos e mais perto do corpo (27°), luvas maiores, pernas em A com os
+pés afastados como na ficha, tênis maiores, saia da jaqueta mais aberta, orelhas maiores e mais
+para fora, rabo mais junto das costas e mais alto, e o volume do cabelo 15% mais largo com o topo
+quadrado. O que sobra de diferença na conta é o vão entre as pernas (a ficha fecha esse vão com os
+tênis encostados) e o rabo, que na ficha aparece de frente.
+
+## Cabelo
+
+O cabelo virou um capacete coberto de **mechas facetadas** (`mecha_casca`), como o PDF descreve
+(arestas da borda puxadas e fundidas numa ponta), em vez de espetos soltos:
+
+- cada mecha nasce de um arco da calota e acompanha a curva da cabeça, com um vinco no meio e
+  espessura (de baixo não some e tem a cor de dentro, mais escura e chapada);
+- franja assimétrica de 6 mechas até a linha dos olhos, com o "M" em V por cima;
+- laterais e nuca como **cortinas** (`mecha_cortina`): cobrem a cabeça até a ponta, abrem para fora
+  embaixo, têm a borda serrilhada e listras escuras alternadas, como as rajadas da ficha;
+- atrás, duas fileiras de mechas espetando para trás (o perfil da ficha) e três pontas no topo;
+- tufos nos cantos de cima, que dão a silhueta quadrada da cabeça na ficha.
+
+## O que entrou da ficha e do PDF
+
+| Fonte | O que pede | Como ficou |
+|---|---|---|
+| Ficha | Cabeça grande, corpo chunky, mão em luva, tênis grandões | Cabeça de 0,40 m de largura, corpo alargado 1,24 × 1,2 (`LARGURA_CORPO`), luvas com polegar, tênis com cano alto |
+| Ficha | Top esportivo preto com alças e barra brancas, short preto com barra branca | Pintados na textura do tronco e das pernas |
+| Ficha | Jaqueta vermelha amarrada na cintura, com listras creme na barra | Faixa, nó com as mangas e a "saia" aberta na frente |
+| Ficha | Listras de gata na pele (braços, coxas, canelas e bochechas) e curativo no joelho direito | Pintadas na textura e no atlas do rosto |
+| Ficha | Cabelo espetado com o "M" das rajadas em V na testa, orelha esquerda com entalhe, rabo listrado em interrogação | Capacete de cabelo com espetos, V escuro por cima, orelhas grandes, rabo grosso com anéis |
+| Ficha | 6 expressões: normal, olhos fechados, feliz, surpresa, tonta, piscadinha com língua | Atlas 3 × 2 do rosto; a íris some ou aparece conforme a expressão |
+| PDF §2 | Pernas de 5 lados, pescoço de 3, mão em cunha, cabelo como capacete + espetos, franja assimétrica | Seguido |
+| PDF §3 | Textura em potência de 2, sombra pintada, material sem luz | Atlas 512 × 512: paleta (14 cores × 4 tons) + regiões pintadas por parte com sombra de 4 tons; material com emissão no Blender e sem luz no Godot; View Transform Standard |
+| PDF §4–5 | Rig econômico, joelho para frente e cotovelo para trás, pesos chapados | 30 ossos: corpo humanoide, 2 orelhas, 6 de rabo e 2 de olho; pesos 1,0 por parte e 50/50 nas juntas |
+| PDF §6 | Íris separadas presas a ossos de olho, rosto 2D por atlas | Íris em placas próprias (`eye.L`, `eye.R`); `ModeloGarota.olhar()` mexe os olhos |
+| PDF §7 | 30 fps, ciclos fechados | Tudo a 30 fps |
+
+## Animações
+
+As 31 animações do Mixamo em `arte/animações/` são passadas para o esqueleto da Lira no próprio
+Blender (`tools/blender/retarget_mixamo.py`): cada osso recebe a mesma variação de orientação
+que o osso do Mixamo fez a partir da pose T, então o rig em pose A e as proporções diferentes
+não atrapalham. As de andar e correr perdem o deslocamento para frente (ficam no lugar).
+Rabo e orelhas, que o Mixamo não tem, ganham uma camada própria por tipo de animação.
+
+| No jogo | Arquivo do Mixamo |
 |---|---|
-| Cabeça grande, corpo com ~5 cabeças de altura | Cabeça 25% maior e corpo mais baixo e robusto (`ESCALA_CORPO`) |
-| Cabelo é um volume maior que o crânio, cortado em mechas grandes e chapadas | Calota 1,13× a cabeça, franja de 5 mechas largas até os olhos, laterais emoldurando o rosto, nuca serrilhada e o espetado atrás |
-| Olhos enormes pintados na textura do rosto, com cílio grosso e 2 brilhos | Olhos ~35% maiores no atlas, sobrancelhas acima |
-| Sombra e brilho **pintados** na textura, sem depender da luz | Paleta com 4 tons por cor (luz, base, sombra rosada, sombra funda); cada face pega o tom pela direção; no Godot o material é sem luz |
-| Contorno preto em volta do personagem | Casco invertido (`Lira_Contorno`), sem contorno onde as mechas entram no cabelo |
-| Brilho em triângulos claros no topo do cabelo | 4 triângulos `brilho` no topo |
-| Estilo PS1 | Fica como filtro opcional (GDD §11.1); a textura já é nearest e pequena |
+| `parada`, `andar`, `trote`, `correr`, `sprint`, `largada` | idle, Walking, Medium Run, Running, Fast Run, Idle To Sprint |
+| `comemorar`, `animada`, `perder`, `pular` | Victory Idle, Excited, Defeated, jump |
+| `treino_vel`, `treino_est`, `treino_pod`, `treino_det`, `treino_int` | Fast Run, Jumping Jacks, Air Squat, Burpee, Thinking |
+| `prancha`, `sentar`, `bocejar`, `apoio` | Plank, Sitting, Yawn, weight shift |
+| Gestos para encontros: `sim`, `nao`, `concordar`, `brava`, `irritada`, `convencida`, `desdenhar`, `gesto_feliz`, `suspiro`, `desviar_olhar`, `sarcasmo`, `pensativa` | head nod yes, shaking head no, acknowledging, angry gesture, annoyed head shake, being cocky, dismissing gesture, happy hand gesture, relieved sigh, look away gesture, sarcastic head nod, thoughtful head shake |
 
-## O que tem
-
-| Item | Como ficou |
-|---|---|
-| **Malha** | 1.614 triângulos (mais ~1.330 do contorno), 1,60 m no Blender. |
-| **Cor** | Textura de paleta 16 × 64: 16 cores em linhas, 4 tons em colunas. Cada face aponta a UV para a cor e o tom dela. Trocar a pelagem é trocar as linhas da paleta. |
-| **Rosto** | Atlas 384 × 256 com as 6 expressões do MVP (normal, feliz, determinada, cansada, triste, surpresa). O rosto é uma malha fina na frente da cabeça; o Godot troca a expressão deslocando a UV. |
-| **Ficha visual** | Cabelo curto e espetado atrás, franja com listras escuras (o "M" das rajadas), olhos verde-claros, orelhas pontudas viradas para frente com entalhe na esquerda, rabo grosso com anéis escuros e ponta clara em ponto de interrogação, munhequeira laranja, jaqueta azul amarrada na cintura, curativo no joelho direito e a estrela na camisa de corrida. |
-| **Esqueleto** | 28 ossos (27 que deformam mais a raiz): corpo humanoide simples (quadril, coluna, peito, pescoço, cabeça, ombros, braços, pernas, pés), **2 orelhas** e **6 ossos de rabo**. Pesos feitos no script, sem pintura automática. |
-| **Animações** | `parada` (48 quadros: respiração, rabo balançando, orelha tremendo) e `correr` (16 quadros: passada, braços, rabo esticado para trás, orelhas para trás). |
+Na corrida a Lira usa `trote` abaixo de 15 m/s, `correr` no meio e `sprint` na fase final, com
+o ritmo casado com a passada. Os gestos tocam uma vez; o resto fica em loop. Os arquivos de
+virar e andar de lado (turn, strafe) e as cópias "(1)" ficaram de fora.
 
 ## Como gerar de novo
-
-Tudo sai de um script só, sem mexer no Blender à mão:
 
 ```
 "C:\Program Files\Blender Foundation\Blender 5.2\blender.exe" --background --factory-startup --python tools/blender/lira.py -- --render
 ```
 
-Ele grava `modelos/lira.glb` (o que o Godot usa), `arte/lira.blend` (para editar à mão),
-as texturas em `arte/` e prévias em `arte/previa/` (com `--render`). A pasta `arte/` tem
-`.gdignore`, então o Godot não tenta importar o `.blend`.
+`--anims=parada,correr` gera só algumas animações (mais rápido para testar o visual);
+`--sem-mixamo` pula o retarget. Saem `modelos/lira.glb`, `arte/lira.blend`, as texturas em
+`arte/` e prévias em `arte/previa/`.
 
 No Godot:
 
-- `scripts/modelo_garota.gd` (`ModeloGarota`) carrega o modelo, troca os materiais por sem luz com
-  a paleta (filtro nearest) e o contorno, toca as animações em loop e troca a expressão.
-- A corrida usa o modelo no lugar das cápsulas quando a garota tem um (só a Lira, por enquanto),
-  com a animação `correr` no ritmo da velocidade e o rosto `determinada`.
-- `cenas/vitrine_modelo.tscn` mostra a garota girando: 1–6 trocam a expressão, Espaço alterna
-  parada/correr, setas giram.
-- `testes/teste_modelo.gd` confere ossos, animações, materiais, triângulos e a troca de expressão.
-- `testes/captura_modelo.gd` tira as capturas acima (com janela).
+- `scripts/modelo_garota.gd` (`ModeloGarota`): materiais sem luz e contorno, `tocar()`,
+  `expressao()`, `olhar()`, `duracao()`.
+- `cenas/vitrine_modelo.tscn`: 1–6 trocam a expressão, Espaço/Backspace passam pelas animações,
+  O liga o olhar passeando, setas giram.
+- `testes/teste_modelo.gd` confere ossos, animações, materiais, íris e expressões;
+  `testes/captura_modelo.gd` tira as capturas acima (com janela).
+- Ao reimportar as texturas extraídas do glb, confira `detect_3d/compress_to=0` e
+  `mipmaps/generate=false` nos `.import` de `modelos/` (o Godot tenta comprimir e borra a paleta).
 
-## Escolhas e pendências
+## Pendências
 
-- **Sem Rigify por enquanto.** O GDD fala em Rigify. Para a referência, o script monta direto um
-  esqueleto de jogo (só ossos que deformam, nomes no padrão do Rigify sem o prefixo `DEF-`). Um rig
-  de controle Rigify pode ser posto por cima depois, para animar à mão, sem mudar o que o Godot recebe.
-- **Base única ainda não separada.** O script já tem as peças como funções (tronco, braço, perna,
-  cabeça, orelha, rabo, cabelo). Para a próxima garota: separar o que é base, parametrizar orelha,
-  rabo e cabelo pela ficha e trocar a paleta.
-- **Sem luz do Godot.** A sombra é pintada, então o modelo não muda com o sol da pista nem com o clima.
-  Se precisar escurecer à noite, multiplique `ModeloGarota.BRILHO`.
-- **Mechas da franja** ainda deixam frestas pequenas de pele perto da testa em alguns ângulos.
-- **Faltam animações:** andar, sprint, comemorar, perder, treinar e cochilar (GDD §11.2).
-- **Escala na pista:** o modelo aparece com 2,15 m para combinar com as cápsulas (`Corrida3D.ALTURA_MODELO`).
-  Quando todas tiverem modelo, dá para voltar à escala real.
+- **As outras 7 fichas** (Nashira, Mira, Capela, Antares, Shaula, Polaris, Algol): mesma base;
+  falta separar o que é base no script e parametrizar cabelo, orelhas, rabo, roupa e paleta.
+- **Expressões:** o GDD listava normal, feliz, determinada, cansada, triste e surpresa; agora valem
+  as 6 das fichas. Determinada, cansada e triste podem voltar num segundo atlas.
+- **Escala na pista:** 2,15 m para combinar com as cápsulas (`Corrida3D.ALTURA_MODELO`).
+- **Rigify:** o rig é próprio (nomes no padrão do Rigify sem `DEF-`). Um rig de controle pode vir
+  por cima para animar à mão, sem mudar o que o Godot recebe.

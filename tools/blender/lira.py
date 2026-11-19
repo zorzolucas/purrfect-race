@@ -1,11 +1,16 @@
-"""Lira, a garota de referência em 3D low-poly (GDD §11, visual-elenco §4.1).
+"""Lira v0.3, a garota de referência em 3D low-poly (fichas conceituais em arte/animações/).
 
-Gera do zero, dentro do Blender: malha low-poly com cor por paleta, atlas de expressões
-do rosto, esqueleto com ossos de orelha e rabo, pesos, animações (parada e correr) e
-exporta tudo em glTF para o Godot.
+Segue o pipeline do PDF em arte/ (estilo chunky retrô): volumes simples, pernas de 5 lados,
+pescoço de 3 lados, mão em luva, cabelo em capacete com espetos e franja assimétrica,
+textura pintada com a sombra (material sem luz), íris separadas presas a ossos de olho,
+rosto 2D trocável por atlas, pesos chapados por parte e animações a 30 fps.
+
+Gera do zero dentro do Blender: malha, textura pintada (atlas 512 × 512 com paleta e
+regiões pintadas por parte), atlas de expressões, íris, contorno, esqueleto com orelhas,
+rabo e olhos, pesos, animações do Mixamo (tools/blender/retarget_mixamo.py) e o glTF.
 
 Uso (na raiz do repo):
-    blender --background --factory-startup --python tools/blender/lira.py -- [--render]
+    blender --background --factory-startup --python tools/blender/lira.py -- [--render] [--anims=a,b] [--sem-mixamo]
 
 Saída:
     modelos/lira.glb          modelo para o Godot
@@ -13,14 +18,13 @@ Saída:
     arte/previa/*.png         prévias renderizadas (só com --render)
 
 Eixos no Blender: Z para cima, a garota olha para -Y, a esquerda dela é +X.
-Altura: 1,60 m (o Godot escala para o tamanho da pista).
+Altura: 1,60 m até o topo do cabelo (o Godot escala para o tamanho da pista).
 """
 
 import math
 import os
 import sys
 
-import bmesh
 import bpy
 import numpy as np
 from mathutils import Matrix, Quaternion, Vector
@@ -31,43 +35,49 @@ ARGS = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
 RENDER = "--render" in ARGS
 
 # ---------------------------------------------------------------------------
-# Paleta (visual-elenco §2, pelagem 1: laranja rajada)
+# Paleta (ficha conceitual da Lira)
 # ---------------------------------------------------------------------------
 
 PALETA = [
-    ("pele", "#F6D7BE"),
-    ("laranja", "#E8833A"),        # base da pelagem
-    ("laranja_esc", "#B8541E"),    # rajadas
-    ("creme", "#F6D2A8"),          # detalhe: ponta do rabo
-    ("camisa", "#F4F4F0"),
-    ("short", "#2B2F4A"),
-    ("tenis", "#F2F2F2"),
-    ("sola", "#3A3A44"),
-    ("jaqueta", "#3E6FB0"),
-    ("munhequeira", "#F08A24"),
-    ("curativo", "#E9CF9E"),
-    ("orelha_int", "#F2A9A0"),
-    ("meia", "#FFFFFF"),
-    ("estrela", "#F2C230"),
-    ("jaqueta_esc", "#2D528A"),
-    ("brilho", "#FFC48C"),        # brilho pintado no cabelo
+    ("pele", "#F8CDA6"),
+    ("laranja", "#F0852E"),        # cabelo, orelhas, rabo
+    ("laranja_esc", "#B5461C"),    # rajadas
+    ("creme", "#F8E2BF"),
+    ("preto", "#2A2730"),          # top e short
+    ("branco", "#F3EFE7"),         # alças e barras
+    ("vermelho", "#D63E2A"),       # jaqueta na cintura
+    ("vermelho_esc", "#9C281D"),
+    ("sola", "#2E2A33"),
+    ("tenis", "#EE7A2A"),          # tênis e munhequeiras
+    ("orelha_int", "#F5A9A2"),
+    ("brilho", "#FFC890"),         # brilho pintado no cabelo
+    ("listra_pele", "#E07C3C"),    # listras de gata na pele
+    ("curativo", "#F2DDB2"),
+    ("cabelo_dentro", "#B9501F"),  # parte de dentro das mechas: tom chapado, sem cair no quase preto
 ]
 COR = {nome: i for i, (nome, _) in enumerate(PALETA)}
-TONS = 4        # colunas: luz, base, sombra, sombra funda
-PX_CELULA = 4
-# direção da luz "pintada" na textura (frente, de cima, do lado direito dela)
-LUZ = Vector((-0.25, -0.3, 0.92)).normalized()
-SEM_SOMBRA = {"brilho", "orelha_int", "estrela"}
+SEM_SOMBRA = {"brilho", "orelha_int", "cabelo_dentro"}
+# luz "pintada" na textura: de frente, de cima e do lado direito dela
+LUZ = Vector((-0.45, -0.55, 0.70)).normalized()
+
+# atlas 512 × 512: paleta no canto de cima à esquerda (cor por linha, tom por coluna)
+# e regiões pintadas para as partes cilíndricas
+ATLAS = 512
+PAL_LINHA, PAL_COLUNA = 16, 64
+REGIOES = {
+    "tronco": (256, 0, 256, 128),
+    "perna_L": (256, 128, 128, 128), "perna_R": (384, 128, 128, 128),
+    "braco_L": (0, 256, 128, 128), "braco_R": (128, 256, 128, 128),
+    "tenis_L": (256, 256, 128, 128), "tenis_R": (384, 256, 128, 128),
+    "rabo": (0, 384, 256, 128),
+    "saia": (256, 384, 256, 128),
+}
+META = {}  # dados dos anéis de cada região, para pintar
 
 
 def hex_rgb(h):
     h = h.lstrip("#")
     return tuple(int(h[i:i + 2], 16) / 255.0 for i in (0, 2, 4))
-
-
-def uv_da_cor(i, tom=1):
-    # linha = cor, coluna = tom; linha 0 em cima da imagem (v alto no Blender)
-    return ((tom + 0.5) / TONS, 1.0 - (i + 0.5) / len(PALETA))
 
 
 def tom_rgb(rgb, tom):
@@ -81,38 +91,44 @@ def tom_rgb(rgb, tom):
     return rgb
 
 
+def tom_da_luz(d):
+    return 0 if d > 0.55 else 1 if d > -0.25 else 2 if d > -0.62 else 3
+
+
+def uv_da_cor(i, tom=1):
+    x = tom * PAL_COLUNA + PAL_COLUNA / 2
+    y = i * PAL_LINHA + PAL_LINHA / 2
+    return (x / ATLAS, 1.0 - y / ATLAS)
+
+
+def uv_regiao(nome, u, v):
+    x0, y0, w, h = REGIOES[nome]
+    x = x0 + 0.5 + u * (w - 1)
+    y = y0 + 0.5 + v * (h - 1)
+    return (x / ATLAS, 1.0 - y / ATLAS)
+
+
 # ---------------------------------------------------------------------------
-# Construtor de malha: tudo vai para uma malha só, com cor e pesos por parte
+# Construtor de malha
 # ---------------------------------------------------------------------------
-
-ESCALA_CORPO = Vector((0.97, 0.97, 0.86))
-
-
-def no_corpo(p):
-    return Vector((p[0] * ESCALA_CORPO.x, p[1] * ESCALA_CORPO.y, p[2] * ESCALA_CORPO.z))
-
 
 class Malha:
     def __init__(self):
-        self.corpo = False   # True: aplica ESCALA_CORPO (corpo, rabo, roupa)
-        self.verts = []      # Vector
-        self.pesos = []      # {osso: peso}
+        self.verts = []
+        self.pesos = []
         self.contorno = []   # fator da espessura do contorno por vértice (0 = sem contorno)
-        self.faces = []      # (índices, cor, material, uvs ou None)
+        self.faces = []      # (índices, cor da paleta ou None, material, uvs ou None)
 
     def v(self, p, pesos):
-        self.verts.append(no_corpo(p) if self.corpo else Vector(p))
+        self.verts.append(Vector(p))
         self.pesos.append(dict(pesos))
         self.contorno.append(1.0)
         return len(self.verts) - 1
 
     def face(self, idx, cor, para_fora=None, material=0, uvs=None):
-        """para_fora: ponto de dentro da peça; a face é virada para longe dele."""
         idx = list(idx)
         if para_fora is not None:
             pts = [self.verts[i] for i in idx]
-            if self.corpo:
-                para_fora = no_corpo(para_fora)
             centro = sum(pts, Vector()) / len(pts)
             n = Vector()
             for a in range(len(pts)):
@@ -125,6 +141,10 @@ class Malha:
 
 
 M = Malha()
+
+
+def mix(a, b, t):
+    return a + (b - a) * t
 
 
 def base_perp(direcao, frente=Vector((0, -1, 0))):
@@ -140,49 +160,59 @@ def base_perp(direcao, frente=Vector((0, -1, 0))):
 
 def anel(centro, direcao, rx, ry, lados, giro=0.0, frente=Vector((0, -1, 0))):
     lado, f = base_perp(direcao, frente)
-    pts = []
-    for k in range(lados):
-        a = giro + 2 * math.pi * k / lados
-        pts.append(Vector(centro) + lado * math.cos(a) * rx + f * math.sin(a) * ry)
-    return pts
+    pts = [Vector(centro) + lado * math.cos(giro + 2 * math.pi * k / lados) * rx
+           + f * math.sin(giro + 2 * math.pi * k / lados) * ry for k in range(lados)]
+    return {"pts": pts, "c": Vector(centro), "rx": rx, "ry": ry, "lado": lado, "frente": f,
+            "giro": giro, "lados": lados}
 
 
-def loft(aneis, pesos, cores, tampa_ini=True, tampa_fim=True, cor_tampa=None):
-    """aneis: lista de listas de pontos (mesmo nº de lados). cores[i](k) ou nome: faixa i."""
-    lados = len(aneis[0])
-    idx = [[M.v(p, pesos[i]) for p in a] for i, a in enumerate(aneis)]
-    centros = [sum(a, Vector()) / lados for a in aneis]
+def loft(aneis, pesos, cores=None, regiao=None, tampa_ini=True, tampa_fim=True, cor_tampa="pele",
+         fechado=True):
+    """Tubo entre anéis. Com `regiao`, a UV vai para a região pintada (u em volta, v ao longo)."""
+    lados = aneis[0]["lados"]
+    idx = [[M.v(p, pesos[i]) for p in a["pts"]] for i, a in enumerate(aneis)]
+    centros = [a["c"] for a in aneis]
+    if regiao:
+        comp = [0.0]
+        for a, b in zip(centros, centros[1:]):
+            comp.append(comp[-1] + (b - a).length)
+        vs = [c / comp[-1] for c in comp]
+        META[regiao] = {"v": vs, "c": [tuple(c) for c in centros], "rx": [a["rx"] for a in aneis],
+                        "ry": [a["ry"] for a in aneis], "lado": [tuple(a["lado"]) for a in aneis],
+                        "frente": [tuple(a["frente"]) for a in aneis], "giro": aneis[0]["giro"],
+                        "lados": lados, "fechado": fechado}
+    n_faces = lados if fechado else lados - 1
     for i in range(len(aneis) - 1):
         meio = (centros[i] + centros[i + 1]) / 2
-        for k in range(lados):
+        for k in range(n_faces):
             k2 = (k + 1) % lados
-            c = cores[i](k) if callable(cores[i]) else cores[i]
-            M.face([idx[i][k], idx[i][k2], idx[i + 1][k2], idx[i + 1][k]], COR[c], meio)
+            quad = [idx[i][k], idx[i][k2], idx[i + 1][k2], idx[i + 1][k]]
+            if regiao:
+                u0, u1 = k / n_faces, (k + 1) / n_faces
+                uvs = [uv_regiao(regiao, u0, vs[i]), uv_regiao(regiao, u1, vs[i]),
+                       uv_regiao(regiao, u1, vs[i + 1]), uv_regiao(regiao, u0, vs[i + 1])]
+                M.face(quad, None, meio, uvs=uvs)
+            else:
+                c = cores[i](k) if callable(cores[i]) else cores[i]
+                M.face(quad, COR[c], meio)
     if tampa_ini:
-        d = centros[1] - centros[0]
-        ct = cor_tampa or (cores[0] if not callable(cores[0]) else cores[0](0))
-        M.face(idx[0], COR[ct], centros[0] + d)
+        M.face(idx[0], COR[cor_tampa], centros[0] + (centros[1] - centros[0]))
     if tampa_fim:
-        d = centros[-1] - centros[-2]
-        ct = cor_tampa or (cores[-1] if not callable(cores[-1]) else cores[-1](0))
-        M.face(idx[-1], COR[ct], centros[-1] - d)
+        M.face(idx[-1], COR[cor_tampa], centros[-1] - (centros[-1] - centros[-2]))
     return idx
 
 
-def piramide(base_c, direcao, comp, larg, esp, cor, pesos, giro=0.0, frente=None, cor_ponta=None, centro=None):
-    """Mecha de cabelo: base retangular afundada no crânio e ponta para fora."""
+def piramide(base_c, direcao, comp, larg, esp, cor, pesos, frente=None, centro=None):
+    """Espeto: base retangular afundada e ponta para fora (cabelo, polegar)."""
     d = direcao.normalized()
-    frente = frente or Vector((0, -1, 0))
-    lado, f = base_perp(d, frente)
-    rot = Matrix.Rotation(giro, 3, d)
-    lado, f = rot @ lado, rot @ f
-    if centro is not None:  # mecha de cabelo: base afundada em direção ao centro da cabeça
+    lado, f = base_perp(d, frente or Vector((0, -1, 0)))
+    if centro is not None:  # mecha de cabelo: base afundada para o centro da cabeça, sem contorno
         b = Vector(base_c) - (Vector(base_c) - centro).normalized() * 0.035
     else:
         b = Vector(base_c) - d * 0.012
     cantos = [b + lado * sx * larg / 2 + f * sy * esp / 2 for sx, sy in ((-1, -1), (1, -1), (1, 1), (-1, 1))]
     ib = [M.v(p, pesos) for p in cantos]
-    if centro is not None:  # a base fica dentro do volume: sem contorno ali, senão risca o cabelo
+    if centro is not None:
         for i in ib:
             M.contorno[i] = 0.0
     it = M.v(b + d * comp, pesos)
@@ -192,134 +222,137 @@ def piramide(base_c, direcao, comp, larg, esp, cor, pesos, giro=0.0, frente=None
     M.face(ib, COR[cor], dentro)
 
 
-def mix(a, b, t):
-    return a + (b - a) * t
-
-
 # ---------------------------------------------------------------------------
-# Esqueleto (posição de repouso em A)
+# Esqueleto (pose A, joelho um pouco para frente e cotovelo para trás, como o PDF pede)
 # ---------------------------------------------------------------------------
 
-SEN, COS = math.sin(math.radians(35)), math.cos(math.radians(35))
+ANG_BRACO = math.radians(27)
+OMBRO_Z = 1.062
 
 
 def braco_pts(s):
-    d = Vector((s * SEN, 0.0, -COS))
-    ombro = Vector((s * 0.165, 0.0, 1.29))
-    cotovelo = ombro + d * 0.25
-    pulso = cotovelo + d * 0.22
-    mao = pulso + d * 0.085
+    d = Vector((s * math.sin(ANG_BRACO), 0.0, -math.cos(ANG_BRACO)))
+    ombro = Vector((s * 0.148, 0.0, OMBRO_Z))
+    cotovelo = ombro + d * 0.175 + Vector((0, 0.012, 0))
+    pulso = cotovelo + d * 0.155
+    mao = pulso + d * 0.14
     return ombro, cotovelo, pulso, mao, d
 
 
 def perna_pts(s):
-    quadril = Vector((s * 0.085, 0.0, 0.90))
-    joelho = Vector((s * 0.085, -0.008, 0.49))
-    tornozelo = Vector((s * 0.085, 0.0, 0.085))
-    dedos = Vector((s * 0.085, -0.11, 0.03))
+    quadril = Vector((s * 0.09, 0.0, 0.72))
+    joelho = Vector((s * 0.118, -0.012, 0.45))
+    tornozelo = Vector((s * 0.148, 0.0, 0.20))
+    dedos = Vector((s * 0.148, -0.15, 0.05))
     return quadril, joelho, tornozelo, dedos
 
 
 RABO = [Vector(p) for p in (
-    (0, 0.07, 0.90), (0, 0.19, 0.90), (0, 0.295, 0.97), (0, 0.345, 1.08),
-    (0, 0.35, 1.195), (0, 0.30, 1.275), (0, 0.23, 1.27))]
+    (0, 0.08, 0.74), (0, 0.16, 0.71), (0, 0.225, 0.77), (0, 0.255, 0.88),
+    (0, 0.26, 1.00), (0, 0.235, 1.10), (0, 0.17, 1.13))]
 
-CABECA_C = Vector((0, 0.004, 1.372))
-CABECA_R = Vector((0.150, 0.150, 0.158))
+CABECA_C = Vector((0, 0.005, 1.322))
+CABECA_R = Vector((0.200, 0.180, 0.188))
+# a ficha é "chunky": corpo mais largo e grosso para a mesma altura
+LARGURA_CORPO = Vector((1.24, 1.2, 1.0))
+OSSOS_CABECA = {"head", "ear.L", "ear.R", "eye.L", "eye.R"}
 
 OSSOS = []  # (nome, cabeça, cauda, pai, deforma)
 
 
-def osso(nome, h, t, pai=None, deforma=True, corpo=True):
-    h, t = Vector(h), Vector(t)
-    if corpo:
-        h, t = no_corpo(h), no_corpo(t)
-    OSSOS.append((nome, h, t, pai, deforma))
+def osso(nome, h, t, pai=None, deforma=True):
+    OSSOS.append((nome, Vector(h), Vector(t), pai, deforma))
 
 
 osso("root", (0, 0, 0), (0, -0.25, 0), None, False)
-osso("hips", (0, 0, 0.90), (0, 0, 1.01), "root")
-osso("spine", (0, 0, 1.01), (0, 0, 1.15), "hips")
-osso("chest", (0, 0, 1.15), (0, 0, 1.33), "spine")
-osso("neck", (0, 0, 1.33), (0, 0, 1.42), "chest")
-osso("head", no_corpo((0, 0, 1.42)), CABECA_C + Vector((0, 0, 0.17)), "neck", corpo=False)
-for s, L in ((1, "L"), (-1, "R")):
-    q, j, t, dd = perna_pts(s)
-    osso(f"thigh.{L}", q, j, "hips")
-    osso(f"shin.{L}", j, t, f"thigh.{L}")
-    osso(f"foot.{L}", t, dd, f"shin.{L}")
-    o, c, p, m, _ = braco_pts(s)
-    osso(f"shoulder.{L}", (s * 0.03, -0.01, 1.30), o, "chest")
-    osso(f"upper_arm.{L}", o, c, f"shoulder.{L}")
-    osso(f"forearm.{L}", c, p, f"upper_arm.{L}")
-    osso(f"hand.{L}", p, m, f"forearm.{L}")
-for i in range(len(RABO) - 1):
-    osso(f"tail.{i + 1:03d}", RABO[i], RABO[i + 1], "hips" if i == 0 else f"tail.{i:03d}")
+osso("hips", (0, 0, 0.72), (0, 0, 0.84), "root")
+osso("spine", (0, 0, 0.84), (0, 0, 0.97), "hips")
+osso("chest", (0, 0, 0.97), (0, 0, 1.10), "spine")
+osso("neck", (0, 0, 1.10), (0, 0, 1.20), "chest")
+osso("head", (0, 0, 1.20), CABECA_C + Vector((0, 0, 0.19)), "neck")
+for _s, _L in ((1, "L"), (-1, "R")):
+    _q, _j, _t, _d = perna_pts(_s)
+    osso(f"thigh.{_L}", _q, _j, "hips")
+    osso(f"shin.{_L}", _j, _t, f"thigh.{_L}")
+    osso(f"foot.{_L}", _t, _d, f"shin.{_L}")
+    _o, _c, _p, _m, _ = braco_pts(_s)
+    osso(f"shoulder.{_L}", (_s * 0.03, -0.01, OMBRO_Z + 0.005), _o, "chest")
+    osso(f"upper_arm.{_L}", _o, _c, f"shoulder.{_L}")
+    osso(f"forearm.{_L}", _c, _p, f"upper_arm.{_L}")
+    osso(f"hand.{_L}", _p, _m, f"forearm.{_L}")
+for _i in range(len(RABO) - 1):
+    osso(f"tail.{_i + 1:03d}", RABO[_i], RABO[_i + 1], "hips" if _i == 0 else f"tail.{_i:03d}")
 
 # ---------------------------------------------------------------------------
 # Corpo
 # ---------------------------------------------------------------------------
 
-G8 = math.pi / 8  # 8 lados com uma face reta na frente
+G8 = math.pi / 8   # 8 lados com uma face reta na frente
+G5 = 0.3 * math.pi  # 5 lados com uma face reta na frente
 
 
 def tronco():
-    # (z, rx, ry, desloc_y, pesos, cor da faixa acima)
-    perfil = [
-        (0.79, 0.095, 0.070, 0.000, {"hips": 1}, "short"),
-        (0.85, 0.145, 0.095, 0.000, {"hips": 1}, "short"),
-        (0.93, 0.150, 0.096, 0.000, {"hips": 1}, "short"),
-        (1.00, 0.116, 0.080, 0.000, {"hips": 0.5, "spine": 0.5}, "camisa"),
-        (1.10, 0.124, 0.085, -0.002, {"spine": 1}, "camisa"),
-        (1.20, 0.140, 0.094, -0.012, {"chest": 1}, "camisa"),
-        (1.27, 0.150, 0.085, -0.006, {"chest": 1}, "camisa"),
-        (1.325, 0.095, 0.068, 0.000, {"chest": 1}, "pele"),
-        (1.355, 0.044, 0.042, 0.000, {"neck": 1}, "pele"),
-        (1.46, 0.042, 0.042, 0.004, {"neck": 0.4, "head": 0.6}, None),
+    perfil = [  # (z, rx, ry, desloc_y, pesos)
+        (0.62, 0.095, 0.070, 0.000, {"hips": 1}),
+        (0.68, 0.142, 0.094, 0.000, {"hips": 1}),
+        (0.755, 0.152, 0.098, 0.000, {"hips": 1}),
+        (0.84, 0.118, 0.082, 0.000, {"hips": 0.5, "spine": 0.5}),
+        (0.92, 0.124, 0.084, -0.003, {"spine": 1}),
+        (0.99, 0.138, 0.094, -0.012, {"chest": 1}),
+        (1.055, 0.146, 0.088, -0.006, {"chest": 1}),
+        (1.10, 0.105, 0.072, 0.000, {"chest": 1}),
+        (1.12, 0.060, 0.050, 0.000, {"chest": 1}),
     ]
-    aneis = [anel((0, dy, z), Vector((0, 0, 1)), rx, ry, 8, G8) for z, rx, ry, dy, _, _ in perfil]
-    loft(aneis, [p[4] for p in perfil], [p[5] for p in perfil[:-1]], cor_tampa=None)
+    aneis = [anel((0, dy, z), Vector((0, 0, 1)), rx, ry, 8, G8) for z, rx, ry, dy, _ in perfil]
+    loft(aneis, [p[4] for p in perfil], regiao="tronco", cor_tampa="preto")
+
+
+def pescoco():
+    # prisma de 3 lados, como no PDF (uma face para a frente)
+    aneis = [anel((0, 0.004, z), Vector((0, 0, 1)), 0.05, 0.05, 3, math.pi / 2 + math.pi / 3)
+             for z in (1.09, 1.23)]
+    loft(aneis, [{"neck": 1}, {"neck": 0.4, "head": 0.6}], ["pele"], tampa_ini=False, tampa_fim=False)
 
 
 def perna(s):
     L = "L" if s > 0 else "R"
     q, j, t, _ = perna_pts(s)
-    coxa, canela, pe = f"thigh.{L}", f"shin.{L}", f"foot.{L}"
-    perfil = [  # (ponto, raio, pesos, cor da faixa abaixo)
-        (Vector((s * 0.085, 0.0, 0.93)), 0.070, {coxa: 1}, "short"),
-        (Vector((s * 0.088, 0.0, 0.79)), 0.076, {coxa: 1}, "pele"),
-        (Vector((s * 0.086, -0.004, 0.62)), 0.062, {coxa: 1}, "pele"),
-        (j, 0.047, {coxa: 0.5, canela: 0.5}, "pele"),
-        (Vector((s * 0.085, -0.002, 0.41)), 0.049, {canela: 1}, "pele"),
-        (Vector((s * 0.085, 0.010, 0.30)), 0.052, {canela: 1}, "pele"),
-        (Vector((s * 0.085, 0.004, 0.16)), 0.035, {canela: 1}, "meia"),
-        (Vector((s * 0.085, 0.0, 0.085)), 0.034, {canela: 0.5, pe: 0.5}, None),
+    coxa, canela = f"thigh.{L}", f"shin.{L}"
+    def na_perna(z, dy=0.0):  # ponto no eixo quadril-joelho-tornozelo naquela altura
+        if z >= j.z:
+            p = q.lerp(j, (q.z - z) / (q.z - j.z))
+        else:
+            p = j.lerp(t, (j.z - z) / (j.z - t.z))
+        return p + Vector((0, dy, 0))
+
+    perfil = [
+        (na_perna(0.75) + Vector((-s * 0.004, 0, 0.0)), 0.078, {coxa: 1}),
+        (na_perna(0.64), 0.077, {coxa: 1}),
+        (na_perna(0.55, -0.005), 0.064, {coxa: 1}),
+        (j, 0.054, {coxa: 0.5, canela: 0.5}),
+        (na_perna(0.39, -0.006), 0.057, {canela: 1}),
+        (na_perna(0.31, 0.008), 0.058, {canela: 1}),
+        (na_perna(0.24, 0.002), 0.045, {canela: 1}),
+        (t, 0.042, {canela: 1}),
     ]
-    cores = [p[3] for p in perfil[:-1]]
-    if s < 0:  # curativo no joelho direito, nas faces da frente
-        cores[2] = lambda k: "curativo" if k == 1 else "pele"
-    aneis = [anel(p, Vector((0, 0, -1)), r, r, 6, math.pi / 6) for p, r, _, _ in perfil]
-    loft(aneis, [p[2] for p in perfil], cores)
-    # tênis: loft para a frente
-    tenis = [  # (y, meia largura, meia altura, z do centro, pesos)
-        (0.050, 0.034, 0.040, 0.058, {canela: 0.3, pe: 0.7}),
-        (0.022, 0.049, 0.058, 0.060, {pe: 1}),
-        (-0.065, 0.048, 0.046, 0.046, {pe: 1}),
-        (-0.135, 0.034, 0.028, 0.032, {pe: 1}),
-    ]
-    aneis = []
-    for y, rx, rz, z, _ in tenis:
-        pts = anel((s * 0.085, y, z), Vector((0, -1, 0)), rx, rz, 6, math.pi / 6, frente=Vector((0, 0, 1)))
-        aneis.append(pts)
-    inicio = len(M.faces)
-    loft(aneis, [p[4] for p in tenis], ["tenis"] * 3)
-    # sola nas faces viradas para baixo
-    for fi in range(inicio, len(M.faces)):
-        idx, cor, mat, uvs = M.faces[fi]
-        pts = [M.verts[i] for i in idx]
-        n = (pts[1] - pts[0]).cross(pts[2] - pts[0]).normalized()
-        if abs(n.z) > 0.75 and max(p.z for p in pts) < 0.035:
-            M.faces[fi] = (idx, COR["sola"], mat, uvs)
+    aneis = [anel(p, Vector((0, 0, -1)), r, r, 5, G5) for p, r, _ in perfil]
+    loft(aneis, [p[2] for p in perfil], regiao=f"perna_{L}")
+
+
+def tenis(s):
+    L = "L" if s > 0 else "R"
+    canela, pe = f"shin.{L}", f"foot.{L}"
+    x = s * 0.148
+    # cano alto do tênis (cor sólida da paleta)
+    cano = [anel((x, 0.01, z), Vector((0, 0, 1)), r, r * 0.95, 8, G8) for z, r in ((0.12, 0.066), (0.215, 0.07))]
+    loft(cano, [{canela: 0.4, pe: 0.6}, {canela: 1}], ["tenis"], tampa_ini=False, tampa_fim=False)
+    # corpo do tênis: grande e arredondado, pintado (sola, biqueira e faixa creme)
+    perfil = [  # (y, meia largura, meia altura, z do centro)
+        (0.10, 0.08, 0.066, 0.075), (0.058, 0.11, 0.098, 0.10), (-0.048, 0.113, 0.088, 0.09),
+        (-0.142, 0.099, 0.068, 0.07), (-0.205, 0.072, 0.045, 0.049)]
+    aneis = [anel((x, y, z), Vector((0, -1, 0)), rx, rz, 8, G8, frente=Vector((0, 0, 1)))
+             for y, rx, rz, z in perfil]
+    loft(aneis, [{canela: 0.3, pe: 0.7}] + [{pe: 1}] * 4, regiao=f"tenis_{L}", cor_tampa="tenis")
 
 
 def braco(s):
@@ -327,31 +360,102 @@ def braco(s):
     o, c, p, m, d = braco_pts(s)
     ua, fa, ha = f"upper_arm.{L}", f"forearm.{L}", f"hand.{L}"
     perfil = [
-        (o - d * 0.025, 0.043, {ua: 1}, "camisa"),
-        (o + d * 0.06, 0.044, {ua: 1}, "pele"),
-        (c - d * 0.03, 0.039, {ua: 1}, "pele"),
-        (c, 0.035, {ua: 0.5, fa: 0.5}, "pele"),
-        (c + d * 0.05, 0.037, {fa: 1}, "pele"),
-        (p - d * 0.05, 0.030, {fa: 1}, "munhequeira" if s > 0 else "pele"),
-        (p, 0.029, {fa: 0.6, ha: 0.4}, None),
-    ]
-    aneis = [anel(pt, d, r, r, 6, 0.0) for pt, r, _, _ in perfil]
-    loft(aneis, [x[2] for x in perfil], [x[3] for x in perfil[:-1]])
-    # mão: achatada, palma para o corpo
-    lado = Vector((0, -1, 0)).cross(d).normalized()  # eixo fino
-    maos = [(p - d * 0.01, 0.019, 0.033), (p + d * 0.05, 0.021, 0.039), (m + d * 0.01, 0.012, 0.024)]
+        (o - d * 0.03, 0.050, {ua: 1}), (o + d * 0.05, 0.048, {ua: 1}), (c - d * 0.03, 0.041, {ua: 1}),
+        (c, 0.039, {ua: 0.5, fa: 0.5}), (c + d * 0.04, 0.043, {fa: 1}), (p - d * 0.03, 0.038, {fa: 1}),
+        (p, 0.036, {fa: 0.6, ha: 0.4})]
+    aneis = [anel(pt, d, r, r, 6, 0.0) for pt, r, _ in perfil]
+    loft(aneis, [x[2] for x in perfil], regiao=f"braco_{L}")
+    # munhequeira laranja, bem marcada
+    mun = [anel(p + d * k, d, 0.05, 0.05, 6, 0.0) for k in (-0.045, 0.0)]
+    loft(mun, [{fa: 1}, {fa: 0.7, ha: 0.3}], ["tenis"], cor_tampa="tenis")
+    # mão em luva (sem dedos), como no PDF: bloco afunilado + polegar em cunha
+    fino = Vector((0, -1, 0)).cross(d).normalized()  # espessura da palma
+    frente = Vector((0, -1, 0))
+    blocos = [(p + d * 0.005, 0.038, 0.054), (p + d * 0.055, 0.05, 0.074), (p + d * 0.12, 0.047, 0.07),
+              (m + d * 0.02, 0.03, 0.045)]
     aneis = []
-    for pt, fino, larg in maos:
-        pts = []
-        for k in range(6):
-            a = 2 * math.pi * k / 6
-            pts.append(pt + lado * math.cos(a) * fino + Vector((0, 1, 0)) * math.sin(a) * larg)
-        aneis.append(pts)
-    loft(aneis, [{ha: 1}] * 3, ["pele"] * 2)
+    for pt, e, w in blocos:
+        pts = [pt + fino * math.cos(2 * math.pi * k / 6) * e + frente * math.sin(2 * math.pi * k / 6) * w
+               for k in range(6)]
+        aneis.append({"pts": pts, "c": pt, "rx": e, "ry": w, "lado": fino, "frente": frente, "giro": 0, "lados": 6})
+    loft(aneis, [{ha: 1}] * 4, ["pele"] * 3)
+    polegar = p + d * 0.05 + frente * 0.056
+    piramide(polegar, (frente * 0.8 + d * 0.6), 0.06, 0.04, 0.034, "pele", {ha: 1}, frente=Vector((0, 0, 1)))
 
+
+def jaqueta():
+    """Jaqueta vermelha amarrada na cintura: faixa, mangas com nó e a 'saia' aberta na frente."""
+    faixa = [anel((0, 0, z), Vector((0, 0, 1)), rx, ry, 8, G8) for z, rx, ry in ((0.835, 0.158, 0.106), (0.885, 0.142, 0.098))]
+    loft(faixa, [{"hips": 1}, {"hips": 0.5, "spine": 0.5}], ["vermelho"], tampa_ini=False, tampa_fim=False)
+    # saia: só costas e lados (a frente fica aberta mostrando o short)
+    lados = 11
+    abertura = 0.8
+    a0 = math.pi / 2 + abertura
+    perfil = [(0.865, 0.160, 0.108), (0.76, 0.19, 0.132), (0.60, 0.228, 0.158)]
+    aneis = []
+    for z, rx, ry in perfil:
+        pts = []
+        for k in range(lados + 1):
+            a = a0 + (2 * math.pi - 2 * abertura) * k / lados
+            pts.append(Vector((-math.cos(a) * rx, -math.sin(a) * ry, z)))
+        aneis.append({"pts": pts, "c": Vector((0, 0, z)), "rx": rx, "ry": ry, "lado": Vector((-1, 0, 0)),
+                      "frente": Vector((0, -1, 0)), "giro": a0, "lados": lados + 1})
+    pesos_barra = []
+    for p in aneis[2]["pts"]:
+        lado_coxa = "thigh.L" if p.x > 0 else "thigh.R"
+        w = min(0.45, abs(p.x) * 2.5)
+        pesos_barra.append({"hips": 1 - w, lado_coxa: w} if w > 0.05 else {"hips": 1})
+    idx = loft(aneis, [{"hips": 1}, {"hips": 1}, {"hips": 1}], regiao="saia", tampa_ini=False, tampa_fim=False,
+               fechado=False)
+    for i, pw in zip(idx[2], pesos_barra):
+        M.pesos[i] = pw
+    # mangas cruzando na frente e o nó
+    no = Vector((0.0, -0.125, 0.85))
+    for s in (1, -1):
+        L = "L" if s > 0 else "R"
+        caminho = [Vector((s * 0.15, -0.06, 0.865)), no + Vector((s * 0.012, 0, 0)), Vector((s * 0.05, -0.118, 0.67))]
+        aneis = [anel(pt, caminho[min(i + 1, 2)] - caminho[max(i - 1, 0)], 0.03, 0.022, 6, 0.0)
+                 for i, pt in enumerate(caminho)]
+        loft(aneis, [{"hips": 1}, {"hips": 1}, {"hips": 0.6, f"thigh.{L}": 0.4}],
+             ["vermelho", "vermelho_esc" if s > 0 else "vermelho"], cor_tampa="creme")
+    # o nó em si
+    nos = [anel(no + Vector((0, 0, dz)), Vector((0, 0, 1)), 0.035, 0.024, 6, 0.0) for dz in (-0.02, 0.02)]
+    loft(nos, [{"hips": 1}] * 2, ["vermelho_esc"], cor_tampa="vermelho")
+
+
+def rabo():
+    """Grosso, laranja com anéis escuros e ponta clara, em ponto de interrogação."""
+    pts, pesos, raios = [], [], []
+    n = len(RABO)
+    for i in range(n):
+        ossos = [f"tail.{i:03d}"] if i > 0 else []
+        if i < n - 1:
+            ossos.append(f"tail.{i + 1:03d}")
+        pts.append(RABO[i])
+        pesos.append({o: 1.0 / len(ossos) for o in ossos})
+        raios.append(mix(0.050, 0.040, i / (n - 1)))
+        if i < n - 1:
+            pts.append((RABO[i] + RABO[i + 1]) / 2)
+            pesos.append({f"tail.{i + 1:03d}": 1.0})
+            raios.append(mix(0.050, 0.040, (i + 0.5) / (n - 1)))
+    tang = (RABO[-1] - RABO[-2]).normalized()
+    pts.append(RABO[-1] + tang * 0.04)
+    pesos.append({f"tail.{n - 1:03d}": 1.0})
+    raios.append(0.022)
+    aneis = []
+    for i, p in enumerate(pts):
+        a = pts[max(0, i - 1)]
+        b = pts[min(len(pts) - 1, i + 1)]
+        aneis.append(anel(p, b - a, raios[i], raios[i], 6, 0.0, frente=Vector((1, 0, 0))))
+    loft(aneis, pesos, regiao="rabo", cor_tampa="laranja")
+
+
+# ---------------------------------------------------------------------------
+# Cabeça, rosto, íris, orelhas e cabelo
+# ---------------------------------------------------------------------------
 
 def esfera(centro, raios, segs, lat, deform=None):
-    """Elipsoide low-poly: devolve (pontos, quads) com polos únicos."""
+    """Elipsoide low-poly: devolve (pontos, faces) com polos únicos."""
     pts = [Vector((0, 0, -1))]
     for i in range(1, lat):
         phi = -math.pi / 2 + math.pi * i / lat
@@ -381,15 +485,15 @@ def esfera(centro, raios, segs, lat, deform=None):
 
 
 def queixo(q):
-    """Afina o queixo e as bochechas na frente de baixo."""
-    if q.y < 0:  # rosto mais reto, como em anime
-        q = Vector((q.x, q.y * 0.9, q.z))
+    """Rosto reto como em anime, queixo pontudo e bochechas que afinam embaixo."""
+    if q.y < 0:
+        q = Vector((q.x, q.y * 0.88, q.z))
     if q.z < 0:
         baixo = -q.z / CABECA_R.z
         frente = max(0.0, -q.y / CABECA_R.y)
-        q = Vector((q.x * (1 - 0.42 * baixo * (0.4 + 0.6 * frente)),
-                    q.y * (1 - 0.18 * baixo) - 0.012 * baixo * frente,
-                    q.z * (1 + 0.10 * frente)))
+        q = Vector((q.x * (1 - 0.45 * baixo * (0.4 + 0.6 * frente)),
+                    q.y * (1 - 0.18 * baixo) - 0.014 * baixo * frente,
+                    q.z * (1 + 0.08 * frente)))
     return q
 
 
@@ -406,60 +510,92 @@ def cabeca():
     CABECA_FACES.extend(faces)
 
 
-# rosto: decal recortado do atlas de expressões
-ROSTO_YAW = math.radians(56)
-ROSTO_Z = (CABECA_C.z - 0.128, CABECA_C.z + 0.064)
+ROSTO_YAW = math.radians(50)
+ROSTO_Z = (CABECA_C.z - 0.152, CABECA_C.z + 0.076)
 ATLAS_COLS, ATLAS_ROWS, ATLAS_CEL = 3, 2, 128
-EXPRESSOES = ["normal", "feliz", "determinada", "cansada", "triste", "surpresa"]
+EXPRESSOES = ["normal", "fechados", "feliz", "surpresa", "tonta", "piscadinha"]
+OLHOS_PX = [(37, 62), (91, 62)]   # olho direito dela (x menor) e esquerdo, na célula de 128
+OLHO_RX, OLHO_RY = 18.0, 25.0     # olhos grandes como na ficha
+
+
+def _bvh_cabeca():
+    return BVHTree.FromPolygons(CABECA_PTS, CABECA_FACES)
+
+
+def _no_rosto(bvh, s, t, afasta):
+    yaw = mix(-ROSTO_YAW, ROSTO_YAW, s)
+    z = mix(ROSTO_Z[0], ROSTO_Z[1], t)
+    alvo = Vector((math.sin(yaw), -math.cos(yaw), 0)) * 0.3 + Vector((0, 0, z))
+    origem = Vector((0, 0.03, z))
+    d = (alvo - origem).normalized()
+    hit, normal, _, _ = bvh.ray_cast(origem, d, 1.0)
+    return hit + normal * afasta, normal
 
 
 def rosto():
-    bvh = BVHTree.FromPolygons(CABECA_PTS, CABECA_FACES)
+    bvh = _bvh_cabeca()
     nx, nz = 12, 8
     grade = []
     for j in range(nz + 1):
         t = j / nz
-        z = mix(ROSTO_Z[0], ROSTO_Z[1], t)
         linha = []
         for i in range(nx + 1):
             s = i / nx
-            yaw = mix(-ROSTO_YAW, ROSTO_YAW, s)
-            alvo = Vector((math.sin(yaw), -math.cos(yaw), 0)) * 0.3 + Vector((0, 0, z))
-            origem = Vector((0, 0.03, z))
-            d = (alvo - origem).normalized()
-            hit, normal, _, _ = bvh.ray_cast(origem, d, 1.0)
-            p = hit + normal * 0.006
+            p, _ = _no_rosto(bvh, s, t, 0.006)
             linha.append((M.v(p, {"head": 1}), s, t))
         grade.append(linha)
     for j in range(nz):
         for i in range(nx):
             cel = [grade[j][i], grade[j][i + 1], grade[j + 1][i + 1], grade[j + 1][i]]
-            # célula 0 do atlas: canto de cima à esquerda
             uvs = [(s / ATLAS_COLS, 1.0 - (1.0 - t) / ATLAS_ROWS) for _, s, t in cel]
-            M.face([c[0] for c in cel], 0, CABECA_C, material=1, uvs=uvs)
+            M.face([c[0] for c in cel], None, CABECA_C, material=1, uvs=uvs)
+            for c in cel:
+                M.contorno[c[0]] = 0.0
+
+
+def iris():
+    """Íris separadas (PDF §6.1): placas na frente da esclera, presas aos ossos eye.L/eye.R."""
+    bvh = _bvh_cabeca()
+    for (px, py), L, mat in zip(OLHOS_PX, ("R", "L"), (2, 3)):
+        s_c = px / ATLAS_CEL
+        t_c = 1.0 - py / ATLAS_CEL
+        ds = OLHO_RX * 0.80 / ATLAS_CEL
+        dt = OLHO_RY * 0.80 / ATLAS_CEL
+        pesos = {f"eye.{L}": 1}
+        n = 3  # grade 3 × 3 para acompanhar a curva do rosto
+        grade = [[M.v(_no_rosto(bvh, s_c + ds * (2 * i / n - 1), t_c + dt * (2 * j / n - 1), 0.013)[0], pesos)
+                  for i in range(n + 1)] for j in range(n + 1)]
+        for j in range(n):
+            for i in range(n):
+                ids = [grade[j][i], grade[j][i + 1], grade[j + 1][i + 1], grade[j + 1][i]]
+                uvs = [(i / n, j / n), ((i + 1) / n, j / n), ((i + 1) / n, (j + 1) / n), (i / n, (j + 1) / n)]
+                M.face(ids, None, CABECA_C, material=mat, uvs=uvs)
+                for k in ids:
+                    M.contorno[k] = 0.0
+        centro, normal = _no_rosto(bvh, s_c, t_c, 0.0)
+        osso(f"eye.{L}", centro - normal * 0.09, centro, "head")
 
 
 def orelha(s):
-    """Orelha de gato média e pontuda, virada para a frente. A esquerda tem um entalhe."""
+    """Orelha grande e pontuda, virada para a frente. A esquerda tem o entalhe."""
     L = "L" if s > 0 else "R"
-    w, h = 0.105, 0.115
-    if s > 0:  # entalhe na borda de fora, perto da ponta
+    w, h = 0.175, 0.20
+    if s > 0:
         contorno = [(-0.5, 0.0), (0.5, 0.0), (0.16, 0.74), (0.03, 0.76), (0.08, 0.86), (0.0, 1.0)]
     else:
         contorno = [(-0.5, 0.0), (0.5, 0.0), (0.0, 1.0)]
-    # quadro local: x para fora, y para cima, n para a frente
-    base = CABECA_C + Vector((s * 0.088, 0.02, 0.128))
-    cima = Matrix.Rotation(math.radians(-s * 16), 3, "Y") @ Matrix.Rotation(math.radians(-8), 3, "X") @ Vector((0, 0, 1))
+    base = CAP_C + Vector((s * 0.165, 0.02, 0.128))
+    cima = Matrix.Rotation(math.radians(-s * 30), 3, "Y") @ Matrix.Rotation(math.radians(-6), 3, "X") @ Vector((0, 0, 1))
     frente = Vector((0, -1, 0))
     frente = (frente - cima * frente.dot(cima)).normalized()
-    fora = Vector((1, 0, 0)) - cima * cima.x * s
+    fora = Vector((1, 0, 0))
     fora = (fora - frente * fora.dot(frente)).normalized()
 
     def P(x, y, prof):
         return base + fora * (x * s * w) + cima * (y * h) + frente * prof
 
     pesos = {f"ear.{L}": 1}
-    esp = lambda y: 0.012 * (1 - y) + 0.002
+    esp = lambda y: 0.016 * (1 - y) + 0.002
     fr = [M.v(P(x, y, esp(y)), pesos) for x, y in contorno]
     tr = [M.v(P(x, y, -esp(y)), pesos) for x, y in contorno]
     centro_f = M.v(P(0, 0.05, esp(0)), pesos)
@@ -471,183 +607,209 @@ def orelha(s):
         M.face([centro_f, fr[k], fr[k2]], COR["laranja"], dentro)
         M.face([centro_t, tr[k2], tr[k]], COR["laranja"], dentro)
         M.face([fr[k], tr[k], tr[k2], fr[k2]], COR["laranja"], dentro)
-    # parte de dentro rosada
-    interno = [(-0.30, 0.10), (0.30, 0.10), (0.0, 0.72)]
+    interno = [(-0.32, 0.10), (0.32, 0.10), (0.0, 0.74)]
     ii = [M.v(P(x, y, esp(y) + 0.003), pesos) for x, y in interno]
     M.face(ii, COR["orelha_int"], P(0, 0.3, -0.05))
-    osso(f"ear.{L}", base, base + cima * h, "head", corpo=False)
+    osso(f"ear.{L}", base, base + cima * h, "head")
 
 
-CAP_ESC = 1.13  # o cabelo é um volume bem maior que o crânio, como na série de referência
+# volume do cabelo: um elipsoide bem maior que o crânio, um pouco acima dele (topo largo da ficha)
+CAP_C = CABECA_C + Vector((0, 0.012, 0.035))
+CAP_R = Vector((0.245, 0.218, 0.205))
 
 
-def ponto_cranio(yaw_graus, z_rel, extra=0.0, esc=CAP_ESC):
-    """Ponto na superfície do cabelo: yaw 0 = frente, 90 = esquerda (+X). z_rel em metros."""
+def ponto_cap(yaw_graus, z, extra=0.0):
+    """Ponto na superfície do volume do cabelo: yaw 0 = frente, 90 = esquerda dela (+X); z relativo a CAP_C."""
     yaw = math.radians(yaw_graus)
-    r = CABECA_R * esc
-    zz = max(-0.999, min(0.999, z_rel / r.z))
+    zz = max(-0.999, min(0.999, z / CAP_R.z))
     c = math.sqrt(1 - zz * zz)
-    return CABECA_C + Vector((math.sin(yaw) * c * (r.x + extra), -math.cos(yaw) * c * (r.y + extra), z_rel))
+    return CAP_C + Vector((math.sin(yaw) * c * (CAP_R.x + extra), -math.cos(yaw) * c * (CAP_R.y + extra), z))
 
 
-def mecha(base, ponta, larg, esp, cor, pesos, frente):
-    piramide(base, ponta - base, (ponta - base).length + 0.035, larg, esp, cor, pesos, frente=frente, centro=CABECA_C)
+def _normal_cap(p):
+    q = p - CAP_C
+    return Vector((q.x / CAP_R.x ** 2, q.y / CAP_R.y ** 2, q.z / CAP_R.z ** 2)).normalized()
+
+
+def mecha_casca(yaw_a, yaw_b, z_base, yaw_p, z_p, levanta, cor, espessura=0.028, crista=0.018, ponta=None, n_base=3):
+    """Mecha facetada que acompanha a cabeça (PDF §2.5: arestas da borda puxadas e fundidas numa ponta).
+    A base é um arco da calota (afundado nela), a ponta sai para fora (levanta) e uma crista no meio
+    dá o vinco da mecha. Tem espessura, então de baixo ela não some."""
+    pesos = {"head": 1}
+    base = []
+    for k in range(n_base):
+        t = k / (n_base - 1)
+        b = ponto_cap(mix(yaw_a, yaw_b, t), z_base)
+        base.append(b - _normal_cap(b) * 0.012)
+    tip = ponta if ponta is not None else ponto_cap(yaw_p, z_p, levanta)
+    meio_base = sum(base, Vector()) / n_base
+    r = meio_base.lerp(tip, 0.5)
+    r = r + _normal_cap(r) * crista
+    nb = [_normal_cap(b) for b in base]
+    nr, nt = _normal_cap(r), _normal_cap(tip)
+    fora = [M.v(b, pesos) for b in base]
+    dentro = [M.v(b - n * espessura, pesos) for b, n in zip(base, nb)]
+    ir, it = M.v(r, pesos), M.v(tip, pesos)
+    ir2, it2 = M.v(r - nr * espessura * 0.8, pesos), M.v(tip - nt * espessura * 0.25, pesos)
+    for i in fora + dentro:
+        M.contorno[i] = 0.0
+    M.contorno[ir2] = 0.5
+    M.contorno[it2] = 0.5
+    interior = r - nr * espessura * 0.5  # um ponto dentro da mecha, para virar as faces para fora
+    for k in range(n_base - 1):
+        M.face([fora[k], fora[k + 1], ir], COR[cor], interior)
+        M.face([dentro[k], dentro[k + 1], ir2], COR["cabelo_dentro"], interior)
+    M.face([fora[0], ir, it], COR[cor], interior)
+    M.face([ir, fora[-1], it], COR[cor], interior)
+    M.face([dentro[0], ir2, it2], COR["cabelo_dentro"], interior)
+    M.face([ir2, dentro[-1], it2], COR["cabelo_dentro"], interior)
+    M.face([fora[0], it, it2, dentro[0]], COR[cor], interior)
+    M.face([fora[-1], dentro[-1], it2, it], COR[cor], interior)
+
+
+def ponto_cortina(yaw_graus, z, extra=0.0):
+    """Como ponto_cap, mas abaixo do 'equador' o cabelo cai reto em vez de fechar sob a cabeça."""
+    z_eq = -0.06
+    if z >= z_eq:
+        return ponto_cap(yaw_graus, z, extra)
+    p = ponto_cap(yaw_graus, z_eq, extra)
+    return Vector((p.x, p.y, CAP_C.z + z))
+
+
+def mecha_cortina(yaw_a, yaw_b, z_topo, z_base_frente, z_base_tras, abre_frente, abre_tras, colunas, dente,
+                  cores=("laranja", "laranja_esc"), espessura=0.022):
+    """Cortina de cabelo (laterais e nuca): cobre a cabeça do topo até as pontas, com a borda de baixo
+    serrilhada e listras escuras em colunas alternadas, abrindo para fora embaixo."""
+    pesos = {"head": 1}
+    n = colunas * 2  # pontas e reentrâncias alternadas
+    linhas = []
+    for k in range(n + 1):
+        t = k / n
+        yaw = mix(yaw_a, yaw_b, t)
+        z_b = mix(z_base_frente, z_base_tras, t) + (0.0 if k % 2 == 0 else dente)
+        abre = mix(abre_frente, abre_tras, t)
+        topo = ponto_cap(yaw, z_topo)
+        topo = topo - _normal_cap(topo) * 0.012
+        meio = ponto_cortina(yaw, -0.06, 0.012 + abre * 0.3)
+        fim = ponto_cortina(yaw, z_b, abre if k % 2 == 0 else abre * 0.7)
+        linhas.append((topo, meio, fim))
+    fora, dentro = [], []
+    for topo, meio, fim in linhas:
+        cent = Vector((CAP_C.x, CAP_C.y, 0))
+        def para_dentro(p, e):
+            d = Vector((p.x - CAP_C.x, p.y - CAP_C.y, 0)).normalized()
+            return p - d * e
+        f = [M.v(topo, pesos), M.v(meio, pesos), M.v(fim, pesos)]
+        d = [M.v(para_dentro(topo, espessura), pesos), M.v(para_dentro(meio, espessura), pesos),
+             M.v(para_dentro(fim, espessura * 0.6), pesos)]
+        M.contorno[f[0]] = 0.0
+        for i in d:
+            M.contorno[i] = 0.3
+        fora.append(f)
+        dentro.append(d)
+    V = M.verts
+
+    def eixo(ids):  # ponto no eixo da cabeça, na altura média da face
+        z = sum(V[i].z for i in ids) / len(ids)
+        return Vector((CAP_C.x, CAP_C.y, z))
+
+    def centro(ids):
+        return sum((V[i] for i in ids), Vector()) / len(ids)
+
+    for k in range(n):
+        cor = COR[cores[(k // 2) % 2]]
+        for r in range(2):
+            ext = [fora[k][r], fora[k + 1][r], fora[k + 1][r + 1], fora[k][r + 1]]
+            M.face(ext, cor, eixo(ext))
+            inn = [dentro[k][r], dentro[k][r + 1], dentro[k + 1][r + 1], dentro[k + 1][r]]
+            e = eixo(inn)
+            M.face(inn, COR["cabelo_dentro"], e + (centro(inn) - e) * 3)
+        baixo = [fora[k][2], fora[k + 1][2], dentro[k + 1][2], dentro[k][2]]
+        M.face(baixo, COR["cabelo_dentro"], centro(baixo) + Vector((0, 0, 0.1)))
+    for k, viz in ((0, 1), (n, n - 1)):  # tampas dos lados
+        tampa = [fora[k][0], fora[k][1], fora[k][2], dentro[k][2], dentro[k][1], dentro[k][0]]
+        M.face(tampa, COR[cores[0]], centro(fora[viz] + dentro[viz]))
 
 
 def cabelo():
-    """Volume de cabelo com mechas grandes e chapadas (franja, laterais, nuca) e o espetado atrás."""
+    """Capacete de cabelo (PDF §2.5) coberto de mechas facetadas em camadas: franja assimétrica,
+    laterais abrindo na altura do queixo, três fileiras atrás espetando para trás, tufos no topo
+    e o "M" das rajadas em V na testa."""
     pesos = {"head": 1}
-    R = CABECA_R
-    raios = R * CAP_ESC
-    pts, faces = esfera(CABECA_C + Vector((0, 0.008, 0.01)), raios, 12, 8)
+    pts, faces = esfera(CAP_C, CAP_R * 0.985, 16, 10)
     usados = {}
 
-    def limite(y_norm):
-        # linha do cabelo: alta na testa, desce dos lados e mais ainda na nuca
-        if y_norm < -0.76:
-            return 0.32 * R.z
-        if y_norm < -0.5:
-            return mix(0.32, -0.72, (y_norm + 0.76) / 0.26) * R.z
-        if y_norm < 0.15:
-            return -0.72 * R.z
-        return mix(-0.72, -0.60, (y_norm - 0.15) / 0.85) * R.z
+    def limite(yaw):
+        # pelo ângulo (não pela profundidade): os anéis de baixo encolhem e enganariam a conta
+        a = abs(yaw)
+        if a < 40:
+            return 0.055
+        if a < 70:
+            return mix(0.055, -0.08, (a - 40) / 30)
+        return -0.12
 
     for f in faces:
         c = sum((pts[i] for i in f), Vector()) / len(f)
-        rel = c - CABECA_C
-        if rel.z < limite(rel.y / raios.y):
+        rel = c - CAP_C
+        if rel.z < limite(math.degrees(math.atan2(rel.x, -rel.y))):
             continue
         idx = []
         for i in f:
             if i not in usados:
                 usados[i] = M.v(pts[i], pesos)
             idx.append(usados[i])
-        ang = math.degrees(math.atan2(rel.x, -rel.y)) % 360
-        cor = "laranja_esc" if (rel.z > 0.35 * R.z and int((ang + 15) // 30) % 3 == 0) else "laranja"
-        M.face(idx, COR[cor], CABECA_C)
+        M.face(idx, COR["laranja"], CAP_C)
 
-    # franja: mechas largas que descem até a linha dos olhos; as escuras desenham o "M"
-    franja = [(-54, 0.036, 0.12, "laranja"), (-29, 0.016, 0.125, "laranja_esc"), (-5, 0.006, 0.125, "laranja"),
-              (20, 0.014, 0.125, "laranja_esc"), (46, 0.032, 0.12, "laranja")]
-    for yaw, z_ponta, larg, cor in franja:
-        b = ponto_cranio(yaw * 0.8, 0.78 * R.z)
-        ponta = ponto_cranio(yaw * 0.95, z_ponta, 0.018, esc=1.0)
-        mecha(b, ponta, larg, 0.03, cor, pesos, (b - CABECA_C).normalized())
-    # laterais compridas emoldurando o rosto, até a altura do queixo
+    E, C_ = "laranja_esc", "laranja"
+    # o "M": V escuro na testa, entre os tufos e a franja
     for s in (1, -1):
-        for yaw, z_ponta, larg, cor in ((56, -0.13, 0.075, "laranja"), (74, -0.12, 0.085, "laranja_esc"),
-                                        (94, -0.10, 0.09, "laranja"), (112, -0.09, 0.09, "laranja_esc")):
-            b = ponto_cranio(s * yaw, 0.05)
-            ponta = ponto_cranio(s * (yaw + 4), z_ponta, 0.02, esc=1.05)
-            mecha(b, ponta, larg, 0.03, cor, pesos, (b - CABECA_C).normalized())
-    # nuca: borda serrilhada de mechas grandes
-    for k, yaw in enumerate(range(125, 240, 16)):
-        b = ponto_cranio(yaw, -0.25 * R.z)
-        ponta = ponto_cranio(yaw, -0.12, 0.05, esc=1.0) + Vector((0, 0.02, 0))
-        mecha(b, ponta, 0.085, 0.032, "laranja_esc" if k % 2 else "laranja", pesos, Vector((0, 0, 1)))
-    # espetado atrás, como quem acabou de correr
-    for yaw, z, incl, comp, cor in ((150, 0.45, 25, 0.10, "laranja"), (180, 0.55, 35, 0.11, "laranja_esc"),
-                                    (210, 0.45, 25, 0.10, "laranja"), (165, 0.15, 5, 0.09, "laranja_esc"),
-                                    (195, 0.15, 5, 0.09, "laranja"), (125, 0.35, 15, 0.08, "laranja_esc"),
-                                    (235, 0.35, 15, 0.08, "laranja")):
-        b = ponto_cranio(yaw, z * R.z)
-        n = (b - CABECA_C).normalized()
-        d = (n + Vector((0, 0.5, math.sin(math.radians(incl))))).normalized()
-        piramide(b, d, comp, 0.075, 0.035, cor, pesos, frente=Vector((0, 0, 1)), centro=CABECA_C)
-    # brilhos pintados no topo (triângulos claros por cima do volume)
-    for yaw in (-55, -25, 25, 55):
-        a = ponto_cranio(yaw - 5, 0.93 * R.z, 0.012)
-        b2 = ponto_cranio(yaw + 5, 0.93 * R.z, 0.012)
-        c = ponto_cranio(yaw + 2, 0.80 * R.z, 0.014)
-        M.face([M.v(a, pesos), M.v(b2, pesos), M.v(c, pesos)], COR["brilho"], CABECA_C)
-
-
-def rabo():
-    """Grosso, com anéis escuros e ponta clara, em pé como ponto de interrogação."""
-    pts, pesos, raios = [], [], []
-    n = len(RABO)
-    for i in range(n):
-        ossos = []
-        if i > 0:
-            ossos.append(f"tail.{i:03d}")
-        if i < n - 1:
-            ossos.append(f"tail.{i + 1:03d}")
-        pts.append(RABO[i])
-        pesos.append({o: 1.0 / len(ossos) for o in ossos})
-        raios.append(mix(0.043, 0.030, i / (n - 1)))
-        if i < n - 1:
-            pts.append((RABO[i] + RABO[i + 1]) / 2)
-            pesos.append({f"tail.{i + 1:03d}": 1.0})
-            raios.append(mix(0.043, 0.030, (i + 0.5) / (n - 1)))
-    # ponta arredondada
-    tang = (RABO[-1] - RABO[-2]).normalized()
-    pts.append(RABO[-1] + tang * 0.035)
-    pesos.append({f"tail.{n - 1:03d}": 1.0})
-    raios.append(0.016)
-    aneis = []
-    for i, p in enumerate(pts):
-        a = pts[max(0, i - 1)]
-        b = pts[min(len(pts) - 1, i + 1)]
-        aneis.append(anel(p, b - a, raios[i], raios[i], 6, 0.0, frente=Vector((1, 0, 0))))
-    cores = []
-    for i in range(len(pts) - 1):
-        if i >= len(pts) - 3:
-            cores.append("creme")
-        else:
-            cores.append("laranja_esc" if i % 2 == 1 else "laranja")
-    loft(aneis, pesos, cores, cor_tampa="laranja")
-
-
-def jaqueta():
-    """Jaqueta do treino amarrada na cintura."""
-    # faixa em volta do quadril (aberta, dupla face no Godot)
-    perfil = [(0.955, 0.162, 0.108), (1.025, 0.138, 0.095)]
-    aneis = [anel((0, 0, z), Vector((0, 0, 1)), rx, ry, 8, G8) for z, rx, ry in perfil]
-    loft(aneis, [{"hips": 1}] * 2, ["jaqueta"], tampa_ini=False, tampa_fim=False)
-    # mangas cruzando na frente e o nó
-    no = Vector((0.0, -0.112, 0.965))
+        trilha = [(s * 64, 0.17), (s * 44, 0.155), (s * 22, 0.13), (s * 3, 0.105)]
+        larg = 0.015
+        ant = None
+        for yaw, z in trilha:
+            c = ponto_cap(yaw, z, 0.004)
+            cima = (ponto_cap(yaw, z + 0.02, 0.004) - c).normalized()
+            par = [M.v(c + cima * larg, pesos), M.v(c - cima * larg, pesos)]
+            for i in par:
+                M.contorno[i] = 0.0
+            if ant:
+                M.face([ant[0], ant[1], par[1], par[0]], COR[E], CAP_C)
+            ant = par
+    # franja assimétrica: mechas largas que descem até a linha dos olhos, um pouco à frente do rosto
+    for ya, yb, yp, zp, cor in ((-66, -40, -58, -0.035, C_), (-46, -20, -34, -0.055, E), (-26, 0, -12, -0.07, C_),
+                                (-4, 22, 9, -0.065, C_), (16, 42, 30, -0.05, E), (38, 66, 56, -0.03, C_)):
+        mecha_casca(ya, yb, 0.115, yp, zp, 0.03, cor, espessura=0.025, crista=0.012)
+    # tufos nos cantos de cima (a silhueta quadrada da ficha)
     for s in (1, -1):
-        L = "L" if s > 0 else "R"
-        ini = Vector((s * 0.135, -0.07, 0.99))
-        fim = Vector((s * 0.03, -0.12, 0.80))
-        caminho = [ini, no + Vector((s * 0.01, 0, 0)), fim]
-        aneis = [anel(p, (caminho[min(i + 1, 2)] - caminho[max(i - 1, 0)]), 0.024, 0.016, 6, 0.0)
-                 for i, p in enumerate(caminho)]
-        loft(aneis, [{"hips": 1}, {"hips": 1}, {"hips": 0.6, f"thigh.{L}": 0.4}],
-             ["jaqueta", "jaqueta_esc" if s > 0 else "jaqueta"])
-    # corpo da jaqueta caindo atrás, em duas abas (o rabo passa no meio)
+        mecha_casca(s * 38, s * 70, 0.16, s * 70, 0.10, 0.07, C_, crista=0.02)
+        mecha_casca(s * 62, s * 92, 0.12, s * 92, 0.03, 0.08, E, crista=0.02)
+    # laterais: cortina do lado do rosto até o queixo, abrindo embaixo, com pontas e listras
     for s in (1, -1):
-        L = "L" if s > 0 else "R"
-        topo = [Vector((s * 0.04, 0.10, 0.96)), Vector((s * 0.15, 0.04, 0.96))]
-        baixo = [Vector((s * 0.035, 0.125, 0.76)), Vector((s * 0.165, 0.06, 0.78))]
-        esp = Vector((0, 0.008, 0))
-        pw = [{"hips": 1}, {"hips": 1}, {"hips": 0.5, f"thigh.{L}": 0.5}, {"hips": 0.5, f"thigh.{L}": 0.5}]
-        q = [topo[0], topo[1], baixo[1], baixo[0]]
-        fora = [M.v(p + esp, w) for p, w in zip(q, pw)]
-        dentro = [M.v(p - esp * 0.5, w) for p, w in zip(q, pw)]
-        meio = sum(q, Vector()) / 4 - Vector((0, 0.05, 0))
-        M.face(fora, COR["jaqueta"], meio)
-        M.face(dentro, COR["jaqueta_esc"], meio + Vector((0, 0.2, 0)))
-        for k in range(4):
-            k2 = (k + 1) % 4
-            M.face([fora[k], fora[k2], dentro[k2], dentro[k]], COR["jaqueta"], sum(q, Vector()) / 4)
-
-
-def estrela_peito():
-    """Símbolo da estrela na camisa de corrida (GDD §11.2)."""
-    c = Vector((0.06, -0.103, 1.17))
-    n = Vector((0, -1, 0.18)).normalized()
-    up = Vector((0, 0, 1))
-    up = (up - n * up.dot(n)).normalized()
-    lado = n.cross(up).normalized()
-    centro = M.v(c, {"chest": 1})
-    anel_e = []
-    for k in range(10):
-        r = 0.024 if k % 2 == 0 else 0.010
-        a = math.pi / 2 + 2 * math.pi * k / 10
-        anel_e.append(M.v(c + lado * math.cos(a) * r + up * math.sin(a) * r, {"chest": 1}))
-    for k in range(10):
-        M.face([centro, anel_e[k], anel_e[(k + 1) % 10]], COR["estrela"], c - n)
+        mecha_cortina(s * 63, s * 128, 0.09, -0.20, -0.15, 0.02, 0.10, 4, 0.06)
+        # duas mechas por cima, para a lateral não ficar lisa
+        mecha_casca(s * 70, s * 98, 0.06, s * 90, -0.16, 0.12, E, crista=0.02)
+        mecha_casca(s * 100, s * 126, 0.04, s * 118, -0.13, 0.13, C_, crista=0.02)
+    # atrás: três fileiras de mechas espetando para trás (como no perfil da ficha)
+    # nuca: cortina serrilhada de um lado ao outro
+    mecha_cortina(126, 234, 0.02, -0.17, -0.17, 0.07, 0.07, 5, 0.05, cores=("laranja_esc", "laranja"))
+    for z_b, z_p, lev, centros, larg in ((0.15, 0.03, 0.15, (128, 154, 180, 206, 232), 30),
+                                         (0.03, -0.09, 0.16, (122, 145, 168, 192, 215, 238), 26)):
+        for k, yc in enumerate(centros):
+            desvio = 6 if yc < 180 else (-6 if yc > 180 else 0)
+            mecha_casca(yc - larg / 2, yc + larg / 2, z_b, yc + desvio, z_p, lev, E if k % 2 else C_, crista=0.025)
+    # topo: três pontas para cima e para trás
+    for yc, dx in ((160, -0.05), (180, 0.0), (200, 0.05)):
+        ponta = CAP_C + Vector((dx * 1.4, 0.20, CAP_R.z + 0.03))
+        mecha_casca(yc - 18, yc + 18, 0.17, yc, 0.2, 0.0, C_ if yc == 180 else E, ponta=ponta, crista=0.015)
+    # brilhos pintados no topo
+    for yaw in (-34, 26):
+        a = ponto_cap(yaw - 6, 0.19, 0.006)
+        b2 = ponto_cap(yaw + 6, 0.19, 0.006)
+        c = ponto_cap(yaw + 2, 0.165, 0.008)
+        ids = [M.v(a, pesos), M.v(b2, pesos), M.v(c, pesos)]
+        for i in ids:
+            M.contorno[i] = 0.0
+        M.face(ids, COR["brilho"], CAP_C)
 
 
 # ---------------------------------------------------------------------------
@@ -659,35 +821,169 @@ def imagem(nome, arr):
     h, w = arr.shape[:2]
     img = bpy.data.images.new(nome, w, h, alpha=True)
     img.pixels.foreach_set(np.flipud(arr).astype(np.float32).ravel())
-    caminho = os.path.join(RAIZ, "arte", nome + ".png")
-    img.filepath_raw = caminho
+    img.filepath_raw = os.path.join(RAIZ, "arte", nome + ".png")
     img.file_format = "PNG"
     img.save()
     img.pack()
     return img
 
 
-def textura_paleta():
-    arr = np.zeros((len(PALETA) * PX_CELULA, TONS * PX_CELULA, 4))
+def _cor(nome):
+    return np.array(hex_rgb(dict(PALETA)[nome]))
+
+
+def _faixa_listra(S, N, zc, fora, w=0.011, incl=0.025, min_fora=0.2):
+    """Listra de gata: traço que afina para os lados, só no lado de fora do membro."""
+    f = N @ np.array(fora)
+    frente = N @ np.array((0, -1, 0))
+    return (f > min_fora) & (np.abs(S[..., 2] - zc - incl * frente) < w * np.clip((f - min_fora) / 0.6, 0, 1))
+
+
+def pintor_tronco(U, V, S, N):
+    z = S[..., 2]
+    x = S[..., 0]
+    cor = np.zeros(S.shape)
+    cor[:] = _cor("pele")
+    cor[z < 0.805] = _cor("preto")                              # short
+    top = (z > 0.915) & (z < 1.085)
+    cor[top] = _cor("preto")                                    # top esportivo
+    cor[(z > 0.915) & (z < 0.93)] = _cor("branco")              # barra do top
+    alca = (z >= 1.085) & (np.abs(np.abs(x) - 0.07) < 0.014)
+    cor[alca] = _cor("branco")
+    umbigo = (np.abs(x) < 0.006) & (np.abs(z - 0.86) < 0.008) & (S[..., 1] < 0)
+    cor[umbigo] = _cor("listra_pele")
+    return cor
+
+
+def pintor_perna(lado_s, curativo):
+    def pintor(U, V, S, N):
+        z = S[..., 2]
+        cor = np.zeros(S.shape)
+        cor[:] = _cor("pele")
+        fora = (lado_s, 0, 0)
+        for zc in (0.50, 0.36, 0.30):
+            cor[_faixa_listra(S, N, zc, fora)] = _cor("listra_pele")
+        cor[z > 0.545] = _cor("preto")
+        cor[(z > 0.545) & (z < 0.562)] = _cor("branco")          # barra do short
+        if curativo:
+            frente = N @ np.array((0, -1, 0))
+            band = (frente > 0.35) & (np.abs(z - 0.455) < 0.03)
+            cor[band] = _cor("curativo")
+            cor[band & (np.abs(z - 0.455) < 0.012) & (frente > 0.75)] = _cor("creme")
+        return cor
+    return pintor
+
+
+def pintor_braco(lado_s):
+    def pintor(U, V, S, N):
+        cor = np.zeros(S.shape)
+        cor[:] = _cor("pele")
+        fora = (lado_s * 0.8, 0.0, 0.6)
+        for zc, w in ((1.01, 0.010), (0.975, 0.009), (0.86, 0.009), (0.83, 0.008)):
+            cor[_faixa_listra(S, N, zc, fora, w=w, incl=0.02, min_fora=0.15)] = _cor("listra_pele")
+        return cor
+    return pintor
+
+
+def pintor_tenis(U, V, S, N):
+    z = S[..., 2]
+    cor = np.zeros(S.shape)
+    cor[:] = _cor("tenis")
+    lateral = np.abs(N[..., 0]) > 0.45
+    cor[(V > 0.30) & (V < 0.50) & lateral & (z > 0.05) & (z < 0.14)] = _cor("creme")
+    cor[(V > 0.70) & (z < 0.115)] = _cor("creme")               # biqueira
+    cor[z < 0.042] = _cor("sola")
+    return cor
+
+
+def pintor_rabo(U, V, S, N):
+    cor = np.zeros(S.shape)
+    cor[:] = _cor("laranja")
+    anel_esc = ((V * 7.0) % 1.0 > 0.55) & (V < 0.84)
+    cor[anel_esc] = _cor("laranja_esc")
+    cor[V > 0.9] = _cor("creme")
+    return cor
+
+
+def pintor_saia(U, V, S, N):
+    z = S[..., 2]
+    cor = np.zeros(S.shape)
+    cor[:] = _cor("vermelho")
+    cor[(z > 0.625) & (z < 0.645)] = _cor("creme")
+    cor[(z > 0.66) & (z < 0.672)] = _cor("creme")
+    return cor
+
+
+PINTORES = {
+    "tronco": pintor_tronco,
+    "perna_L": pintor_perna(1, False), "perna_R": pintor_perna(-1, True),
+    "braco_L": pintor_braco(1), "braco_R": pintor_braco(-1),
+    "tenis_L": pintor_tenis, "tenis_R": pintor_tenis,
+    "rabo": pintor_rabo, "saia": pintor_saia,
+}
+
+
+def _sombrear(cor, N):
+    d = N @ np.array(tuple(LUZ))
+    out = cor.copy()
+    luz = d > 0.55
+    out[luz] = np.minimum(1.0, cor[luz] * 1.06 + 0.06)
+    s1 = (d <= -0.25) & (d > -0.62)
+    out[s1] = cor[s1] * np.array((0.84, 0.74, 0.82))
+    s2 = d <= -0.62
+    out[s2] = cor[s2] * np.array((0.66, 0.54, 0.68))
+    return out
+
+
+def _pintar_regiao(arr, nome):
+    x0, y0, w, h = REGIOES[nome]
+    m = META[nome]
+    ys, xs = np.mgrid[0:h, 0:w].astype(float)
+    U = xs / (w - 1)
+    V = ys / (h - 1)
+    vr = np.array(m["v"])
+    j = np.clip(np.searchsorted(vr, V, side="right") - 1, 0, len(vr) - 2)
+    t = np.clip((V - vr[j]) / np.maximum(vr[j + 1] - vr[j], 1e-9), 0, 1)[..., None]
+
+    def lerp(lista):
+        a = np.array(lista)
+        if a.ndim == 1:
+            return (a[j] * (1 - t[..., 0]) + a[j + 1] * t[..., 0])[..., None]
+        return a[j] * (1 - t) + a[j + 1] * t
+
+    C = lerp(m["c"])
+    rx, ry = lerp(m["rx"]), lerp(m["ry"])
+    la, fr = lerp(m["lado"]), lerp(m["frente"])
+    la /= np.linalg.norm(la, axis=-1, keepdims=True)
+    fr /= np.linalg.norm(fr, axis=-1, keepdims=True)
+    lados = m["lados"]
+    if m["fechado"]:
+        a = m["giro"] + 2 * math.pi * U
+    else:  # tira aberta (saia): u vai do primeiro ao último ponto
+        a = m["giro"] + (2 * math.pi - 2 * 0.8) * U
+    a = a[..., None]
+    S = C + la * np.cos(a) * rx + fr * np.sin(a) * ry
+    N = la * np.cos(a) / rx + fr * np.sin(a) / ry
+    N /= np.linalg.norm(N, axis=-1, keepdims=True)
+    cor = PINTORES[nome](U, V, S, N)
+    arr[y0:y0 + h, x0:x0 + w, :3] = _sombrear(cor, N)
+    arr[y0:y0 + h, x0:x0 + w, 3] = 1.0
+
+
+def textura_atlas():
+    arr = np.zeros((ATLAS, ATLAS, 4))
+    arr[..., 3] = 1.0
     for i, (_, hx) in enumerate(PALETA):
-        for t in range(TONS):
-            arr[i * PX_CELULA:(i + 1) * PX_CELULA, t * PX_CELULA:(t + 1) * PX_CELULA] = (*tom_rgb(hex_rgb(hx), t), 1)
-    return imagem("lira_paleta", arr)
+        for t in range(4):
+            arr[i * PAL_LINHA:(i + 1) * PAL_LINHA, t * PAL_COLUNA:(t + 1) * PAL_COLUNA, :3] = tom_rgb(hex_rgb(hx), t)
+    for nome in REGIOES:
+        if nome in META:
+            _pintar_regiao(arr, nome)
+    return imagem("lira_textura", arr)
 
 
-def atlas_rosto():
-    W, H = ATLAS_COLS * ATLAS_CEL, ATLAS_ROWS * ATLAS_CEL
-    arr = np.zeros((H, W, 4))
-    yy, xx = np.mgrid[0:ATLAS_CEL, 0:ATLAS_CEL].astype(float) + 0.5
-
-    escuro = (*hex_rgb("#2A1A16"), 1)
-    branco = (1, 1, 1, 1)
-    iris = (*hex_rgb("#8FD16A"), 1)
-    iris_esc = (*hex_rgb("#3F8A3A"), 1)
-    pupila = (*hex_rgb("#1D2A1A"), 1)
-    boca = (*hex_rgb("#7A3A30"), 1)
-    lingua = (*hex_rgb("#E07A72"), 1)
-    rubor = (*hex_rgb("#F2A0A0"), 0.55)
+def _ferramentas(tam):
+    yy, xx = np.mgrid[0:tam, 0:tam].astype(float) + 0.5
 
     def elipse(cx, cy, rx, ry):
         return ((xx - cx) / rx) ** 2 + ((yy - cy) / ry) ** 2 <= 1
@@ -704,88 +1000,101 @@ def atlas_rosto():
             m |= segmento(*a, *b, esp)
         return m
 
-    def arco(cx, cy, rx, ry, a0, a1, esp, n=14):
-        pts = [(cx + rx * math.cos(a), cy + ry * math.sin(a)) for a in np.linspace(a0, a1, n)]
-        return curva(pts, esp)
+    def arco(cx, cy, rx, ry, a0, a1, esp, n=16):
+        return curva([(cx + rx * math.cos(a), cy + ry * math.sin(a)) for a in np.linspace(a0, a1, n)], esp)
+
+    return yy, xx, elipse, segmento, curva, arco
+
+
+def atlas_rosto():
+    """Rosto 2D (PDF §6): esclera, cílios, boca e as listras das bochechas. A íris é à parte."""
+    W, H = ATLAS_COLS * ATLAS_CEL, ATLAS_ROWS * ATLAS_CEL
+    arr = np.zeros((H, W, 4))
+    yy, xx, elipse, segmento, curva, arco = _ferramentas(ATLAS_CEL)
+    escuro = (*hex_rgb("#2A1A16"), 1)
+    branco = (1, 1, 1, 1)
+    boca = (*hex_rgb("#7A3A30"), 1)
+    lingua = (*hex_rgb("#E8706A"), 1)
+    rubor = (*hex_rgb("#F2A0A0"), 0.6)
+    listra = (*hex_rgb(dict(PALETA)["listra_pele"]), 1)
+    verde = (*hex_rgb("#5DB04A"), 1)
+    BOCA = (64, 112)
 
     def pinta(cel, mask, cor):
         cel[mask] = cor
 
-    # olhos: centro (x, y) e raios, no espaço da célula (y para baixo)
-    OLHOS = [(37, 64), (91, 64)]
-    RX, RY = 14.0, 19.5
-    BOCA = (64, 108)
-
-    def olho_aberto(cel, cx, cy, lado, rx=RX, ry=RY, corte=0.0, pupila_r=1.0):
-        # corte: fração de cima tampada (cansada)
-        dentro = elipse(cx, cy, rx, ry)
-        topo = cy - ry + corte * 2 * ry
-        dentro &= yy >= topo
-        pinta(cel, dentro, branco)
-        ir = elipse(cx, cy + 1.5, rx * 0.86, ry * 0.86) & dentro
-        pinta(cel, ir, iris)
-        pinta(cel, ir & (yy < cy - ry * 0.25), iris_esc)
-        pinta(cel, elipse(cx, cy + 2.5, rx * 0.42 * pupila_r, ry * 0.45 * pupila_r) & dentro, pupila)
-        pinta(cel, elipse(cx - 3.5 * lado, cy - 5, 2.6, 3.4) & dentro, branco)
-        pinta(cel, elipse(cx + 3 * lado, cy + 6, 1.4, 1.8) & dentro, branco)
-        # contorno e cílio grosso em cima, com pontinha para fora
-        borda = elipse(cx, cy, rx + 1.6, ry + 1.6) & ~elipse(cx, cy, rx, ry) & (yy >= topo - 2)
+    def olho_aberto(cel, cx, cy, lado, rx=OLHO_RX, ry=OLHO_RY):
+        pinta(cel, elipse(cx, cy, rx, ry), branco)
+        borda = elipse(cx, cy, rx + 1.6, ry + 1.6) & ~elipse(cx, cy, rx, ry)
         pinta(cel, borda & (yy > cy), escuro)
-        cilio = arco(cx, cy if corte == 0 else topo + ry * 0.2, rx + 1.0, ry * (1 - corte) + 1.0 if corte == 0 else 3.0,
-                     math.pi * 1.05, math.pi * 1.95, 2.4)
-        pinta(cel, cilio, escuro)
-        pinta(cel, segmento(cx + (rx + 0.5) * lado, cy - ry * 0.55, cx + (rx + 5) * lado, cy - ry * 0.85, 1.6), escuro)
-        if corte > 0:
-            pinta(cel, segmento(cx - rx - 1, topo, cx + rx + 1, topo, 1.8), escuro)
+        pinta(cel, arco(cx, cy, rx + 1.0, ry + 1.0, math.pi * 1.02, math.pi * 1.98, 2.8), escuro)
+        pinta(cel, segmento(cx + (rx + 0.5) * lado, cy - ry * 0.5, cx + (rx + 6) * lado, cy - ry * 0.85, 1.8), escuro)
 
-    def sobrancelha(cel, cx, cy, lado, incl):
-        # incl > 0: ponta de dentro para baixo (brava); < 0: para cima (triste)
-        dentro_x = cx - 11 * lado
-        fora_x = cx + 12 * lado
-        pinta(cel, segmento(fora_x, cy - 29, dentro_x, cy - 29 + incl, 2.0), escuro)
+    def fechado(cel, cx, cy, feliz=False):
+        if feliz:  # ^ ^
+            pinta(cel, arco(cx, cy + 6, OLHO_RX, OLHO_RY * 0.7, math.pi * 1.1, math.pi * 1.9, 2.8), escuro)
+        else:      # olhos calmos fechados, curva para baixo
+            pinta(cel, arco(cx, cy - 2, OLHO_RX, OLHO_RY * 0.5, math.pi * 0.1, math.pi * 0.9, 2.6), escuro)
+
+    def piscando(cel, cx, cy, lado):  # > ou <
+        pinta(cel, curva([(cx - 11 * lado, cy - 9), (cx + 9 * lado, cy), (cx - 11 * lado, cy + 9)], 2.6), escuro)
+
+    def espiral(cel, cx, cy):
+        pinta(cel, elipse(cx, cy, OLHO_RX, OLHO_RY), branco)
+        pts = [(cx + (1.5 + 1.9 * a) * math.cos(a) * 0.95, cy + (1.5 + 1.9 * a) * math.sin(a) * 1.25)
+               for a in np.linspace(0, 5.5 * math.pi / 1.0, 60)]
+        pinta(cel, curva(pts, 1.5) & elipse(cx, cy, OLHO_RX, OLHO_RY), verde)
+        borda = elipse(cx, cy, OLHO_RX + 1.6, OLHO_RY + 1.6) & ~elipse(cx, cy, OLHO_RX, OLHO_RY)
+        pinta(cel, borda, escuro)
+
+    def sobrancelha(cel, cx, cy, lado, incl=-1):
+        pinta(cel, segmento(cx + 13 * lado, cy - 34, cx - 12 * lado, cy - 34 + incl, 2.0), escuro)
 
     def celula(nome):
         cel = np.zeros((ATLAS_CEL, ATLAS_CEL, 4))
-        for (cx, cy), lado in zip(OLHOS, (-1, 1)):
-            # bochechas coradas, bem leves
-            pinta(cel, elipse(cx + 3 * lado, cy + 27, 10, 4), rubor)
+        for (cx, cy), lado in zip(OLHOS_PX, (-1, 1)):
+            pinta(cel, elipse(cx + 2 * lado, cy + 32, 10, 4), rubor)
+            # listras de gata nas bochechas (3 traços para fora)
+            for k in range(3):
+                y = cy + 27 + k * 6
+                pinta(cel, segmento(cx + (6 + k) * lado, y, cx + (17 + k) * lado, y - 2, 1.4), listra)
         bx, by = BOCA
+        olhos = list(zip(OLHOS_PX, (-1, 1)))
         if nome == "normal":
-            for (cx, cy), lado in zip(OLHOS, (-1, 1)):
+            for (cx, cy), lado in olhos:
                 olho_aberto(cel, cx, cy, lado)
-                sobrancelha(cel, cx, cy, lado, -1)
+                sobrancelha(cel, cx, cy, lado)
             pinta(cel, arco(bx, by - 4, 6, 4, 0.15 * math.pi, 0.85 * math.pi, 1.4), boca)
+        elif nome == "fechados":
+            for (cx, cy), lado in olhos:
+                fechado(cel, cx, cy)
+                sobrancelha(cel, cx, cy + 2, lado, -2)
+            pinta(cel, arco(bx, by - 4, 5, 3, 0.15 * math.pi, 0.85 * math.pi, 1.4), boca)
         elif nome == "feliz":
-            for (cx, cy), lado in zip(OLHOS, (-1, 1)):
-                pinta(cel, arco(cx, cy + 4, RX, RY * 0.7, math.pi * 1.1, math.pi * 1.9, 2.6), escuro)
-                sobrancelha(cel, cx, cy - 3, lado, -2)
-            m = elipse(bx, by - 2, 9, 7) & (yy >= by - 3)
+            for (cx, cy), lado in olhos:
+                fechado(cel, cx, cy, feliz=True)
+                sobrancelha(cel, cx, cy - 2, lado, -3)
+            m = elipse(bx, by - 3, 10, 8) & (yy >= by - 4)
             pinta(cel, m, boca)
-            pinta(cel, elipse(bx, by + 3, 5, 3) & m, lingua)
-        elif nome == "determinada":
-            for (cx, cy), lado in zip(OLHOS, (-1, 1)):
-                olho_aberto(cel, cx, cy + 1, lado, ry=RY * 0.9, corte=0.18)
-                pinta(cel, segmento(cx + 14 * lado, cy - 26, cx - 11 * lado, cy - 16, 2.6), escuro)
-            pinta(cel, curva([(bx - 7, by - 1), (bx, by - 3), (bx + 7, by - 1)], 1.5), boca)
-            pinta(cel, segmento(bx + 4, by - 2.5, bx + 7, by - 5, 1.2), boca)
-        elif nome == "cansada":
-            for (cx, cy), lado in zip(OLHOS, (-1, 1)):
-                olho_aberto(cel, cx, cy + 2, lado, corte=0.5, pupila_r=0.9)
-                sobrancelha(cel, cx, cy + 3, lado, -4)
-            pinta(cel, elipse(bx, by - 1, 4, 3.5), boca)
-            pinta(cel, elipse(108, 44, 3, 5) | (elipse(108, 41, 1.6, 4) & (yy < 41)), (*hex_rgb("#9AD4F0"), 1))
-        elif nome == "triste":
-            for (cx, cy), lado in zip(OLHOS, (-1, 1)):
-                olho_aberto(cel, cx, cy + 2, lado, ry=RY * 0.92, corte=0.12)
-                sobrancelha(cel, cx, cy, lado, -8)
-                pinta(cel, elipse(cx - 6 * lado, cy + 16, 2, 3), (*hex_rgb("#9AD4F0"), 1))
-            pinta(cel, arco(bx, by + 2, 6, 4, 1.15 * math.pi, 1.85 * math.pi, 1.4), boca)
+            pinta(cel, elipse(bx, by + 3, 6, 3.5) & m, lingua)
         elif nome == "surpresa":
-            for (cx, cy), lado in zip(OLHOS, (-1, 1)):
-                olho_aberto(cel, cx, cy - 1, lado, rx=RX * 1.05, ry=RY * 1.08, pupila_r=0.6)
+            for (cx, cy), lado in olhos:
+                olho_aberto(cel, cx, cy - 1, lado, rx=OLHO_RX * 1.04, ry=OLHO_RY * 1.06)
                 sobrancelha(cel, cx, cy - 6, lado, -3)
-            pinta(cel, elipse(bx, by - 1, 5, 6.5), boca)
-            pinta(cel, elipse(bx, by + 2, 3, 2.5), lingua)
+            pinta(cel, elipse(bx, by - 1, 3.5, 4.5), boca)
+        elif nome == "tonta":
+            for (cx, cy), lado in olhos:
+                espiral(cel, cx, cy)
+                sobrancelha(cel, cx, cy, lado, -4)
+            pinta(cel, curva([(bx - 4, by), (bx, by - 4), (bx + 4, by)], 1.4), boca)
+        elif nome == "piscadinha":
+            (cxd, cyd), (cxe, cye) = OLHOS_PX
+            olho_aberto(cel, cxd, cyd, -1)
+            sobrancelha(cel, cxd, cyd, -1)
+            piscando(cel, cxe, cye, 1)
+            sobrancelha(cel, cxe, cye + 3, 1, -3)
+            pinta(cel, arco(bx, by - 5, 7, 4, 0.1 * math.pi, 0.9 * math.pi, 1.4), boca)
+            pinta(cel, elipse(bx + 2, by + 1, 3.5, 4.5) & (yy > by - 2), lingua)
         return cel
 
     for i, nome in enumerate(EXPRESSOES):
@@ -794,7 +1103,23 @@ def atlas_rosto():
     return imagem("lira_rosto", arr)
 
 
+def textura_iris():
+    tam = 64
+    yy, xx, elipse, segmento, curva, arco = _ferramentas(tam)
+    arr = np.zeros((tam, tam, 4))
+    c = tam / 2
+    fora = elipse(c, c, 29, 31)
+    arr[fora] = (*hex_rgb("#2E6B2A"), 1)
+    arr[elipse(c, c + 2, 26, 27)] = (*hex_rgb("#7CC85A"), 1)
+    arr[elipse(c, c + 2, 26, 27) & (yy < c - 6)] = (*hex_rgb("#3F8A3A"), 1)
+    arr[elipse(c, c + 3, 11, 16)] = (*hex_rgb("#17221A"), 1)
+    arr[elipse(c - 9, c - 9, 6, 7)] = (1, 1, 1, 1)
+    arr[elipse(c + 8, c + 12, 3, 3.5)] = (1, 1, 1, 1)
+    return imagem("lira_iris", arr)
+
+
 def material(nome, img, alpha=False):
+    """Material sem luz (PDF §3.2): a cor da textura vai na base e na emissão."""
     mat = bpy.data.materials.new(nome)
     mat.use_nodes = True
     nt = mat.node_tree
@@ -803,6 +1128,12 @@ def material(nome, img, alpha=False):
     tex.image = img
     tex.interpolation = "Closest"
     nt.links.new(tex.outputs["Color"], bsdf.inputs["Base Color"])
+    for nome_in in ("Emission Color", "Emission"):
+        if nome_in in bsdf.inputs:
+            nt.links.new(tex.outputs["Color"], bsdf.inputs[nome_in])
+            break
+    if "Emission Strength" in bsdf.inputs:
+        bsdf.inputs["Emission Strength"].default_value = 1.0
     bsdf.inputs["Roughness"].default_value = 1.0
     if alpha:
         nt.links.new(tex.outputs["Alpha"], bsdf.inputs["Alpha"])
@@ -819,6 +1150,11 @@ def material(nome, img, alpha=False):
 
 def limpar():
     bpy.ops.wm.read_factory_settings(use_empty=True)
+    cena = bpy.context.scene
+    try:  # PDF §1.2: sem AgX, cor da textura 1:1
+        cena.view_settings.view_transform = "Standard"
+    except TypeError:
+        pass
 
 
 def normal_face(idx):
@@ -830,22 +1166,22 @@ def normal_face(idx):
 
 
 def tom_da_face(idx, cor):
-    """Sombra pintada: escolhe o tom da paleta pela direção da face em relação à LUZ."""
     nome = PALETA[cor][0]
     if nome in SEM_SOMBRA:
         return 0 if nome == "brilho" else 1
-    d = normal_face(idx).dot(LUZ)
-    tom = 0 if d > 0.62 else 1 if d > -0.3 else 2 if d > -0.72 else 3
-    centro = sum((M.verts[i] for i in idx), Vector()) / len(idx)
     n = normal_face(idx)
-    if nome == "pele" and (centro - CABECA_C).length < 0.2 and n.y < -0.25:
-        return 1  # rosto chapado, como nas texturas pintadas da referência
-    if nome == "pele" and abs(centro.x) < 0.07 and centro.z < CABECA_C.z - 0.12 and centro.z > 1.1:
+    centro = sum((M.verts[i] for i in idx), Vector()) / len(idx)
+    if nome == "pele" and (centro - CABECA_C).length < 0.22 and n.y < -0.25:
+        return 1  # rosto chapado
+    tom = tom_da_luz(n.dot(LUZ))
+    if nome == "pele" and (centro - CABECA_C).length < 0.24:
+        return min(tom, 2)  # lados da cabeça: no máximo a sombra rosada, nunca a funda
+    if nome == "pele" and abs(centro.x) < 0.07 and 1.08 < centro.z < CABECA_C.z - 0.12:
         tom = max(tom, 2)  # pescoço na sombra da cabeça
     return tom
 
 
-def contorno(faces_ok, espessura=0.0065):
+def contorno(faces_ok, espessura=0.007):
     """Contorno preto por casco invertido: cópia inflada pelas normais suaves, com as faces viradas."""
     chave = lambda v: (round(v.x, 4), round(v.y, 4), round(v.z, 4))
     soma = {}
@@ -886,23 +1222,28 @@ def contorno(faces_ok, espessura=0.0065):
     return ob, pesos
 
 
+def _alargar_corpo():
+    """Alarga x e y de tudo que não é da cabeça (depois de modelar, antes de montar a malha)."""
+    for i, v in enumerate(M.verts):
+        if not any(o in OSSOS_CABECA for o in M.pesos[i]):
+            M.verts[i] = Vector((v.x * LARGURA_CORPO.x, v.y * LARGURA_CORPO.y, v.z))
+
+
 def montar_malha():
-    M.corpo = True
     tronco()
+    pescoco()
     for s in (1, -1):
         perna(s)
+        tenis(s)
         braco(s)
-    M.corpo = False
-    for s in (1, -1):
         orelha(s)
+    jaqueta()
+    rabo()
     cabeca()
     rosto()
+    iris()
     cabelo()
-    M.corpo = True
-    rabo()
-    jaqueta()
-    estrela_peito()
-    M.corpo = False
+    _alargar_corpo()
 
     me = bpy.data.meshes.new("Lira")
     me.from_pydata([tuple(v) for v in M.verts], [], [f[0] for f in M.faces])
@@ -910,19 +1251,23 @@ def montar_malha():
     uv = me.uv_layers.new(name="UVMap")
     for poly, (idx, cor, mat, uvs) in zip(me.polygons, M.faces):
         poly.material_index = mat
-        tom = tom_da_face(idx, cor) if not uvs else 1
+        if uvs is None:
+            tom = tom_da_face(idx, cor)
+            uvs = [uv_da_cor(cor, tom)] * len(idx)
         for k, li in enumerate(poly.loop_indices):
-            uv.data[li].uv = uvs[k] if uvs else uv_da_cor(cor, tom)
-    me.materials.append(material("Lira_Paleta", textura_paleta()))
+            uv.data[li].uv = uvs[k]
+    img_iris = textura_iris()
+    me.materials.append(material("Lira_Textura", textura_atlas()))
     me.materials.append(material("Lira_Rosto", atlas_rosto(), alpha=True))
+    me.materials.append(material("Lira_IrisD", img_iris, alpha=True))
+    me.materials.append(material("Lira_IrisE", img_iris, alpha=True))
     for p in me.polygons:
         p.use_smooth = False
     ob = bpy.data.objects.new("Lira", me)
     bpy.context.scene.collection.objects.link(ob)
     tris = sum(len(p.vertices) - 2 for p in me.polygons)
     print(f"[lira] vértices {len(me.vertices)}  triângulos {tris}")
-    # o contorno ignora o rosto e os detalhes chapados por cima da malha
-    fora = {COR["brilho"], COR["orelha_int"], COR["estrela"]}
+    fora = {COR["brilho"], COR["orelha_int"]}
     faces_ok = [f for f in M.faces if f[2] == 0 and f[1] not in fora]
     cont, pesos_cont = contorno(faces_ok)
     return ob, cont, pesos_cont
@@ -934,9 +1279,14 @@ def montar_esqueleto():
     bpy.context.scene.collection.objects.link(ob)
     bpy.context.view_layer.objects.active = ob
     ob.select_set(True)
+    arm.show_axes = False
+    ob.show_in_front = True  # PDF §4.1
     bpy.ops.object.mode_set(mode="EDIT")
     for nome, h, t, pai, deforma in OSSOS:
         eb = arm.edit_bones.new(nome)
+        if nome not in OSSOS_CABECA:
+            h = Vector((h.x * LARGURA_CORPO.x, h.y * LARGURA_CORPO.y, h.z))
+            t = Vector((t.x * LARGURA_CORPO.x, t.y * LARGURA_CORPO.y, t.z))
         eb.head, eb.tail = h, t
         eb.use_deform = deforma
         eb.align_roll(Vector((0, -1, 0)) if abs((t - h).normalized().y) < 0.9 else Vector((0, 0, 1)))
@@ -962,86 +1312,26 @@ def pesar(malha, rig, lista_pesos):
 
 
 # ---------------------------------------------------------------------------
-# Animações
+# Animação de reserva (sem os FBX do Mixamo)
 # ---------------------------------------------------------------------------
 
-def rot_mundo(rig, osso_nome, eixo, graus):
-    """Rotação em torno de um eixo do mundo, convertida para o espaço do osso em repouso."""
-    m = rig.data.bones[osso_nome].matrix_local.to_3x3()
-    r = Matrix.Rotation(math.radians(graus), 3, eixo)
-    return (m.inverted() @ r @ m).to_quaternion()
-
-
-def pose(rig, quadro, rots, locs=None):
-    """rots: {osso: [(eixo, graus), ...]}; aplica e grava chave em todos os ossos."""
-    for pb in rig.pose.bones:
-        pb.rotation_mode = "QUATERNION"
-        q = Quaternion()
-        for eixo, g in rots.get(pb.name, []):
-            q = rot_mundo(rig, pb.name, eixo, g) @ q
-        pb.rotation_quaternion = q
-        pb.location = (locs or {}).get(pb.name, (0, 0, 0))
-        pb.keyframe_insert("rotation_quaternion", frame=quadro)
-        pb.keyframe_insert("location", frame=quadro)
-
-
-def nova_acao(rig, nome):
-    acao = bpy.data.actions.new(nome)
+def anim_parada(rig):
+    acao = bpy.data.actions.new("parada")
     acao.use_fake_user = True
     if rig.animation_data is None:
         rig.animation_data_create()
     rig.animation_data.action = acao
-    return acao
-
-
-def anim_parada(rig):
-    acao = nova_acao(rig, "parada")
-    N = 48
-    for f in range(0, N + 1, 4):
-        p = 2 * math.pi * f / N
-        respira = math.sin(p)
-        rots = {
-            "spine": [("X", 1.5 * respira)],
-            "chest": [("X", 1.0 * respira)],
-            "head": [("X", -1.5 * respira), ("Z", 3 * math.sin(p * 0.5))],
-            "upper_arm.L": [("Y", 4 + 1.5 * respira)],
-            "upper_arm.R": [("Y", -4 - 1.5 * respira)],
-            "forearm.L": [("X", -8)],
-            "forearm.R": [("X", -8)],
-        }
-        # rabo em pé, balançando de leve, com atraso ao longo da corrente
-        for i in range(1, len(RABO)):
-            rots[f"tail.{i:03d}"] = [("Z", 6 * math.sin(p - i * 0.6))]
-        # orelha esquerda dá uma tremidinha
-        tre = 12 if f in (32, 36) else 0
-        rots["ear.L"] = [("Y", -tre)]
-        rots["ear.R"] = [("Y", 2 * respira)]
-        pose(rig, f + 1, rots, {"hips": (0, -0.004 * (1 - respira) * 0.5, 0)})
-    acao.frame_range = (1, N + 1)
-    return acao
-
-
-def anim_correr(rig):
-    acao = nova_acao(rig, "correr")
-    N = 16
-    for f in range(0, N + 1, 2):
-        p = 2 * math.pi * f / N
-        rots = {"spine": [("X", 8)], "chest": [("X", 4), ("Z", 6 * math.cos(p))],
-                "hips": [("Z", -5 * math.cos(p))], "head": [("X", -9)], "neck": [("X", -2)]}
-        for s, L, fase in ((1, "L", 0.0), (-1, "R", math.pi)):
-            q = p + fase
-            rots[f"thigh.{L}"] = [("X", -38 * math.cos(q) + 6)]
-            rots[f"shin.{L}"] = [("X", 12 + 80 * max(0.0, -math.sin(q)) + 10 * max(0.0, math.sin(q)))]
-            rots[f"foot.{L}"] = [("X", 18 * max(0.0, -math.sin(q)) - 8 * math.cos(q))]
-            # braço oposto à perna, cotovelo dobrado, mais perto do corpo
-            rots[f"upper_arm.{L}"] = [("Y", s * 22), ("X", 38 * math.cos(q))]
-            rots[f"forearm.{L}"] = [("X", -72 - 12 * math.cos(q))]
-            rots[f"ear.{L}"] = [("X", -18)]
-        rots["tail.001"] = [("X", -38), ("Z", 8 * math.sin(p))]
-        for i in range(2, len(RABO)):
-            rots[f"tail.{i:03d}"] = [("X", -14), ("Z", 7 * math.sin(p - i * 0.7))]
-        bob = 0.03 * abs(math.sin(p))
-        pose(rig, f + 1, rots, {"hips": (0, bob - 0.02, 0)})
+    N = 60
+    for f in range(0, N + 1, 6):
+        respira = math.sin(2 * math.pi * f / N)
+        for pb in rig.pose.bones:
+            pb.rotation_mode = "QUATERNION"
+            q = Quaternion()
+            if pb.name in ("spine", "chest"):
+                m = rig.data.bones[pb.name].matrix_local.to_3x3()
+                q = (m.inverted() @ Matrix.Rotation(math.radians(1.5 * respira), 3, "X") @ m).to_quaternion()
+            pb.rotation_quaternion = q
+            pb.keyframe_insert("rotation_quaternion", frame=f + 1)
     acao.frame_range = (1, N + 1)
     return acao
 
@@ -1066,14 +1356,9 @@ def exportar(rig):
     os.makedirs(os.path.join(RAIZ, "modelos"), exist_ok=True)
     caminho = os.path.join(RAIZ, "modelos", "lira.glb")
     bpy.ops.object.select_all(action="DESELECT")
-    kw = dict(filepath=caminho, export_format="GLB", export_skins=True, export_animations=True,
-              export_animation_mode="NLA_TRACKS", export_yup=True, export_apply=False,
-              export_texcoords=True, export_normals=True, export_materials="EXPORT")
-    try:
-        bpy.ops.export_scene.gltf(**kw)
-    except TypeError as e:
-        print("[lira] export: parâmetro rejeitado:", e)
-        raise
+    bpy.ops.export_scene.gltf(filepath=caminho, export_format="GLB", export_skins=True, export_animations=True,
+                              export_animation_mode="NLA_TRACKS", export_yup=True, export_apply=False,
+                              export_texcoords=True, export_normals=True, export_materials="EXPORT")
     print("[lira] exportado:", caminho, os.path.getsize(caminho), "bytes")
 
 
@@ -1086,18 +1371,20 @@ def exportar_fbx_mixamo(malha):
     bpy.ops.export_scene.fbx(filepath=caminho, use_selection=True, use_armature_deform_only=True,
                              add_leaf_bones=False, path_mode="COPY", embed_textures=True,
                              use_mesh_modifiers=False)
-    print("[lira] fbx para o Mixamo:", caminho)
 
 
-def previas(rig, malha):
+def _posar_repouso(rig):
     for pb in rig.pose.bones:
         pb.rotation_quaternion = Quaternion()
         pb.location = (0, 0, 0)
+
+
+def previas(rig):
+    _posar_repouso(rig)
     pasta = os.path.join(RAIZ, "arte", "previa")
     os.makedirs(pasta, exist_ok=True)
     cena = bpy.context.scene
-    for motor in ("BLENDER_WORKBENCH",):
-        cena.render.engine = motor
+    cena.render.engine = "BLENDER_WORKBENCH"
     sh = cena.display.shading
     sh.light = "FLAT"
     sh.show_backface_culling = True
@@ -1106,47 +1393,40 @@ def previas(rig, malha):
     sh.show_cavity = False
     cena.render.resolution_x = 900
     cena.render.resolution_y = 1100
-    cena.render.film_transparent = False
-    mundo = bpy.data.worlds.new("Fundo")
-    cena.world = mundo
+    cena.world = bpy.data.worlds.new("Fundo")
     cam_d = bpy.data.cameras.new("Cam")
     cam_d.type = "ORTHO"
-    cam_d.ortho_scale = 1.95
+    cam_d.ortho_scale = 1.9
     cam = bpy.data.objects.new("Cam", cam_d)
     cena.collection.objects.link(cam)
     cena.camera = cam
-    alvo = Vector((0, 0.05, 0.80))
-    vistas = {"frente": (0, -1, 0.05), "lado": (1, 0, 0.05), "tres_quartos": (0.7, -0.7, 0.18),
-              "costas": (-0.4, 1, 0.1)}
-    for nome, d in vistas.items():
+    alvo = Vector((0, 0.05, 0.82))
+
+    def foto(nome, d, centro=alvo, escala=1.9, res=(900, 1100)):
         d = Vector(d).normalized()
-        cam.location = alvo + d * 4
+        cam_d.ortho_scale = escala
+        cena.render.resolution_x, cena.render.resolution_y = res
+        cam.location = centro + d * 4
         cam.rotation_euler = (-d).to_track_quat("-Z", "Y").to_euler()
         cena.render.filepath = os.path.join(pasta, f"{nome}.png")
         bpy.ops.render.render(write_still=True)
-    # close do rosto com todas as expressões? fica no Godot (troca de UV)
-    cam_d.ortho_scale = 0.5
-    d = Vector((0.25, -1, 0.05)).normalized()
-    cam.location = CABECA_C + Vector((0, 0, 0.02)) + d * 3
-    cam.rotation_euler = (-d).to_track_quat("-Z", "Y").to_euler()
-    cena.render.resolution_x = cena.render.resolution_y = 700
-    cena.render.filepath = os.path.join(pasta, "rosto.png")
-    bpy.ops.render.render(write_still=True)
-    # pose de corrida
+
+    for nome, d in {"frente": (0, -1, 0.02), "lado": (1, 0, 0.02), "tres_quartos": (0.7, -0.7, 0.15),
+                    "costas": (-0.4, 1, 0.1)}.items():
+        foto(nome, d)
+    foto("rosto", (0.2, -1, 0.05), CABECA_C + Vector((0, 0, 0.03)), 0.62, (700, 700))
+    for nome, d in {"cabeca_34": (1, -1, 0.1), "cabeca_lado": (1, 0, 0.05), "cabeca_costas": (-0.6, 1, 0.25),
+                    "cabeca_baixo": (0.3, -1, -0.35)}.items():
+        foto(nome, d, CAP_C, 0.75, (700, 700))
     ad = rig.animation_data
-    for tr in ad.nla_tracks:
-        tr.mute = tr.name != "correr"
-    cena.frame_set(5)
-    cam_d.ortho_scale = 1.95
-    cena.render.resolution_x, cena.render.resolution_y = 900, 1100
-    d = Vector((1, -0.35, 0.1)).normalized()
-    cam.location = alvo + d * 4
-    cam.rotation_euler = (-d).to_track_quat("-Z", "Y").to_euler()
-    cena.render.filepath = os.path.join(pasta, "correndo.png")
-    bpy.ops.render.render(write_still=True)
-    for tr in ad.nla_tracks:
-        tr.mute = True
-    cena.frame_set(1)
+    if ad and any(t.name == "correr" for t in ad.nla_tracks):
+        for tr in ad.nla_tracks:
+            tr.mute = tr.name != "correr"
+        cena.frame_set(6)
+        foto("correndo", (1, -0.35, 0.1))
+        for tr in ad.nla_tracks:
+            tr.mute = True
+        cena.frame_set(1)
     bpy.data.objects.remove(cam)
 
 
@@ -1157,17 +1437,25 @@ def main():
     rig = montar_esqueleto()
     pesar(malha, rig, M.pesos)
     pesar(cont, rig, pesos_cont)
-    acoes = [anim_parada(rig), anim_correr(rig)]
+    bpy.context.scene.render.fps = 30  # PDF §7.1
+    pasta_mixamo = os.path.join(RAIZ, "arte", "animações")
+    if os.path.isdir(pasta_mixamo) and "--sem-mixamo" not in ARGS:
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        import retarget_mixamo
+        lista = retarget_mixamo.ANIMACOES
+        so = [a for a in ARGS if a.startswith("--anims=")]
+        if so:
+            nomes = so[0].split("=", 1)[1].split(",")
+            lista = {k: v for k, v in lista.items() if k in nomes}
+        acoes = retarget_mixamo.retargetar_tudo(rig, pasta_mixamo, lista)
+    else:
+        acoes = [anim_parada(rig)]
     guardar_acoes(rig, acoes)
-    bpy.context.scene.render.fps = 24
     exportar(rig)
     exportar_fbx_mixamo(malha)
     if RENDER:
-        previas(rig, malha)
-    # arquivo salvo em repouso, com a vista em textura (o Workbench das prévias não tem Material Preview)
-    for pb in rig.pose.bones:
-        pb.rotation_quaternion = Quaternion()
-        pb.location = (0, 0, 0)
+        previas(rig)
+    _posar_repouso(rig)
     bpy.context.scene.display.shading.color_type = "TEXTURE"
     bpy.ops.wm.save_as_mainfile(filepath=os.path.join(RAIZ, "arte", "lira.blend"), compress=True)
     print("[lira] ok")

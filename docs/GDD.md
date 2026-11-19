@@ -358,7 +358,7 @@ Referências que o Lucas mandou: modelagem de personagem low-poly anime no Blend
 - **Base única** de corpo para todas as garotas (~2.500 a 4.000 triângulos), com variações de cabelo e roupa, **3 alturas × 2 portes** por escala de ossos, e **orelhas e rabo com formato próprio** por garota ([visual do elenco](visual-elenco.md)). Assim 48 garotas não viram 48 modelos do zero.
 - **Orelhas e rabo** têm ossos próprios. O rabo é uma corrente de ossos com balanço físico simples, e as orelhas giram para mostrar emoção (em pé, de lado, para trás).
 - **Cor por paleta:** o modelo usa uma textura pequena de paleta (um quadrado por cor). Trocar a pelagem é trocar a paleta, sem refazer o modelo.
-- **Rosto:** olhos e boca como **textura trocável** (atlas de expressões), não como malha. Expressões do MVP: normal, feliz, determinada, cansada, triste, surpresa.
+- **Rosto:** olhos e boca como **textura trocável** (atlas de expressões), não como malha. Expressões do MVP (das fichas conceituais): normal, olhos fechados, feliz, surpresa, tonta e piscadinha. Íris em placa separada, que se move com o olhar ([modelo da Lira](modelo-lira.md)).
 - **Animações:** parada, andar, correr (2 ritmos), sprint, comemorar, perder, treinar (1 por treino) e cochilar.
 - **Uniformes:** roupa de treino e roupa de corrida. A roupa de corrida tem a cor e um símbolo da estrela de cada garota.
 - **NPCs:** a base com paleta e cabelo sorteados.

@@ -113,6 +113,11 @@ Fora a Lira na pista e os sprites das fichas, a arte é placeholder (formas colo
 | `testes/teste_perfil.gd` | Testa a pool, a garantia, o vínculo, a moeda do fim de carreira e o save do perfil. |
 | `testes/teste_save.gd` | Salva uma carreira, carrega de volta e confere se o estado é o mesmo. |
 | `testes/teste_series.gd` | Testa o olheiro, a instrução, as séries e títulos, o teto da madrinha e o visual do elenco. |
+| `testes/teste_sim.gd` | Testa a simulação da corrida: mesma semente dá o mesmo resultado, a mais forte vence mais, chuva e modo estimativa. |
+| `testes/teste_dados.gd` | Confere os JSON de `data/`: campos, ids únicos e referências entre arquivos (colegas, rivais, habilidades, efeitos). |
+| `testes/teste_carreira.gd` | Joga carreiras inteiras com um bot aleatório, confere o estado a cada passo e que salvar e carregar no meio não muda nada. |
+| `testes/teste_telas.gd` | Abre o jogo e aperta botões ao acaso por 1200 passos. Falha em qualquer erro de script. |
+| `testes/rodar_testes.gd` | Roda todos os `teste_*.gd` e mostra o resumo. O GitHub roda o mesmo a cada PR (`.github/workflows/testes.yml`). |
 | `testes/instrucao.gd` | Compara as 3 instruções em corridas equilibradas e mede o erro do olheiro contra corridas reais. |
 | `testes/teste_patio.gd` | Testa aniversários, eventos do pátio, conversas (uma por turno, afinidade 30+), reações, save e monta a cena 3D em todos os eventos. |
 | `testes/capturas_patio.gd` | Capturas do pátio, das conversas e dos encontros com expressões. |
@@ -122,6 +127,14 @@ Fora a Lira na pista e os sprites das fichas, a arte é placeholder (formas colo
 | `tools/resumo_balanco.py` | Junta as saídas JSON do `testes/balanco.gd` e mostra a taxa geral, a queda por objetivo, as taxas por casa e por arquétipo, a divisão no ponto de virada e os títulos ([campanhas](docs/campanhas.md) §7). |
 
 ### Testes
+
+Todos os testes automáticos de uma vez (uns 2 minutos; com `-- carreira` roda só os que têm "carreira" no nome):
+
+```
+Godot_v4.7.2-stable_win64_console.exe --headless --path . --script res://testes/rodar_testes.gd
+```
+
+Um por um, e as ferramentas de balanceamento e capturas:
 
 ```
 Godot_v4.7.2-stable_win64_console.exe --headless --path . --script res://testes/balanco.gd -- 20 mvp nova

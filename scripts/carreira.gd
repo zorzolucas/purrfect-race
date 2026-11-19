@@ -404,9 +404,10 @@ func treinar(t: String) -> String:
 	var var_ := r.randf_range(0.85, 1.15)
 	var partes := []
 	for k in g:
-		var v: float = round(g[k] * var_)
-		attrs[k] += v
-		partes.append("+%d %s" % [v, Dados.ATTR_CURTO[k]])
+		# mostra o que ela ganhou de fato: perto do limite, o texto dizia +40 e nada subia
+		var antes: float = attrs[k]
+		attrs[k] = minf(limite, attrs[k] + round(g[k] * var_))
+		partes.append("+%d %s" % [roundi(attrs[k] - antes), Dados.ATTR_CURTO[k]])
 	usos_treino[t] += 1
 	var txt := "Treino de %s: %s." % [Dados.ATTR_NOME[t], ", ".join(partes)]
 	if salvou_estrela:
@@ -600,8 +601,10 @@ func _pelotao(c: Dictionary, elenco: Array) -> Dictionary:
 ## A chance sai de 1 rodada da simulação em modo estimativa por instrução (tempo esperado de
 ## cada uma) e de sorteios da sorte por cima. É determinística: o mesmo estado dá a mesma etiqueta.
 func olheiro(c: Dictionary) -> Dictionary:
-	var chave := "%d|%s|%s|%d|%d|%d|%s" % [turno, c.get("id", "x"), c.get("nome", ""), humor,
-		habilidades.size(), amuletos.size(), str(attrs.values())]
+	# a chave leva as listas inteiras, não só o tamanho: trocar um amuleto no limite (mesma
+	# quantidade) ou subir uma aptidão (Coroa) muda a estimativa
+	var chave := "%d|%s|%s|%d|%s|%s|%s|%s" % [turno, c.get("id", "x"), c.get("nome", ""), humor,
+		str(habilidades), str(amuletos), str(aptidao), str(attrs.values())]
 	if _cache_olheiro.has(chave):
 		return _cache_olheiro[chave]
 	var ol: Dictionary = Dados.calendario.olheiro
@@ -945,6 +948,7 @@ func _inspiracao() -> void:
 
 func _fim_turno(chance_encontro: float = BAL.chance_encontro) -> void:
 	turno += 1
+	_cache_olheiro.clear()  # a chave tem o turno: as estimativas antigas não servem mais
 	if turno > BAL.turnos:
 		terminou = true
 		return
@@ -1033,7 +1037,8 @@ func _abrir_misterio() -> void:
 	var lista: Array = Dados.calendario.misterios
 	var e: Dictionary = lista[r.randi() % lista.size()]
 	var colegas := afinidade.keys()
-	encontro_pendente = {"id": e.id, "tipo": "misterio", "outra": colegas[r.randi() % colegas.size()]}
+	var outra: String = colegas[r.randi() % colegas.size()] if not colegas.is_empty() else ""
+	encontro_pendente = {"id": e.id, "tipo": "misterio", "outra": outra}
 
 
 func _abrir_vespera() -> void:

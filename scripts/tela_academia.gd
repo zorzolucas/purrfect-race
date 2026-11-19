@@ -8,6 +8,7 @@ signal continuar
 signal abrir_pool
 signal abrir_circuito
 signal jogar_desafio
+signal abrir_patio
 
 var perfil: Perfil
 var msg: String
@@ -26,6 +27,7 @@ func _ready() -> void:
 	titulo.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	topo.add_child(titulo)
 	topo.add_child(UI.label("%d moedas" % perfil.moeda, 24, UI.DESTAQUE))
+	topo.add_child(UI.botao("Pátio", func(): abrir_patio.emit(), 18))
 	topo.add_child(UI.botao("Circuito", func(): abrir_circuito.emit(), 18))
 	topo.add_child(UI.botao("Pool semanal", func(): abrir_pool.emit(), 18))
 	v.add_child(topo)

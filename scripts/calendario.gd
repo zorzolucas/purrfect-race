@@ -6,7 +6,6 @@ extends RefCounted
 ## Funções estáticas que recebem os dados (data/calendario.json) e a semente.
 
 const TURNOS := 72
-const TURNOS_OBJETIVO := [13, 20, 24, 32, 40, 48, 60, 72]
 
 
 static func cal() -> Dictionary:

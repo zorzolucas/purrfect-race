@@ -1,5 +1,5 @@
 {
-  "_doc": "Encontros da carreira (GDD §4.7). 'garota': null = genérico (sorteia uma colega como {outra}); um nome = evento único dessa garota. 'quando': condições para aparecer. Efeitos: humor, energia, vel/est/pod/det/int, afinidade (com {outra}), nivel_treino (sobe 1 nível do treino mais usado), perde_turno. Uma escolha com 'chance' usa 'efeitos' se der certo e 'efeitos_falha' se não. Textos: {nome} = primeiro nome da garota treinada, {outra} = primeiro nome da colega.",
+  "_doc": "Encontros da carreira (GDD §4.7). 'garota': null = genérico (sorteia uma colega como {outra}); um nome = evento único dessa garota. 'quando': condições para aparecer. 'expressao' e 'gesto': como quem fala aparece no retrato (RetratoGarota); cada escolha pode ter 'reacao' {expressao, gesto, emote}, senão a reação sai dos efeitos. Efeitos: humor, energia, vel/est/pod/det/int, afinidade (com {outra}), nivel_treino (sobe 1 nível do treino mais usado), perde_turno. Uma escolha com 'chance' usa 'efeitos' se der certo e 'efeitos_falha' se não. Textos: {nome} = primeiro nome da garota treinada, {outra} = primeiro nome da colega.",
   "colegas": ["Lira", "Nashira", "Mira", "Capela", "Antares", "Shaula"],
   "afinidade_inicial": {
     "Lira": {"Antares": 20, "Shaula": -10},
@@ -11,6 +11,8 @@
       "id": "lira_refeitorio",
       "garota": "Lira",
       "titulo": "Corrida até o refeitório",
+      "expressao": "piscadinha",
+      "gesto": "pulinho",
       "texto": "— Quem chegar por último paga o almoço! — grita {nome}, já correndo antes de terminar a frase.",
       "quando": {"turno_min": 2},
       "escolhas": [
@@ -22,6 +24,8 @@
       "id": "lira_derrota",
       "garota": "Lira",
       "titulo": "Primeira derrota",
+      "expressao": "fechados",
+      "gesto": "encolher",
       "texto": "{nome} está sentada sozinha na arquibancada vazia, olhando para a pista. Ela não está acostumada a ver as costas das outras.",
       "quando": {"apos_derrota": true},
       "escolhas": [
@@ -33,6 +37,8 @@
       "id": "lira_rival",
       "garota": "Lira",
       "titulo": "Rival declarada",
+      "expressao": "surpresa",
+      "gesto": "susto",
       "texto": "Polaris, a campeã do ano passado, passa por {nome} no corredor e para. — Você é a que larga na frente, não é? Vamos ver até onde aguenta.",
       "quando": {"turno_min": 14},
       "escolhas": [
@@ -44,6 +50,8 @@
       "id": "nashira_caderno",
       "garota": "Nashira",
       "titulo": "O caderno perdido",
+      "expressao": "surpresa",
+      "gesto": "susto",
       "texto": "Você encontra o caderno de anotações de {nome} esquecido no vestiário. Ele está aberto numa página cheia de setas e nomes.",
       "quando": {"turno_min": 2},
       "escolhas": [
@@ -55,6 +63,8 @@
       "id": "nashira_plano",
       "garota": "Nashira",
       "titulo": "Plano perfeito",
+      "expressao": "feliz",
+      "gesto": "concordar",
       "texto": "{nome} aparece com uma tabela de treinos para as próximas semanas, cada uma com um objetivo diferente.",
       "quando": {"turno_min": 4},
       "escolhas": [
@@ -66,6 +76,8 @@
       "id": "nashira_falha",
       "garota": "Nashira",
       "titulo": "Quando o plano falha",
+      "expressao": "tonta",
+      "gesto": "tremer",
       "texto": "Depois da corrida, {nome} folheia o caderno sem parar. — Eu tinha previsto tudo. O que deu errado?",
       "quando": {"apos_derrota": true},
       "escolhas": [
@@ -77,6 +89,8 @@
       "id": "mira_perdida",
       "garota": "Mira",
       "titulo": "Perdida no caminho",
+      "expressao": "tonta",
+      "gesto": "inclinar",
       "texto": "O treino começa e nada de {nome}. Uma mensagem chega: \"acho que entrei no prédio errado... tem muitas plantas aqui\".",
       "quando": {"turno_min": 2},
       "escolhas": [
@@ -88,6 +102,8 @@
       "id": "mira_nuvem",
       "garota": "Mira",
       "titulo": "Nuvem em forma de peixe",
+      "expressao": "feliz",
+      "gesto": "inclinar",
       "texto": "No meio do aquecimento, {nome} para e aponta para o céu. — Olha, aquela nuvem está galopando!",
       "quando": {"turno_min": 3},
       "escolhas": [
@@ -99,6 +115,8 @@
       "id": "mira_virada",
       "garota": "Mira",
       "titulo": "A outra Mira",
+      "expressao": "fechados",
+      "gesto": "",
       "texto": "Depois da vitória, {nome} fala baixinho: — Sabe... eu gosto de correr lá atrás. Dá para ver todo mundo. E quando eu passo, ninguém espera.",
       "quando": {"apos_vitoria": true},
       "escolhas": [
@@ -109,6 +127,8 @@
       "id": "gen_almoco",
       "garota": null,
       "titulo": "Almoço no refeitório",
+      "expressao": "feliz",
+      "gesto": "aceno",
       "texto": "{outra} acena da mesa do canto e oferece a cadeira vazia ao lado.",
       "quando": {},
       "escolhas": [
@@ -120,6 +140,8 @@
       "id": "gen_dupla",
       "garota": null,
       "titulo": "Treino em dupla",
+      "expressao": "piscadinha",
+      "gesto": "pulinho",
       "texto": "{outra} está fazendo tiros na reta e pergunta se {nome} quer marcar o tempo junto.",
       "quando": {},
       "escolhas": [
@@ -131,6 +153,8 @@
       "id": "gen_chuva",
       "garota": null,
       "titulo": "Chuva de repente",
+      "expressao": "normal",
+      "gesto": "tremer",
       "texto": "Uma chuva forte cai no meio do treino. {outra} continua na pista, encharcada.",
       "quando": {},
       "escolhas": [
@@ -142,6 +166,8 @@
       "id": "gen_conselho",
       "garota": null,
       "titulo": "Pedido de conselho",
+      "expressao": "fechados",
+      "gesto": "encolher",
       "texto": "{outra} anda insegura com a próxima prova e pergunta o que {nome} faria no lugar dela.",
       "quando": {"turno_min": 4},
       "escolhas": [
@@ -153,6 +179,8 @@
       "id": "gen_cansaco",
       "garota": null,
       "titulo": "Pernas pesadas",
+      "expressao": "normal",
+      "gesto": "inclinar",
       "texto": "{nome} acorda com as pernas pesando. {outra} sugere uma sessão de alongamento no gramado.",
       "quando": {"energia_max": 50},
       "escolhas": [
@@ -164,6 +192,8 @@
       "id": "gen_festival",
       "garota": null,
       "titulo": "Festival da academia",
+      "expressao": "feliz",
+      "gesto": "pulinho",
       "texto": "A academia monta barracas no pátio. {outra} quer ir à barraca de doces de qualquer jeito.",
       "quando": {"turno_min": 6},
       "escolhas": [

@@ -79,6 +79,17 @@ func _initialize() -> void:
 	for h in dados.habilidades.lista:
 		f.comprar_habilidade(h.id)
 	_checar(f.habilidades.size() == 6, "limite de 6 habilidades (%d)" % f.habilidades.size())
-	var corrida = f.montar_corrida(dados.garotas) if not f.objetivo_do_turno().is_empty() else {}
+
+	# olheiro: trocar um amuleto (mesma quantidade) por um de corrida muda a estimativa
+	var o = CarreiraS.new(lira, dados.config_carreira("Lira"), 9)
+	o.encontro_pendente = {}
+	var cr := {"id": "t", "cat": "aberta", "dist": "milha", "piso": "grama", "nome": "Teste"}
+	o.amuletos = ["ferradura", "fita_azul", "garrafinha", "capa_chuva", "sapatilha", "laco"]
+	for k in o.attrs:
+		o.attrs[k] = 330.0  # perto do pelotão da Aberta, para a chance não ser 0
+	var antes: Dictionary = o.olheiro(cr)
+	o.escolher_amuleto("lenco_ponta", "ferradura")
+	var depois: Dictionary = o.olheiro(cr)
+	_checar(str(antes.chances) != str(depois.chances), "olheiro ignorou a troca de amuleto (cache velho)")
 	print("AMULETOS OK" if falhas.is_empty() else "AMULETOS FALHOU: " + "; ".join(falhas))
 	quit(0 if falhas.is_empty() else 1)

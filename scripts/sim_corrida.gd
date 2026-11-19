@@ -42,6 +42,47 @@ const RITMO := {
 	"arr": [0.9710, 0.9659, 1.0060, 1.0110],
 	"fec": [0.9568, 0.9669, 1.0122, 1.0525],
 }
+## Correção de estilo por nível e distância (corrida.md §8.5): o RITMO acima foi calibrado nos
+## níveis 500 a 1000, mas a carreira passa os 2 primeiros anos entre 200 e 600. Ali a Fechadora
+## sobrava na Sprint e na Milha (o teto de velocidade quase não corta o sprint dela) e a Ponteira
+## na Média e na Longa (todas ficam sem fôlego, e quem está na frente segura). Cada estilo ganha um
+## multiplicador nos atributos, que depende do nível médio do pelotão e da distância (interpolado
+## na grade) e vale 1,0 a partir do nível 800. Calibrado com testes/ajustar_estilo.gd.
+static var CORRECAO_ESTILO := {
+	"niveis": [200.0, 300.0, 375.0, 450.0, 525.0, 600.0, 700.0, 800.0],
+	"dists": [1200.0, 1600.0, 2000.0, 2400.0, 3200.0],
+	"pon": [[1.0132, 0.9964, 0.9834, 0.9762, 0.9688], [1.0189, 0.9989, 0.9913, 0.9793, 0.9694], [1.0496, 1.0090, 0.9821, 0.9808, 0.9640], [1.0402, 1.0461, 1.0021, 0.9779, 0.9766], [1.0156, 1.0427, 1.0329, 0.9961, 0.9686], [0.9984, 1.0198, 1.0251, 1.0286, 0.9751], [0.9954, 1.0059, 1.0085, 1.0101, 1.0099], [1.0, 1.0, 1.0, 1.0, 1.0]],
+	"per": [[1.0157, 1.0073, 0.9886, 0.9871, 0.9856], [1.0099, 1.0046, 1.0028, 0.9883, 0.9880], [1.0145, 1.0043, 1.0006, 1.0003, 0.9895], [1.0105, 1.0182, 0.9986, 0.9947, 0.9924], [0.9978, 1.0105, 1.0091, 0.9994, 0.9938], [0.9920, 0.9980, 0.9995, 0.9999, 0.9932], [0.9930, 0.9907, 0.9910, 0.9956, 0.9891], [1.0, 1.0, 1.0, 1.0, 1.0]],
+	"arr": [[1.0130, 1.0143, 1.0109, 1.0120, 1.0195], [1.0034, 1.0135, 1.0123, 1.0156, 1.0175], [1.0011, 1.0045, 1.0164, 1.0147, 1.0176], [0.9911, 0.9904, 1.0099, 1.0177, 1.0139], [0.9855, 0.9855, 0.9919, 1.0090, 1.0191], [0.9804, 0.9840, 0.9911, 0.9908, 1.0155], [0.9846, 0.9942, 0.9921, 0.9936, 0.9957], [1.0, 1.0, 1.0, 1.0, 1.0]],
+	"fec": [[0.9581, 0.9820, 1.0172, 1.0248, 1.0261], [0.9678, 0.9830, 0.9935, 1.0167, 1.0251], [0.9348, 0.9821, 1.0009, 1.0042, 1.0289], [0.9582, 0.9453, 0.9893, 1.0097, 1.0171], [1.0011, 0.9612, 0.9661, 0.9954, 1.0185], [1.0292, 0.9982, 0.9843, 0.9807, 1.0161], [1.0269, 1.0092, 1.0085, 1.0007, 1.0052], [1.0, 1.0, 1.0, 1.0, 1.0]],
+}
+
+
+## Interpola linearmente numa grade crescente: [índice de baixo, peso do de cima].
+static func _na_grade(grade: Array, x: float) -> Array:
+	if x <= grade[0]:
+		return [0, 0.0]
+	for i in range(grade.size() - 1):
+		if x <= grade[i + 1]:
+			return [i, (x - grade[i]) / (grade[i + 1] - grade[i])]
+	return [grade.size() - 2, 1.0]
+
+
+## Multiplicador de estilo para um pelotão de nível médio `nivel` (atributos crus) em `dist` metros.
+static func correcao_estilo(estilo: String, nivel: float, dist: float) -> float:
+	var t: Dictionary = CORRECAO_ESTILO
+	if not t.has(estilo):
+		return 1.0
+	var a := _na_grade(t.niveis, nivel)
+	var b := _na_grade(t.dists, dist)
+	var m: Array = t[estilo]
+	var i: int = a[0]
+	var j: int = b[0]
+	var baixo: float = lerpf(m[i][j], m[i][j + 1], b[1])
+	var cima: float = lerpf(m[i + 1][j], m[i + 1][j + 1], b[1])
+	return lerpf(baixo, cima, a[1])
+
+
 ## Habilidades genéricas de referência (corrida.md §7): [fase, tipo, valor, duração s].
 const GENERICAS := [
 	[1, "hp", 0.06, 0.0, "Fôlego Extra"],
@@ -98,12 +139,18 @@ func _init(field: Array, distancia: float, seed: int = 0, clima: String = "", es
 	else:
 		rng.seed = seed
 	var k := ESCALA
+	var nivel := 0.0
+	for g in field:
+		for key in KEYS:
+			nivel += float(g.attrs[key])
+	nivel /= maxf(1.0, 5.0 * field.size())
 	for idx in field.size():
 		var g: Dictionary = field[idx]
 		var st: String = g.estilo
+		var corr := correcao_estilo(st, nivel, D)
 		var e := {}
 		for key in KEYS:
-			e[key] = float(g.attrs[key]) * PESOS[st][key] * float(g.get("mult", 1.0))
+			e[key] = float(g.attrs[key]) * PESOS[st][key] * float(g.get("mult", 1.0)) * corr
 		var hpmax: float = (K_HP_D * D + K_HP * e.est) * (0.98 if clima == "calor" else 1.0)
 		var noise := 0.0 if estimativa else rng.randfn(0.0, SORTE * (1.0 - e.int / 2400.0))
 		var chance := minf(0.9, e.int / 1000.0)

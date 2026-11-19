@@ -30,6 +30,37 @@ PH = {  # ritmo por fase: largada, meio, final, sprint
     "arr": (0.9710, 0.9659, 1.0060, 1.0110),
     "fec": (0.9568, 0.9669, 1.0122, 1.0525),
 }
+# Correção de estilo por nível e distância (corrida.md §8.5), igual a CORRECAO_ESTILO de
+# scripts/sim_corrida.gd: multiplica os atributos de cada estilo conforme o nível médio do
+# pelotão e a distância (interpolado na grade). Vale 1,0 a partir do nível 800.
+CORR_NIVEIS = (200.0, 300.0, 375.0, 450.0, 525.0, 600.0, 700.0, 800.0)
+CORR_DISTS = (1200.0, 1600.0, 2000.0, 2400.0, 3200.0)
+CORRECAO_ESTILO = {
+    "pon": [[1.0132, 0.9964, 0.9834, 0.9762, 0.9688], [1.0189, 0.9989, 0.9913, 0.9793, 0.9694], [1.0496, 1.0090, 0.9821, 0.9808, 0.9640], [1.0402, 1.0461, 1.0021, 0.9779, 0.9766], [1.0156, 1.0427, 1.0329, 0.9961, 0.9686], [0.9984, 1.0198, 1.0251, 1.0286, 0.9751], [0.9954, 1.0059, 1.0085, 1.0101, 1.0099], [1.0, 1.0, 1.0, 1.0, 1.0]],
+    "per": [[1.0157, 1.0073, 0.9886, 0.9871, 0.9856], [1.0099, 1.0046, 1.0028, 0.9883, 0.9880], [1.0145, 1.0043, 1.0006, 1.0003, 0.9895], [1.0105, 1.0182, 0.9986, 0.9947, 0.9924], [0.9978, 1.0105, 1.0091, 0.9994, 0.9938], [0.9920, 0.9980, 0.9995, 0.9999, 0.9932], [0.9930, 0.9907, 0.9910, 0.9956, 0.9891], [1.0, 1.0, 1.0, 1.0, 1.0]],
+    "arr": [[1.0130, 1.0143, 1.0109, 1.0120, 1.0195], [1.0034, 1.0135, 1.0123, 1.0156, 1.0175], [1.0011, 1.0045, 1.0164, 1.0147, 1.0176], [0.9911, 0.9904, 1.0099, 1.0177, 1.0139], [0.9855, 0.9855, 0.9919, 1.0090, 1.0191], [0.9804, 0.9840, 0.9911, 0.9908, 1.0155], [0.9846, 0.9942, 0.9921, 0.9936, 0.9957], [1.0, 1.0, 1.0, 1.0, 1.0]],
+    "fec": [[0.9581, 0.9820, 1.0172, 1.0248, 1.0261], [0.9678, 0.9830, 0.9935, 1.0167, 1.0251], [0.9348, 0.9821, 1.0009, 1.0042, 1.0289], [0.9582, 0.9453, 0.9893, 1.0097, 1.0171], [1.0011, 0.9612, 0.9661, 0.9954, 1.0185], [1.0292, 0.9982, 0.9843, 0.9807, 1.0161], [1.0269, 1.0092, 1.0085, 1.0007, 1.0052], [1.0, 1.0, 1.0, 1.0, 1.0]],
+}
+
+
+def _na_grade(grade, x):
+    if x <= grade[0]:
+        return 0, 0.0
+    for i in range(len(grade) - 1):
+        if x <= grade[i + 1]:
+            return i, (x - grade[i]) / (grade[i + 1] - grade[i])
+    return len(grade) - 2, 1.0
+
+
+def correcao_estilo(style, nivel, D):
+    m = CORRECAO_ESTILO[style]
+    i, a = _na_grade(CORR_NIVEIS, nivel)
+    j, b = _na_grade(CORR_DISTS, D)
+    baixo = m[i][j] + (m[i][j + 1] - m[i][j]) * b
+    cima = m[i + 1][j] + (m[i + 1][j + 1] - m[i + 1][j]) * b
+    return baixo + (cima - baixo) * a
+
+
 # habilidades genéricas que toda corredora leva no teste: (fase, tipo, valor, duração s)
 SKILLS = [(1, "hp", 0.06, 0), (1, "vel", 0.8, 4.0), (2, "vel", 0.8, 4.0), (2, "hp", 0.04, 0), (3, "vel", 1.0, 4.0)]
 
@@ -44,8 +75,10 @@ def race(field, D, seed, ph=None):
     ph = ph or PH
     k, v0 = ESCALA, V0 * ESCALA
     rs = []
+    nivel = sum(s[k] for _, s, _ in field for k in KEYS) / (5 * len(field))
     for idx, (style, s, mult) in enumerate(field):
-        e = {k: s[k] * W[style][k] * mult for k in KEYS}
+        corr = correcao_estilo(style, nivel, D)
+        e = {k: s[k] * W[style][k] * mult * corr for k in KEYS}
         hpmax = K_HP_D * D + K_HP * e["est"]
         noise = rnd.gauss(0, SORTE * (1 - e["int"] / 2400))
         chance = min(0.9, SKILL_BASE + SKILL_INT * e["int"] / 1200)

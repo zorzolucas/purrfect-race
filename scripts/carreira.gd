@@ -477,11 +477,17 @@ func corridas_opcionais() -> Array:
 
 ## Força média das NPCs da categoria neste turno. Pode ser um número ou uma lista com
 ## um valor por ano: o pelotão fica mais forte a cada ano (docs/campanhas.md §7).
-## O multiplicador por distância compensa a sorte maior das corridas curtas.
+## O multiplicador por distância compensa a sorte maior das corridas curtas, e o por categoria e
+## distância acerta as corridas em que uma casa sobrava ou virava muro (campanhas.md §7.4).
 func forca_categoria(cat: String, dist: String = "") -> float:
-	var f = Dados.calendario.categorias[cat].forca
-	var base: float = float(f[mini(f.size() - 1, Calendario.mes_idx(turno) / 12)]) if f is Array else float(f)
-	return base * float(Dados.calendario.get("forca_distancia", {}).get(dist, 1.0))
+	var cal: Dictionary = Dados.calendario
+	var f = cal.categorias[cat].forca
+	var ano := Calendario.mes_idx(turno) / 12
+	var base: float = float(f[mini(f.size() - 1, ano)]) if f is Array else float(f)
+	# por categoria e distância: um número ou uma lista com um valor por ano
+	var pc = cal.get("forca_distancia_cat", {}).get(cat, {}).get(dist, 1.0)
+	var por_cat: float = float(pc[mini(pc.size() - 1, ano)]) if pc is Array else float(pc)
+	return base * float(cal.get("forca_distancia", {}).get(dist, 1.0)) * por_cat
 
 
 func pode_entrar(c: Dictionary) -> bool:

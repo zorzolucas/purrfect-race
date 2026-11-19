@@ -34,7 +34,7 @@ func _ready() -> void:
 	var p := UI.painel()
 	var pv := UI.vbox(8)
 	var topo := UI.hbox(12)
-	topo.add_child(UI.retrato(c.nome, c.cor, 72))
+	topo.add_child(RetratoGarota.new(c.nome, 88, "fechados" if c.falhou_objetivo else "feliz"))
 	var nomes := UI.vbox(2)
 	nomes.add_child(UI.label(c.nome, 26))
 	nomes.add_child(UI.label("Nota final %s" % Dados.nota(c.attrs), 20, UI.DESTAQUE))

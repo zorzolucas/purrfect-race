@@ -15,7 +15,7 @@ static func criar(nome: String, vinculo: int = -1) -> PanelContainer:
 	var v := UI.vbox(6)
 	p.add_child(v)
 	var topo := UI.hbox(10)
-	topo.add_child(UI.retrato(nome, Color(cfg.get("cor", "#999999")), 56))
+	topo.add_child(RetratoGarota.new(nome, 56))
 	var tv := UI.vbox(2)
 	tv.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	tv.add_child(UI.label(nome, 19))

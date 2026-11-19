@@ -4,6 +4,7 @@ extends Control
 ## data, clima, rota e a decisão do turno à direita (ações, mapa, férias, encontro ou corrida).
 
 signal ir_correr
+signal ir_patio
 signal atualizou(msg: String)
 
 var c: Carreira
@@ -47,7 +48,7 @@ func _painel_garota() -> Control:
 	p.custom_minimum_size.x = 410
 	var v := UI.vbox(7)
 	var topo := UI.hbox(12)
-	topo.add_child(UI.retrato(c.nome, c.cor, 64))
+	topo.add_child(RetratoGarota.new(c.nome, 72, SpritesGarota.expressao_do_humor(c.humor)))
 	var nomes := UI.vbox(2)
 	nomes.add_child(UI.label(c.nome, 22))
 	nomes.add_child(UI.label("%s · Nota %s · Fama %d" % [Dados.ESTILO_NOME[c.estilo], Dados.nota(c.attrs), c.fama], 15, UI.DESTAQUE))
@@ -154,7 +155,18 @@ func _painel_turno() -> VBoxContainer:
 
 	if msg != "":
 		var pm := UI.painel(Color("#2a3150"), 10)
-		pm.add_child(UI.label(msg, 15, UI.TEXTO, true))
+		var reacao := c.ultima_reacao
+		if reacao.has("quem"):
+			# quem falou no encontro reage à escolha (expressão da ficha + gesto)
+			var hm := UI.hbox(12)
+			var ret := RetratoGarota.new(reacao.quem, 72, reacao.get("expressao", "normal"))
+			hm.add_child(ret)
+			hm.add_child(UI.label(msg, 15, UI.TEXTO, true))
+			pm.add_child(hm)
+			ret.call_deferred("reagir", reacao)
+			c.ultima_reacao = {}
+		else:
+			pm.add_child(UI.label(msg, 15, UI.TEXTO, true))
 		v.add_child(pm)
 
 	match c.pendencia():
@@ -191,6 +203,7 @@ func _botao_grande(texto: String, acao: Callable) -> Button:
 
 
 func _acoes(v: VBoxContainer) -> void:
+	v.add_child(_faixa_patio())
 	var corridas := c.corridas_opcionais()
 	if not corridas.is_empty():
 		v.add_child(UI.label("Correr (gasta %d de energia, sem treino neste turno)" % c.energia_corrida(), 16, UI.SUAVE))
@@ -218,6 +231,27 @@ func _acoes(v: VBoxContainer) -> void:
 		h.add_child(_botao_acao("Enfermaria\ncura a lesão", c.enfermaria))
 	v.add_child(h)
 	v.add_child(_loja_habilidades())
+
+
+## Entrada do pátio: o evento do turno e se ainda dá para conversar (não gasta o turno).
+func _faixa_patio() -> Control:
+	var ev := c.evento_patio()
+	var info: Dictionary = Dados.patio.eventos.get(ev.id, {})
+	var p := UI.painel(Color("#26382c"), 10)
+	var h := UI.hbox(10)
+	if ev.outra != "":
+		h.add_child(RetratoGarota.new(ev.outra, 44, "feliz" if ev.id == "aniversario" else "normal"))
+	var tv := UI.vbox(2)
+	tv.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	tv.add_child(UI.label("Pátio · %s" % info.get("titulo", ""), 15, UI.DESTAQUE))
+	var extra := " Conversa disponível." if c.pode_conversar_no_patio() else " Já conversaram neste turno."
+	tv.add_child(UI.label(c.texto_patio(info.get("banner", ""), ev.outra) + extra, 13, UI.TEXTO, true))
+	h.add_child(tv)
+	var b := UI.botao("Ir ao pátio", func(): ir_patio.emit(), 16)
+	b.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	h.add_child(b)
+	p.add_child(h)
+	return p
 
 
 ## Loja de habilidades genéricas: comprar não gasta o turno (GDD §3.4).
@@ -457,13 +491,10 @@ func _painel_encontro(e: Dictionary) -> Control:
 	var p := UI.painel(Color("#2b2440") if tipo != "misterio" else Color("#3a2a20"), 18)
 	var v := UI.vbox(10)
 	var topo := UI.hbox(12)
-	var quem: String = c.nome
-	if tipo == "encontro" and e.get("garota") == null:
-		quem = c.encontro_pendente.get("outra", c.nome)
-	elif tipo == "vespera":
-		quem = c.encontro_pendente.get("rival", c.nome)
-	var ini := Dados.config_carreira(quem)
-	topo.add_child(UI.retrato(quem, Color(ini.get("cor", "#b07cc6")), 60))
+	var quem := c.quem_do_encontro()
+	var ret := RetratoGarota.new(quem, 96, e.get("expressao", "normal"))
+	topo.add_child(ret)
+	ret.call_deferred("gesto", e.get("gesto", ""))
 	var tv := UI.vbox(2)
 	tv.add_child(UI.label({"encontro": "Encontro", "misterio": "Mistério", "vespera": "Véspera",
 		"capitulo": "História"}.get(tipo, "Encontro"), 14, UI.SUAVE))

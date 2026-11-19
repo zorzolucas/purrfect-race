@@ -70,8 +70,7 @@ func _cartao(nome: String) -> Control:
 func _painel_resultado() -> Control:
 	var p := UI.painel(Color("#3a2f55"))
 	var h := UI.hbox(10)
-	var cfg := Dados.config_carreira(resultado.nome)
-	h.add_child(UI.retrato(resultado.nome, Color(cfg.cor), 48))
+	h.add_child(RetratoGarota.new(resultado.nome, 56, "feliz"))
 	var txt: String
 	if resultado.nova:
 		txt = "%s entrou no elenco!" % resultado.nome

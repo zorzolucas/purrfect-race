@@ -200,6 +200,8 @@ Muda com encontros, descanso, saídas, vitórias, derrotas e falhas.
 - A afinidade vai de **0 a 100**. Alguns pares começam com **afinidade inicial**: amizade (inicial: +20) ou atrito (inicial: −10). Esses pares estão definidos no [elenco](elenco.md). Garotas de signos do mesmo elemento ganham mais +5, e cada garota tem um encontro de aniversário ([visual do elenco](visual-elenco.md) §3).
 - Isso substitui qualquer sistema de "cartas de suporte".
 - No MVP: **encontros genéricos** (servem para qualquer par) + os **capítulos de história** da campanha de cada garota ([calendário](calendario.md) §3.2).
+- **Pátio:** uma conversa curta por turno com uma colega clicada no pátio (efeito pequeno, quase sempre afinidade). Cada colega tem 2 conversas próprias, a segunda com afinidade 30+. O pátio tem eventos: aniversários (da colega e da própria garota), comemoração depois de vitória, consolo depois de derrota, festival e clima.
+- **Expressão e gesto:** quem fala aparece com o rosto da ficha conceitual (6 expressões) e um gesto simples, e reage à escolha com outra expressão e um balão. Enquanto não há modelos 3D de todas, isso é feito com os sprites 2D das fichas.
 
 ### 4.8 Fim da carreira
 
@@ -368,7 +370,7 @@ Referências que o Lucas mandou: modelagem de personagem low-poly anime no Blend
 | Cenário | Uso | Prioridade |
 |---|---|---|
 | Pista (grama e terra) com arquibancada | Corridas | MVP |
-| Pátio da academia | Tela principal: a garota escolhida aparece grande, parada, e outras garotas passeiam no fundo. Clicar numa delas abre um encontro curto. | MVP |
+| Pátio da academia | Tela principal: a garota escolhida aparece grande, parada, e outras garotas passeiam no fundo. Clicar numa delas abre um encontro curto. **No protótipo** (2026-11-19): cenário de primitivas e as garotas como sprites das fichas conceituais, com hábitos, clima e eventos do turno (`data/patio.json`). | MVP |
 | Campo de treino | Animação dos treinos | Depois |
 | Cidade, praia e serra | Saídas, festival e férias | Depois |
 

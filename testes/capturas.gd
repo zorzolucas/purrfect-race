@@ -2,6 +2,7 @@ extends SceneTree
 ## Abre o jogo, passa pelas telas sozinho e salva capturas em testes/capturas/.
 ## Usa caminhos de save próprios, então não mexe no perfil nem na carreira de verdade.
 ## Uso (com janela, não headless): Godot --path . --script res://testes/capturas.gd
+## Na nuvem (Linux sem tela): xvfb-run -a -s "-screen 0 1280x720x24" Godot --path . --rendering-driver opengl3 --script res://testes/capturas.gd
 
 var main: Node
 var dados: Node
@@ -52,6 +53,11 @@ func _initialize() -> void:
 			main.mostrar_carreira(txt),
 		func():
 			_salvar("2_objetivo_estreia")
+			# Com só 3 treinos ela às vezes perdia a Estreia; aí a carreira acabava e o resto
+			# do roteiro rodava numa carreira encerrada. Reforça os atributos para ganhar sempre.
+			var c = main.carreira
+			for k in c.attrs:
+				c.attrs[k] += 150.0
 			main.mostrar_corrida()
 			main.tela.velocidade = 2.0,
 		func(): pass,
@@ -83,10 +89,15 @@ func _initialize() -> void:
 		func():
 			_salvar("6_mapa")
 			var c = main.carreira
+			if c.pendencia() != "mapa":
+				push_error("capturas: esperava o mapa no turno %d, veio '%s'" % [c.turno, c.pendencia()])
+				quit(1)
+				return
+			var linha: int = c.rota[c.trecho()].size()
 			var cols: Array = c.opcoes_mapa()
 			var escolha: int = cols[0]
 			for col in cols:
-				if c.mapas[c.trecho()][0][col].tipo == "circuito":
+				if c.mapas[c.trecho()][linha][col].tipo == "circuito":
 					escolha = col
 			main.mostrar_carreira(c.escolher_no(escolha))
 			_resolver_encontro()

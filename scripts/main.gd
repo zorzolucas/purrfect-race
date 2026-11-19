@@ -46,7 +46,7 @@ func mostrar_academia(msg: String = "") -> void:
 	t.treinar.connect(_comecar_carreira)
 	t.continuar.connect(_continuar_carreira)
 	t.abrir_pool.connect(mostrar_pool)
-<<<<<<< HEAD
+	t.abrir_patio.connect(mostrar_patio_academia)
 	t.abrir_circuito.connect(mostrar_circuito)
 	t.jogar_desafio.connect(_comecar_desafio)
 	_trocar(t)
@@ -55,9 +55,6 @@ func mostrar_academia(msg: String = "") -> void:
 func mostrar_circuito() -> void:
 	var t := TelaCircuito.new(perfil)
 	t.voltar.connect(func(): mostrar_academia())
-=======
-	t.abrir_patio.connect(mostrar_patio_academia)
->>>>>>> origin/main
 	_trocar(t)
 
 

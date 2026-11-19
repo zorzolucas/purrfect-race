@@ -68,8 +68,9 @@ func _abrir(id: String) -> void:
 
 func _painel_eventos() -> Control:
 	var v := UI.vbox(10)
-	v.add_child(UI.label("Cada copa tem 3 corridas e pede 3 garotas salvas diferentes; o Campeonato Final tem 5 e pede 5. Pontos por colocação: %s. Vence quem somar mais que cada uma das 3 casas rivais (%s). O clima e o traçado de cada corrida mudam a cada rotação da pool." % [
-		", ".join(Dados.endgame.circuito.pontos.map(func(x): return str(int(x)))), ", ".join(Dados.endgame.circuito.casas)], 15, UI.SUAVE, true))
+	v.add_child(UI.label("Cada copa tem 3 corridas e pede 3 garotas salvas diferentes; o Campeonato Final tem 5 e pede 5. Pontos por colocação: %s. Vence quem somar mais que cada uma das 3 casas rivais (%s). O clima e o traçado de cada corrida mudam a cada rotação da pool, e cada evento aceita %d tentativas por rotação: se a semana não favorece o seu elenco, a próxima pode favorecer." % [
+		", ".join(Dados.endgame.circuito.pontos.map(func(x): return str(int(x)))), ", ".join(Dados.endgame.circuito.casas),
+		int(Dados.endgame.circuito.tentativas_por_rotacao)], 15, UI.SUAVE, true))
 	var abas := UI.hbox(8)
 	for n in Endgame.niveis().size():
 		var nv: Dictionary = Endgame.niveis()[n]
@@ -128,10 +129,12 @@ func _cartao_evento(ev: Dictionary, n_aptas: int) -> Control:
 			" (1ª vitória)" if primeira else (" — já recebido nesta rotação" if ja_pago else " (repetição, 1 vez por rotação)")]
 		if reg.melhor > 0:
 			info += " · recorde %d pts" % reg.melhor
+		info += " · %d de %d tentativas nesta rotação" % [perfil.tentativas_restantes(nivel, ev.id),
+			int(Dados.endgame.circuito.tentativas_por_rotacao)]
 	var l := UI.label(info, 14, UI.TEXTO if aberto else UI.SUAVE, true)
 	linha.add_child(l)
 	var b := UI.botao("Escalar", func(): _abrir(ev.id), 16)
-	b.disabled = not aberto or n_aptas < precisa
+	b.disabled = not aberto or n_aptas < precisa or perfil.tentativas_restantes(nivel, ev.id) <= 0
 	linha.add_child(b)
 	v.add_child(linha)
 	p.add_child(v)
@@ -219,8 +222,9 @@ func _painel_escalacao() -> Control:
 		v.add_child(p)
 	var valida: bool = usadas.size() == ev.corridas.size() and not usadas.has("") \
 		and usadas.all(func(n): return usadas.count(n) == 1)
-	var b := UI.botao("Correr %s" % ev.nome, _correr, 20)
-	b.disabled = not valida
+	var restantes := perfil.tentativas_restantes(nivel, evento_id)
+	var b := UI.botao("Correr %s (%d tentativa(s) nesta rotação)" % [ev.nome, restantes], _correr, 20)
+	b.disabled = not valida or restantes <= 0
 	v.add_child(b)
 	if not valida:
 		v.add_child(UI.label("Cada corrida precisa de uma garota diferente.", 14, UI.PERIGO))
@@ -281,9 +285,11 @@ func _painel_resultado() -> Control:
 	placar.add_child(pl)
 	v.add_child(placar)
 	var botoes := UI.hbox(12)
-	botoes.add_child(UI.botao("Tentar de novo com a mesma escalação", func():
+	var de_novo := UI.botao("Tentar de novo (%d restante(s))" % perfil.tentativas_restantes(nivel, evento_id), func():
 		resultado = {}
-		_montar(), 18))
+		_montar(), 18)
+	de_novo.disabled = perfil.tentativas_restantes(nivel, evento_id) <= 0
+	botoes.add_child(de_novo)
 	botoes.add_child(UI.botao("Voltar às copas", func(): _abrir(""), 18))
 	v.add_child(botoes)
 	return v

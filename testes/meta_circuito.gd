@@ -74,7 +74,7 @@ func _corredoras(modo: String, corrida: Dictionary, media: float) -> Dictionary:
 		"garota":
 			for g in dd.garotas:
 				# só quem tem aptidão para disputar: Ótima numa e pelo menos Boa na outra
-				if Dados.APT[g.aptidao[corrida.dist]] * Dados.APT[g.aptidao[corrida.piso]] < 1.05:
+				if dd.APT[g.aptidao[corrida.dist]] * dd.APT[g.aptidao[corrida.piso]] < 1.05:
 					continue
 				var c: Dictionary = EndgameS.corredora_npc(g, media, corrida)
 				c.jogadora = true

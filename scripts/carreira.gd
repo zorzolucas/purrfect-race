@@ -125,19 +125,16 @@ var oferta_amuleto: Array = []  # amuletos oferecidos, esperando a escolha
 var estrela_usada := false
 var instrucao := "normal"    # instrução da próxima corrida (GDD §5.7)
 var titulos: Array = []      # séries completadas: [{id, nome, turno}] (calendario.md §7.4)
-<<<<<<< HEAD
 # endgame (data/endgame.json, scripts/endgame.gd)
 var magnitude := 0           # 0 a 5 (calendario.md §10)
 var regra := ""              # regra do Desafio da semana ("" = carreira normal)
 var desafio := 0             # número da semana do desafio (0 = carreira normal)
 var maldicoes: Array = []    # ids das maldições (amuletos negativos que não ocupam vaga)
-=======
 var conversa_turno := 0     # último turno em que ela conversou no pátio (1 por turno)
 var patio_vistos: Array = [] # conversas próprias de cada colega já vistas no pátio
 ## Reação de quem falou na última escolha (encontro ou pátio), para o retrato mostrar.
 ## Não vai para o save: a tela consome e limpa.
 var ultima_reacao := {}
->>>>>>> origin/main
 var _cache_olheiro := {}
 
 

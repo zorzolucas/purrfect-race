@@ -33,6 +33,7 @@
     ],
     "premio_final": 3.0,
     "premio_repeticao": 0.2,
+    "tentativas_por_rotacao": 3,
     "pontos": [10, 8, 6, 5, 4, 3, 2, 1],
     "forca_casa": [0.98, 1.05],
     "forca_avulsa": [0.85, 1.0],
@@ -40,12 +41,11 @@
     "clima": {"bom": 60, "chuva": 25, "calor": 15},
     "tracados": [
       {"id": "padrao", "nome": "Pista padrão", "descricao": "Sem nada de especial.", "efeito": {}},
-      {"id": "pesada", "nome": "Pista pesada", "descricao": "Grama alta e chão fofo: o fôlego rende menos. Estamina e Poupar valem mais.", "efeito": {"folego_dist": 0.35}},
-      {"id": "subidas", "nome": "Subidas", "descricao": "Acelerar custa mais. Poder vale mais.", "efeito": {"acel": 0.4}},
-      {"id": "vento", "nome": "Vento contra", "descricao": "A Velocidade rende 40% menos para todas: Poder, Determinação e Inteligência pesam mais.", "efeito": {"attr": {"vel": 0.6}}},
-      {"id": "reta", "nome": "Reta final longa", "descricao": "A última reta favorece quem vem de trás: Fechadoras +3,5%, Arrancadoras +1,5%.", "efeito": {"estilo": {"fec": 1.035, "arr": 1.015}}},
-      {"id": "curvas", "nome": "Curvas fechadas", "descricao": "Quem lê bem a curva ganha terreno: Inteligência conta +30%.", "efeito": {"attr": {"int": 1.3}}},
-      {"id": "curvas_b", "nome": "Curvas fechadas (B)", "descricao": "teste", "efeito": {"estilo": {"per": 1.02, "pon": 1.01}}}
+      {"id": "pesada", "nome": "Pista pesada", "descricao": "Grama alta e chão fofo: o fôlego rende bem menos. Nas corridas longas, Estamina e Inteligência valem mais que Velocidade.", "efeito": {"folego_dist": 0.35}},
+      {"id": "subidas", "nome": "Subidas", "descricao": "Acelerar custa mais e ninguém corre no máximo: Poder vale mais e Velocidade, menos. Bom para Arrancadoras.", "efeito": {"acel": 0.4, "attr": {"vel": 0.8}}},
+      {"id": "vento", "nome": "Vento contra", "descricao": "Quem corre atrás pega o vácuo: Fechadoras +2,5% e Arrancadoras +1,5%, e a Velocidade rende 30% menos para todas.", "efeito": {"attr": {"vel": 0.7}, "estilo": {"fec": 1.025, "arr": 1.015}}},
+      {"id": "reta", "nome": "Reta final longa", "descricao": "A última reta favorece quem vem de trás: Fechadoras +3,5% e Arrancadoras +1,5%.", "efeito": {"estilo": {"fec": 1.035, "arr": 1.015}}},
+      {"id": "curvas", "nome": "Curvas fechadas", "descricao": "Quem acompanha o ritmo da frente economiza nas curvas: Perseguidoras +2% e Ponteiras +1%.", "efeito": {"estilo": {"per": 1.02, "pon": 1.01}}}
     ],
     "copas": [
       {"id": "sprint", "nome": "Copa Sprint", "corridas": [

@@ -24,7 +24,7 @@ var semente := 0
 var tiragens := 0
 # endgame (docs/campanhas.md §2.3)
 var magnitudes := {}         # nome -> {liberada: maior magnitude que pode escolher, vencida: maior com o GP final vencido (-1 = nenhuma)}
-var circuito := {}           # "nivel:evento" -> {vitorias: int, melhor: int (pontos), giro_premio: rotação do último prêmio}
+var circuito := {}           # "nivel:evento" -> {vitorias, melhor (pontos), giro_premio (rotação do último prêmio), giro_tentativas e tentativas (nesta rotação)}
 var tentativas_circuito := 0
 var desafios := {}           # semana (texto) -> {tentativas, melhor: placar, pago: bool}
 
@@ -69,7 +69,8 @@ static func carregar() -> Perfil:
 	var circ: Dictionary = d.get("circuito", {})
 	for k in circ:
 		p.circuito[k] = {"vitorias": int(circ[k].get("vitorias", 0)), "melhor": int(circ[k].get("melhor", 0)),
-			"giro_premio": int(circ[k].get("giro_premio", -1))}
+			"giro_premio": int(circ[k].get("giro_premio", -1)), "giro_tentativas": int(circ[k].get("giro_tentativas", -1)),
+			"tentativas": int(circ[k].get("tentativas", 0))}
 	p.tentativas_circuito = int(d.get("tentativas_circuito", 0))
 	var des: Dictionary = d.get("desafios", {})
 	for k in des:
@@ -231,7 +232,16 @@ func concluir_desafio(c: Carreira) -> void:
 # ---------- Circuito (GDD §7) ----------
 
 func registro_circuito(nivel: int, id: String) -> Dictionary:
-	return circuito.get(Endgame.chave(nivel, id), {"vitorias": 0, "melhor": 0, "giro_premio": -1}).duplicate()
+	return circuito.get(Endgame.chave(nivel, id), {"vitorias": 0, "melhor": 0, "giro_premio": -1,
+		"giro_tentativas": -1, "tentativas": 0}).duplicate()
+
+
+## Tentativas que ainda restam nesta rotação. O limite faz a força do elenco e as condições
+## da semana pesarem: sem ele, bastava repetir até a sorte ajudar.
+func tentativas_restantes(nivel: int, id: String) -> int:
+	var reg := registro_circuito(nivel, id)
+	var usadas: int = int(reg.get("tentativas", 0)) if int(reg.get("giro_tentativas", -1)) == giro else 0
+	return maxi(0, int(Dados.endgame.circuito.tentativas_por_rotacao) - usadas)
 
 
 func venceu_evento(nivel: int, id: String) -> bool:
@@ -257,7 +267,7 @@ func aptas_circuito() -> Array:
 ## Corre um evento com a escalação [{nome, instrucao}] e paga o prêmio. Devolve o resultado
 ## de Endgame.correr_evento com {premio, primeira}.
 func correr_circuito(nivel: int, id: String, escalacao: Array) -> Dictionary:
-	if not evento_aberto(nivel, id):
+	if not evento_aberto(nivel, id) or tentativas_restantes(nivel, id) <= 0:
 		return {}
 	var esc := []
 	for e in escalacao:
@@ -265,6 +275,10 @@ func correr_circuito(nivel: int, id: String, escalacao: Array) -> Dictionary:
 	tentativas_circuito += 1
 	var r := Endgame.correr_evento(nivel, giro, id, esc, hash([semente, "circuito", tentativas_circuito]))
 	var reg := registro_circuito(nivel, id)
+	if int(reg.get("giro_tentativas", -1)) != giro:
+		reg.giro_tentativas = giro
+		reg.tentativas = 0
+	reg.tentativas = int(reg.tentativas) + 1
 	reg.melhor = maxi(int(reg.melhor), int(r.total))
 	r.primeira = r.venceu and reg.vitorias == 0
 	r.premio = 0

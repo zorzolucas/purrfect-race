@@ -241,11 +241,14 @@ func _circuito() -> void:
 	_conferir(usadas.filter(func(n): return n in nomes or usadas.count(n) > 1).is_empty(), "casas sem repetir e sem as da jogadora")
 	# progresso: força alta vence o Bronze (garotas 1100 contra NPCs 600)
 	var vitorias := 0
-	for i in 5:
+	for i in 3:
 		var r: Dictionary = p.correr_circuito(0, "sprint", esc)
 		if r.venceu:
 			vitorias += 1
-	_conferir(vitorias >= 4, "garotas 1100 deveriam vencer o Bronze quase sempre (%d/5)" % vitorias)
+	_conferir(vitorias >= 2, "garotas 1100 deveriam vencer o Bronze quase sempre (%d/3)" % vitorias)
+	# limite de tentativas por rotação
+	_conferir(p.tentativas_restantes(0, "sprint") == 0 and p.correr_circuito(0, "sprint", esc).is_empty(),
+		"a 4ª tentativa na mesma rotação é recusada")
 	var reg: Dictionary = p.registro_circuito(0, "sprint")
 	_conferir(reg.vitorias == vitorias and p.evento_aberto(1, "sprint"), "vencer o Bronze abre o Prata")
 	# prêmio: cheio na 1ª; a repetição paga 1 vez por rotação (e não na mesma rotação da 1ª)
@@ -253,7 +256,8 @@ func _circuito() -> void:
 	_conferir(p.moeda == esperado, "prêmio da 1ª vitória (moeda %d, esperado %d)" % [p.moeda, esperado])
 	p.girar_pool()
 	var pagas := 0
-	for i in 4:
+	_conferir(p.tentativas_restantes(0, "sprint") == 3, "a rotação nova devolve as tentativas")
+	for i in 3:
 		var r: Dictionary = p.correr_circuito(0, "sprint", esc)
 		if r.venceu:
 			pagas += 1 if r.premio > 0 else 0

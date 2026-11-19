@@ -53,19 +53,19 @@ func _initialize() -> void:
 			main.perfil = p
 			main.mostrar_academia("Pool girou: o circuito tem condições novas nesta rotação."),
 		func():
-			_salvar("30_academia_endgame")
+			_salvar("50_academia_endgame")
 			main.mostrar_circuito(),
 		func():
-			_salvar("31_circuito")
+			_salvar("51_circuito")
 			main.tela._trocar_nivel(1),
 		func():
-			_salvar("32_circuito_prata")
+			_salvar("52_circuito_prata")
 			main.tela._abrir("milha"),
 		func():
-			_salvar("33_escalacao")
+			_salvar("53_escalacao")
 			main.tela._correr(),
 		func():
-			_salvar("34_resultado_copa")
+			_salvar("54_resultado_copa")
 			main._comecar_carreira("Lira", 3),
 		func():
 			# sem madrinha, para ir direto à carreira na Magnitude 3
@@ -76,17 +76,17 @@ func _initialize() -> void:
 			c.maldicoes = ["coleira", "nuvem"]
 			main.mostrar_carreira("Magnitude 3: as metas sobem um degrau."),
 		func():
-			_salvar("35_carreira_magnitude")
+			_salvar("55_carreira_magnitude")
 			main._comecar_desafio(),
 		func():
-			_salvar("36_carreira_desafio")
+			_salvar("56_carreira_desafio")
 			var c = main.carreira
 			c.turno = 73
 			c.terminou = true
 			c.fama = 6100
 			main.mostrar_carreira(""),
 		func():
-			_salvar("37_fim_desafio"),
+			_salvar("57_fim_desafio"),
 	]
 
 

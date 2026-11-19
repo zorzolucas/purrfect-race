@@ -40,12 +40,12 @@
     "casas": ["Academia Cometa", "Casa Nebulosa", "Clube Aurora"],
     "clima": {"bom": 60, "chuva": 25, "calor": 15},
     "tracados": [
-      {"id": "padrao", "nome": "Pista padrão", "descricao": "Sem nada de especial.", "efeito": {}},
-      {"id": "pesada", "nome": "Pista pesada", "descricao": "Grama alta e chão fofo: o fôlego rende bem menos. Nas corridas longas, Estamina e Inteligência valem mais que Velocidade.", "efeito": {"folego_dist": 0.35}},
-      {"id": "subidas", "nome": "Subidas", "descricao": "Acelerar custa mais e ninguém corre no máximo: Poder vale mais e Velocidade, menos. Bom para Arrancadoras.", "efeito": {"acel": 0.4, "attr": {"vel": 0.8}}},
-      {"id": "vento", "nome": "Vento contra", "descricao": "Quem corre atrás pega o vácuo: Fechadoras +2,5% e Arrancadoras +1,5%, e a Velocidade rende 30% menos para todas.", "efeito": {"attr": {"vel": 0.7}, "estilo": {"fec": 1.025, "arr": 1.015}}},
-      {"id": "reta", "nome": "Reta final longa", "descricao": "A última reta favorece quem vem de trás: Fechadoras +3,5% e Arrancadoras +1,5%.", "efeito": {"estilo": {"fec": 1.035, "arr": 1.015}}},
-      {"id": "curvas", "nome": "Curvas fechadas", "descricao": "Quem acompanha o ritmo da frente economiza nas curvas: Perseguidoras +2% e Ponteiras +1%.", "efeito": {"estilo": {"per": 1.02, "pon": 1.01}}}
+      {"id": "padrao", "nome": "Pista padrão", "peso": 1, "descricao": "Sem nada de especial.", "efeito": {}},
+      {"id": "pesada", "nome": "Pista pesada", "peso": 2, "descricao": "Grama alta e chão fofo: o fôlego rende bem menos e quem vem atrás gasta menos abrindo caminho (Fechadoras +3%, Arrancadoras +1,5%). De 2400 m para cima, Estamina e Inteligência valem mais que Velocidade.", "efeito": {"folego_dist": 0.35, "estilo": {"fec": 1.03, "arr": 1.015}}},
+      {"id": "subidas", "nome": "Subidas", "peso": 2, "descricao": "Acelerar custa mais e ninguém corre no máximo: Poder vale mais que Velocidade. Bom para Arrancadoras.", "efeito": {"acel": 0.4, "attr": {"vel": 0.8}}},
+      {"id": "vento", "nome": "Vento contra", "peso": 1, "descricao": "Quem corre atrás pega o vácuo: Fechadoras +4% e Arrancadoras +2%, e a Velocidade rende 30% menos para todas.", "efeito": {"attr": {"vel": 0.7}, "estilo": {"fec": 1.04, "arr": 1.02}}},
+      {"id": "reta", "nome": "Reta final longa", "peso": 1, "descricao": "A última reta favorece quem vem de trás: Fechadoras +5% e Arrancadoras +2%.", "efeito": {"estilo": {"fec": 1.05, "arr": 1.02}}},
+      {"id": "curvas", "nome": "Curvas fechadas", "peso": 1, "descricao": "Quem abre na frente economiza nas curvas: Ponteiras +2% e Perseguidoras +1%.", "efeito": {"estilo": {"pon": 1.02, "per": 1.01}}}
     ],
     "copas": [
       {"id": "sprint", "nome": "Copa Sprint", "corridas": [

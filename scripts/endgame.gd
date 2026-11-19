@@ -210,9 +210,10 @@ static func condicoes(giro: int, id: String) -> Array:
 	for i in ev.corridas.size():
 		var r := _rng(["condicao", giro, id, i])
 		var clima := Calendario.sortear_peso(r, cfg.clima)
-		var tracados: Array = cfg.tracados
-		var t: Dictionary = tracados[r.randi() % tracados.size()]
-		lista.append({"clima": clima, "tracado": t.id})
+		var pesos := {}
+		for t in cfg.tracados:
+			pesos[t.id] = float(t.get("peso", 1))
+		lista.append({"clima": clima, "tracado": Calendario.sortear_peso(r, pesos)})
 	return lista
 
 

@@ -4,6 +4,7 @@ extends SceneTree
 ## em cada clima e traçado. Se um estilo ou garota vencer em quase tudo, há meta.
 ## Uso: Godot --headless --path . --script res://testes/meta_circuito.gd -- modo N media [parte i/n] [saida.json] [climas] [tracados] [corridas]
 ##   modo: "estilo" (perfil neutro, todos os atributos iguais, aptidão Ótima/Ótima),
+##         "nivel" (chance de vencer cada evento em cada nível com elencos de média 700 a 1100),
 ##         "garota" (as 48 com o próprio perfil e aptidões) ou "attr" (+10% em um atributo por vez)
 ##   media: média dos atributos da corredora da jogadora; o pelotão usa o nível mais próximo abaixo.
 ##   climas: lista separada por vírgula (padrão "bom,chuva,calor").
@@ -40,6 +41,9 @@ func _initialize() -> void:
 	var resultado := {}
 	var idx := 0
 	var t0 := Time.get_ticks_msec()
+	if modo == "nivel":
+		_niveis(n, parte, saida)
+		return
 	for ev in EndgameS.eventos():
 		for i in ev.corridas.size():
 			var corrida: Dictionary = ev.corridas[i]
@@ -132,3 +136,50 @@ func _desfazer_tracado(c: Dictionary, t: Dictionary) -> void:
 	var pa: Dictionary = ef.get("attr", {})
 	for k in pa:
 		c.attrs[k] = float(c.attrs[k]) / float(pa[k])
+
+
+## Dificuldade de cada nível: elencos com a melhor aptidão possível em cada corrida e
+## atributos de média M, em semanas sorteadas (condições e casas mudam). N tentativas.
+func _niveis(n: int, parte: Array, saida: String) -> void:
+	var resultado := {}
+	var idx := 0
+	for media in [700, 800, 850, 900, 950, 1000, 1050, 1100]:
+		for nivel in EndgameS.niveis().size():
+			for ev in EndgameS.eventos():
+				idx += 1
+				if idx % parte[1] != parte[0]:
+					continue
+				var vit := 0
+				var pts := 0
+				for s in n:
+					var giro := 1000 + s
+					var r := RandomNumberGenerator.new()
+					r.seed = hash([s, ev.id, nivel, media])
+					var esc := []
+					var usadas := []
+					for corrida in ev.corridas:
+						var cand: Array = dd.garotas.filter(func(g): return not g.nome in usadas)
+						var notas := {}
+						for g in cand:
+							notas[g.nome] = dd.APT[g.aptidao[corrida.dist]] * dd.APT[g.aptidao[corrida.piso]] + r.randf() * 0.01
+						cand.sort_custom(func(a, b): return notas[a.nome] > notas[b.nome])
+						var g: Dictionary = cand[0]
+						usadas.append(g.nome)
+						var soma := 0.0
+						for k in SimCorrida.KEYS:
+							soma += g.atributos[k]
+						var at := {}
+						for k in SimCorrida.KEYS:
+							at[k] = g.atributos[k] * media * 5.0 / soma
+						esc.append({"nome": g.nome, "salva": {"attrs": at, "habilidades": dd.habilidades.get("iniciais", [])}})
+					var res: Dictionary = EndgameS.correr_evento(nivel, giro, ev.id, esc, hash([s, "nivel", media]))
+					vit += 1 if res.venceu else 0
+					pts += int(res.total)
+				resultado["%d|%s|%s" % [media, EndgameS.niveis()[nivel].id, ev.id]] = [snappedf(float(vit) / n, 0.01), snappedf(float(pts) / n, 0.1)]
+	if saida != "":
+		var f := FileAccess.open(saida, FileAccess.WRITE)
+		f.store_string(JSON.stringify(resultado))
+	else:
+		for k in resultado:
+			print(k, " ", resultado[k])
+	quit()

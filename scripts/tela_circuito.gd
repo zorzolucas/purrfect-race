@@ -7,8 +7,6 @@ extends Control
 
 signal voltar
 
-const CLIMA_NOME := {"bom": "Tempo bom", "chuva": "Chuva", "calor": "Calor"}
-const CLIMA_ICONE := {"bom": "☀", "chuva": "☂", "calor": "♨"}
 
 var perfil: Perfil
 var nivel := 0
@@ -143,8 +141,9 @@ func _cartao_evento(ev: Dictionary, n_aptas: int) -> Control:
 
 func _texto_corrida(corrida: Dictionary, cond: Dictionary) -> String:
 	var t := Endgame.tracado(cond.tracado)
-	return "%s %s · %s · %d m · %s · %s" % [CLIMA_ICONE.get(cond.clima, ""), Dados.DIST_NOME[corrida.dist],
-		corrida.piso.capitalize(), int(corrida.metros), CLIMA_NOME.get(cond.clima, cond.clima), t.get("nome", "")]
+	var cl: Dictionary = Dados.calendario.climas.get(cond.clima, {})
+	return "%s %s · %s · %d m · %s · %s" % [cl.get("icone", ""), Dados.DIST_NOME[corrida.dist],
+		corrida.piso.capitalize(), int(corrida.metros), cl.get("nome", cond.clima), t.get("nome", "")]
 
 
 # ---------- escalação ----------

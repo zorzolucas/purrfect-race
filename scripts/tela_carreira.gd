@@ -112,6 +112,25 @@ func _painel_garota() -> Control:
 	v.add_child(l_amu)
 	if not c.titulos.is_empty():
 		v.add_child(UI.label("Títulos: %s" % ", ".join(c.titulos.map(func(t): return t.nome)), 13, UI.DESTAQUE, true))
+	if c.magnitude > 0 or c.desafio > 0 or not c.maldicoes.is_empty():
+		var partes := []
+		if c.desafio > 0:
+			partes.append("Desafio da semana #%d · regra: %s" % [c.desafio, Endgame.regra(c.regra).get("nome", c.regra)])
+		if c.magnitude > 0:
+			partes.append("Magnitude %d" % c.magnitude)
+		if not c.maldicoes.is_empty():
+			partes.append("Maldições: %s" % ", ".join(c.maldicoes.map(func(id): return Dados.amuleto(id).nome)))
+		var l_end := UI.label(" · ".join(partes), 13, UI.PERIGO, true)
+		var dicas := []
+		if c.magnitude > 0:
+			dicas.append(Endgame.resumo_magnitude(c.magnitude))
+		if c.desafio > 0:
+			dicas.append(Endgame.regra(c.regra).get("descricao", ""))
+		for id in c.maldicoes:
+			dicas.append("%s: %s" % [Dados.amuleto(id).nome, Dados.amuleto(id).descricao])
+		l_end.tooltip_text = "\n".join(dicas)
+		l_end.mouse_filter = Control.MOUSE_FILTER_PASS
+		v.add_child(l_end)
 	if not c.madrinha.is_empty():
 		v.add_child(UI.label("Madrinha: %s (inspira nos turnos 25 e 49)" % c.madrinha.get("nome", "?"), 13, UI.SUAVE, true))
 	var hab: Array = c.habilidades.map(func(id): return Dados.habilidade(id).nome)
@@ -402,7 +421,7 @@ func _painel_mapa() -> Control:
 	for i in mapa.size():
 		var turno_linha: int = turno0 + i * 2
 		var h := UI.hbox(8)
-		var cl: Dictionary = Dados.calendario.climas[Calendario.clima(c.semente, turno_linha)]
+		var cl: Dictionary = Dados.calendario.climas[c.clima_em(turno_linha)]
 		var mes := UI.label("%s %s" % [Dados.calendario.meses[Calendario.mes_idx(turno_linha) % 12].substr(0, 3), cl.icone], 15)
 		mes.custom_minimum_size.x = 64
 		mes.tooltip_text = cl.nome

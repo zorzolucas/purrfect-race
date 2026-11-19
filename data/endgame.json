@@ -1,0 +1,92 @@
+{
+  "_doc": "Endgame (docs/campanhas.md §2.3): Magnitude (calendario.md §10), Circuito em níveis Bronze/Prata/Ouro (GDD §7) e Desafio da semana. Lido por scripts/endgame.gd, carreira.gd e perfil.gd. Valores (inicial).",
+  "magnitude": {
+    "max": 5,
+    "forca_npc": [1.0, 1.05, 1.05, 1.05, 1.10, 1.10],
+    "forca_rival": [1.15, 1.15, 1.15, 1.15, 1.25, 1.25],
+    "maldicoes": [0, 0, 1, 1, 1, 2],
+    "meta_degrau": 3,
+    "menos_recuperacao": 5,
+    "moeda_por_nivel": 0.2,
+    "descricao": [
+      "Normal.",
+      "NPCs +5% de força.",
+      "A carreira começa com 1 maldição sorteada.",
+      "As metas dos objetivos sobem um degrau: top 5 vira top 3, top 3 vira vitória.",
+      "NPCs +10% no total e rivais com nome +25% (em vez de +15%).",
+      "2 maldições, e cada trecho tem 1 nó de Recuperação a menos."
+    ]
+  },
+  "maldicoes": [
+    {"id": "coleira", "nome": "Coleira Frouxa", "tipo": "maldicao", "descricao": "5% de chance de falha em todo treino, mesmo com energia cheia.", "efeito": {"falha_min": 0.05}},
+    {"id": "torcida", "nome": "Torcida Exigente", "tipo": "maldicao", "descricao": "Fama −20% em toda corrida.", "efeito": {"fama": -0.2}},
+    {"id": "insonia", "nome": "Insônia", "tipo": "maldicao", "descricao": "Descanso recupera −15%.", "efeito": {"descanso_mult": 0.85}},
+    {"id": "nuvem", "nome": "Nuvem Carregada", "tipo": "maldicao", "descricao": "Chuva sai com quase o dobro da chance.", "efeito": {"chuva_dobro": true}},
+    {"id": "bolso", "nome": "Bolso Furado", "tipo": "maldicao", "descricao": "Prêmios em moeda das corridas −30%.", "efeito": {"moeda_corrida": -0.3}}
+  ],
+  "circuito": {
+    "_doc": "Cada copa tem 3 corridas e pede 3 garotas diferentes; o Campeonato Final tem 5 e pede 5. Vence quem somar mais pontos entre a jogadora e as 3 casas rivais. O Prata de uma copa abre com o Bronze dela vencido, o Ouro com o Prata. O Final de um nível abre com as 5 copas daquele nível vencidas.",
+    "niveis": [
+      {"id": "bronze", "nome": "Bronze", "forca": 600, "premio": 60},
+      {"id": "prata", "nome": "Prata", "forca": 800, "premio": 120},
+      {"id": "ouro", "nome": "Ouro", "forca": 950, "premio": 200}
+    ],
+    "premio_final": 3.0,
+    "premio_repeticao": 0.2,
+    "pontos": [10, 8, 6, 5, 4, 3, 2, 1],
+    "forca_casa": [0.98, 1.05],
+    "forca_avulsa": [0.85, 1.0],
+    "casas": ["Academia Cometa", "Casa Nebulosa", "Clube Aurora"],
+    "clima": {"bom": 60, "chuva": 25, "calor": 15},
+    "tracados": [
+      {"id": "padrao", "nome": "Pista padrão", "descricao": "Sem nada de especial.", "efeito": {}},
+      {"id": "pesada", "nome": "Pista pesada", "descricao": "Grama alta e chão fofo: o fôlego rende menos. Estamina e Poupar valem mais.", "efeito": {"folego_dist": 0.35}},
+      {"id": "subidas", "nome": "Subidas", "descricao": "Acelerar custa mais. Poder vale mais.", "efeito": {"acel": 0.4}},
+      {"id": "vento", "nome": "Vento contra", "descricao": "A Velocidade rende 40% menos para todas: Poder, Determinação e Inteligência pesam mais.", "efeito": {"attr": {"vel": 0.6}}},
+      {"id": "reta", "nome": "Reta final longa", "descricao": "A última reta favorece quem vem de trás: Fechadoras +3,5%, Arrancadoras +1,5%.", "efeito": {"estilo": {"fec": 1.035, "arr": 1.015}}},
+      {"id": "curvas", "nome": "Curvas fechadas", "descricao": "Quem lê bem a curva ganha terreno: Inteligência conta +30%.", "efeito": {"attr": {"int": 1.3}}},
+      {"id": "curvas_b", "nome": "Curvas fechadas (B)", "descricao": "teste", "efeito": {"estilo": {"per": 1.02, "pon": 1.01}}}
+    ],
+    "copas": [
+      {"id": "sprint", "nome": "Copa Sprint", "corridas": [
+        {"dist": "sprint", "piso": "grama", "metros": 1000},
+        {"dist": "sprint", "piso": "grama", "metros": 1200},
+        {"dist": "sprint", "piso": "grama", "metros": 1400}]},
+      {"id": "milha", "nome": "Copa Milha", "corridas": [
+        {"dist": "milha", "piso": "grama", "metros": 1600},
+        {"dist": "milha", "piso": "grama", "metros": 1600},
+        {"dist": "milha", "piso": "grama", "metros": 1800}]},
+      {"id": "media", "nome": "Copa Média", "corridas": [
+        {"dist": "media", "piso": "grama", "metros": 2000},
+        {"dist": "media", "piso": "grama", "metros": 2200},
+        {"dist": "media", "piso": "grama", "metros": 2400}]},
+      {"id": "longa", "nome": "Copa Longa", "corridas": [
+        {"dist": "longa", "piso": "grama", "metros": 2800},
+        {"dist": "longa", "piso": "grama", "metros": 3000},
+        {"dist": "longa", "piso": "grama", "metros": 3200}]},
+      {"id": "terra", "nome": "Copa Terra", "corridas": [
+        {"dist": "sprint", "piso": "terra", "metros": 1200},
+        {"dist": "milha", "piso": "terra", "metros": 1600},
+        {"dist": "media", "piso": "terra", "metros": 2400}]}
+    ],
+    "final": {"id": "final", "nome": "Campeonato Final", "corridas": [
+      {"dist": "sprint", "piso": "terra", "metros": 1200},
+      {"dist": "milha", "piso": "grama", "metros": 1600},
+      {"dist": "media", "piso": "terra", "metros": 2000},
+      {"dist": "longa", "piso": "terra", "metros": 3000},
+      {"dist": "longa", "piso": "grama", "metros": 3200}]}
+  },
+  "desafio": {
+    "_doc": "Um desafio por rotação da pool, igual para todo jogador na mesma rotação (a semente não usa o perfil). Corre com vínculo 0, sem madrinha e sem guardar versão salva. Não gira a pool, então dá para tentar de novo na mesma semana; a moeda só vem na 1ª tentativa concluída.",
+    "regras": [
+      {"id": "sempre_chove", "nome": "Sempre chove", "descricao": "O céu nunca abre: toda corrida e todo treino acontecem na chuva."},
+      {"id": "so_pratas", "nome": "Só Pratas", "descricao": "Das corridas opcionais, só as da categoria Prata estão abertas."},
+      {"id": "poucos_amuletos", "nome": "Bolsa pequena", "descricao": "No máximo 2 amuletos equipados."},
+      {"id": "amaldicoada", "nome": "Lua negra", "descricao": "Começa com 2 maldições sorteadas."},
+      {"id": "elite", "nome": "Pelotão de elite", "descricao": "Todas as NPCs correm com +10% de força."}
+    ],
+    "forca_elite": 1.10,
+    "maldicoes_amaldicoada": 2,
+    "limite_amuletos": 2
+  }
+}

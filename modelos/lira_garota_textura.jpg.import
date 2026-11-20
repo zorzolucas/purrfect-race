@@ -2,19 +2,19 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://7yu6m4sn2u7v"
-path="res://.godot/imported/lira_lira_contorno.png-8cf465b082ceabf0a25ef58031f37a9a.ctex"
+uid="uid://dyttom0wukwxa"
+path="res://.godot/imported/lira_garota_textura.jpg-e5799940b20de15bb60443f96d1d3331.ctex"
 metadata={
 "vram_texture": false
 }
 generator_parameters={
-"md5": "1a4ba9170c3832fc6f69367a2f6d77fc"
+"md5": "dfb12e9b848dcc1337d527eb849ef350"
 }
 
 [deps]
 
-source_file="res://modelos/lira_lira_contorno.png"
-dest_files=["res://.godot/imported/lira_lira_contorno.png-8cf465b082ceabf0a25ef58031f37a9a.ctex"]
+source_file="res://modelos/lira_garota_textura.jpg"
+dest_files=["res://.godot/imported/lira_garota_textura.jpg-e5799940b20de15bb60443f96d1d3331.ctex"]
 
 [params]
 
@@ -26,7 +26,7 @@ compress/rdo_quality_loss=0.0
 compress/hdr_compression=1
 compress/normal_map=0
 compress/channel_pack=0
-mipmaps/generate=false
+mipmaps/generate=true
 mipmaps/limit=-1
 roughness/mode=0
 roughness/src_normal=""
@@ -40,4 +40,4 @@ process/normal_map_invert_y=false
 process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
-detect_3d/compress_to=0
+detect_3d/compress_to=1

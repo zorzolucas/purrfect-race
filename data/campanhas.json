@@ -1234,7 +1234,7 @@
     "turno": 20,
     "cat": "aberta",
     "meta": {
-     "max": 5,
+     "max": 6,
      "maratona": 2
     },
     "onde": "casa"
@@ -1614,7 +1614,7 @@
     "turno": 20,
     "cat": "aberta",
     "meta": {
-     "max": 5,
+     "max": 6,
      "maratona": 2
     },
     "onde": "casa"
@@ -1822,7 +1822,7 @@
     "turno": 20,
     "cat": "aberta",
     "meta": {
-     "max": 5,
+     "max": 6,
      "maratona": 2
     },
     "onde": "casa"
@@ -1935,7 +1935,7 @@
     "turno": 32,
     "cat": "prata",
     "meta": {
-     "max": 5
+     "max": 4
     },
     "onde": "outro_piso"
    },
@@ -2258,7 +2258,7 @@
     "turno": 32,
     "cat": "prata",
     "meta": {
-     "max": 5
+     "max": 4
     },
     "onde": "outro_piso"
    },

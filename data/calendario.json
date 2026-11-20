@@ -61,9 +61,9 @@
     "ouro": {
       "nome": "Ouro",
       "forca": [
-        458,
-        458,
-        615
+        465,
+        465,
+        628
       ],
       "fama_entrada": 1500,
       "fama": 800,
@@ -78,7 +78,7 @@
     },
     "gp2": {
       "nome": "Grande Prêmio",
-      "forca": 522,
+      "forca": 535,
       "fama_entrada": 0,
       "fama": 1500,
       "desde": 48

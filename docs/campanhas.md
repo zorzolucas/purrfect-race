@@ -251,12 +251,10 @@ As outras **42 garotas** ganham a campanha a partir de **1 dos 12 arquétipos** 
 
 ### 4.2 Exceções do nível baixo
 
-Até o ritmo ser recalibrado nos níveis 150–300 (calendário §11):
+O ritmo foi recalibrado no nível baixo na v0.7 (correção de estilo, corrida.md §8.5). As exceções abaixo foram conferidas de novo com o bot:
 - *A **Fechadora de Longa** do modelo corria os objetivos 1 e 2 e o GP do ano 1 na Média até a v0.6. Saiu da exceção porque, com o GP do ano 1 na Média, a Misteriosa (4 Fechadoras, 2 delas de Longa) completava 10 pontos acima dos outros arquétipos. A Mira e a Shaula, do MVP, continuam com o ano 1 na Média, porque a campanha delas foi escrita assim.*
-- **Fechadora de Sprint:** a Estreia pede **top 3** em vez de top 5, porque ela tem vantagem no começo.
+- **Fechadora de Sprint:** a Estreia pede **top 3** em vez de top 5. A vantagem dela no começo saiu com a correção de estilo, mas a exceção ficou: com top 3 a Estreia derruba só 3% a 8% delas, e a Alcione e a Bellatrix completam acima da média (v0.7).
 - *A **Ponteira de Longa** saiu desta exceção na v0.4: com top 3, a Estreia derrubava 29% delas (§7).*
-
-Quando a recalibração sair, o bot roda de novo e as exceções que não forem mais necessárias saem.
 
 ### 4.3 Rival da campanha
 
@@ -503,7 +501,7 @@ Uma meta pode ter `max` (colocação), `rival` (nome ou `true` para a rival da c
 
 ### 6.3 O que o bot faz
 
-- Treina o atributo mais atrasado em relação ao perfil da casa e descansa com energia abaixo de 45 (ou sai, se o humor estiver Normal ou pior). Escolhe o nó do mapa pelo tipo, preferindo Treino focado e Circuito.
+- Treina o atributo mais atrasado em relação ao perfil da casa, **multiplicado pelos pesos do estilo** (corrida.md §3.1: a Ponteira puxa Inteligência, a Fechadora Determinação e Poder), e descansa com energia abaixo de 45 (ou sai, se o humor estiver Normal ou pior). Escolhe o nó do mapa pelo tipo, preferindo Treino focado e Circuito.
 - **Opcionais:** corre quando a média dos atributos, com a aptidão, chega a 95% da força da corrida (o olheiro diria Favorita ou Disputada) e a energia está em 50 ou mais. Entre as possíveis, escolhe a que dá mais fama.
 - **Escolhas de história:** sorteia 50/50, para medir os dois caminhos.
 - **Instrução pré-corrida:** sempre Normal.

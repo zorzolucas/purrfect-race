@@ -440,7 +440,9 @@ No começo da carreira, a **Fechadora** é forte na Sprint e a **Ponteira** é f
 - Recalibrar o ritmo também nos níveis 150–300 (o `ajustar_ritmo` hoje usa 500 e 800).
 - Aceitar como "sabor" do começo de carreira e compensar com a meta (top 5 em vez de top 3).
 
-Enquanto isso, as campanhas usam uma exceção: a Fechadora de Sprint precisa de top 3 na Estreia ([campanhas](campanhas.md) §4.2). Fica como pendência de balanceamento.
+Enquanto isso, as campanhas usam uma exceção: a Fechadora de Sprint precisa de top 3 na Estreia ([campanhas](campanhas.md) §4.2).
+
+**Resolvido na v0.7 (2026-11-20):** a simulação ganhou uma correção de estilo por nível e distância, calibrada de 200 a 1000 ([corrida.md](corrida.md) §8.5). Com ela, os 4 estilos ficam entre 21% e 29% em cada nível e distância da grade. A exceção da Fechadora de Sprint ficou, porque não pesa (campanhas §4.2).
 
 ## 12. Escopo do MVP
 

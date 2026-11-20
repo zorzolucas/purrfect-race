@@ -8,6 +8,7 @@ var main: Node
 var dados: Node
 var passo := 0
 var espera := 0
+var ESPERA := int(OS.get_environment("CAPTURA_ESPERA")) if OS.get_environment("CAPTURA_ESPERA") != "" else 75
 var passos: Array[Callable] = []
 
 
@@ -156,7 +157,7 @@ func _salvar(nome: String) -> void:
 
 func _process(_delta: float) -> bool:
 	espera += 1
-	if espera < 75:
+	if espera < ESPERA:
 		return false
 	espera = 0
 	if passo >= passos.size():

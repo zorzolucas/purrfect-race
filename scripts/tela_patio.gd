@@ -51,16 +51,21 @@ func _ready() -> void:
 	add_child(m)
 
 	# topo: evento do turno e voltar
-	var topo := UI.painel(Color(0.08, 0.1, 0.16, 0.86), 12)
+	var topo := UI.painel(UI.PAINEL, 12)
 	var ht := UI.hbox(12)
-	var tv := UI.vbox(2)
+	var tv := UI.vbox(4)
 	tv.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var ev: Dictionary = Dados.patio.eventos.get(evento.id, {})
-	var titulo := "Pátio da academia"
+	var hti := UI.hbox(10)
+	hti.add_child(UI.faixa("Pátio da academia", UI.VERDE, 22))
 	if c:
-		titulo += " · " + Calendario.data_texto(c.turno)
-	tv.add_child(UI.label(titulo, 22, UI.DESTAQUE))
-	tv.add_child(UI.label(_texto(ev.get("banner", ""), evento.get("outra", "")), 15, UI.TEXTO, true))
+		var cd := UI.capsula(Calendario.data_texto(c.turno), UI.CEU, 14)
+		cd.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		hti.add_child(cd)
+	tv.add_child(hti)
+	var lb := UI.label(_texto(ev.get("banner", ""), evento.get("outra", "")), 15, UI.TEXTO, true)
+	lb.add_theme_font_override("font", UI.negrito())
+	tv.add_child(lb)
 	var dica := "Clique numa colega para conversar (uma conversa por turno)."
 	if c == null:
 		dica = "Clique numa garota para ouvir o que ela tem a dizer."
@@ -68,7 +73,9 @@ func _ready() -> void:
 		dica = "Vocês já conversaram neste turno. Clique numa colega para ouvir uma fala."
 	tv.add_child(UI.label(dica, 13, UI.SUAVE, true))
 	ht.add_child(tv)
-	ht.add_child(UI.botao("Voltar", func(): voltar.emit(_resultado), 18))
+	var bv := UI.botao("Voltar", func(): voltar.emit(_resultado), 18)
+	bv.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	ht.add_child(bv)
 	topo.add_child(ht)
 	cobre.add_child(topo)
 
@@ -84,7 +91,7 @@ func _ready() -> void:
 	vazio.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	meio.add_child(vazio)
 	# painel da conversa (embaixo, à direita)
-	_painel = UI.painel(Color(0.11, 0.1, 0.18, 0.93), 16)
+	_painel = UI.painel(UI.PAINEL, 16)
 	_painel.custom_minimum_size.x = 560
 	_painel.size_flags_vertical = Control.SIZE_SHRINK_END
 	_painel.visible = false
@@ -111,12 +118,13 @@ func _garota_grande() -> Control:
 		tr.custom_minimum_size = Vector2(250, 400)
 		tr.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		v.add_child(tr)
-	var p := UI.painel(Color(0.08, 0.1, 0.16, 0.86), 10)
+	var p := UI.painel(UI.PAINEL, 10)
 	var h := UI.hbox(10)
-	_retrato_dela = RetratoGarota.new(c.nome, 64, SpritesGarota.expressao_do_humor(c.humor))
-	h.add_child(_retrato_dela)
-	var tv := UI.vbox(2)
-	tv.add_child(UI.label(c.nome, 20))
+	var med := UI.medalhao(c.nome, 64, SpritesGarota.expressao_do_humor(c.humor))
+	_retrato_dela = med.get_child(0)
+	h.add_child(med)
+	var tv := UI.vbox(4)
+	tv.add_child(UI.faixa(c.nome, UI.cor_garota(c.nome), 18))
 	tv.add_child(UI.label("Humor: %s · Energia %d" % [Carreira.HUMOR_NOME[c.humor], c.energia], 13, UI.SUAVE))
 	h.add_child(tv)
 	p.add_child(h)
@@ -141,19 +149,24 @@ func abrir(nome: String) -> void:
 	var cv: Dictionary = c.conversa_patio(nome) if c else {}
 	var v := UI.vbox(10)
 	var topo := UI.hbox(12)
-	var ret := RetratoGarota.new(nome, 96, cv.get("expressao", "normal"))
-	topo.add_child(ret)
-	var tv := UI.vbox(2)
+	var med := UI.medalhao(nome, 96, cv.get("expressao", "normal"))
+	var ret: RetratoGarota = med.get_child(0)
+	topo.add_child(med)
+	var tv := UI.vbox(4)
 	tv.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var inf: Dictionary = Dados.patio.garotas.get(nome, {})
-	tv.add_child(UI.label(nome, 14, UI.SUAVE))
+	var hn := UI.hbox(8)
+	hn.add_child(UI.faixa(nome, UI.cor_garota(nome), 18))
+	if c:
+		var ca := UI.capsula("♥ Afinidade %d" % c.afinidade.get(nome, 0), UI.ROSA, 13)
+		ca.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		hn.add_child(ca)
+	tv.add_child(hn)
 	if cv.is_empty():
 		var hab: String = inf.get("habito", "passeia pelo pátio")
-		tv.add_child(UI.label(hab.left(1).to_upper() + hab.substr(1), 18, UI.DESTAQUE, true))
+		tv.add_child(UI.label(hab.left(1).to_upper() + hab.substr(1), 18, UI.TEXTO, true))
 	else:
-		tv.add_child(UI.label(_texto(cv.titulo, nome), 22, UI.DESTAQUE, true))
-	if c:
-		tv.add_child(UI.label("Afinidade %d" % c.afinidade.get(nome, 0), 13, UI.SUAVE))
+		tv.add_child(UI.label(_texto(cv.titulo, nome), 22, UI.TEXTO, true))
 	topo.add_child(tv)
 	var fechar := UI.botao("×", func(): _painel.visible = false, 18)
 	fechar.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
@@ -161,11 +174,15 @@ func abrir(nome: String) -> void:
 	v.add_child(topo)
 	if cv.is_empty():
 		var falas: Array = inf.get("falas", ["..."])
-		v.add_child(UI.label("\"%s\"" % falas[_rng.randi() % falas.size()], 17, UI.TEXTO, true))
+		var bf := UI.painel(Color("#f4f8fc"), 12)
+		bf.add_child(UI.label("\"%s\"" % falas[_rng.randi() % falas.size()], 17, UI.TEXTO, true))
+		v.add_child(bf)
 		ret.call_deferred("reagir", {"gesto": inf.get("gesto", ""), "emote": inf.get("emote", "")})
 		patio.reagir(nome, {"gesto": "aceno", "emote": inf.get("emote", "")})
 	else:
-		v.add_child(UI.label(_texto(cv.texto, nome), 17, UI.TEXTO, true))
+		var bt := UI.painel(Color("#f4f8fc"), 12)
+		bt.add_child(UI.label(_texto(cv.texto, nome), 17, UI.TEXTO, true))
+		v.add_child(bt)
 		ret.call_deferred("gesto", cv.get("gesto", ""))
 		for i in cv.escolhas.size():
 			var idx: int = i
@@ -184,11 +201,12 @@ func _escolher(nome: String, i: int) -> void:
 		f.queue_free()
 	var v := UI.vbox(10)
 	var h := UI.hbox(12)
-	var ret := RetratoGarota.new(nome, 96, reacao.get("expressao", "normal"))
-	h.add_child(ret)
+	var med := UI.medalhao(nome, 96, reacao.get("expressao", "normal"))
+	var ret: RetratoGarota = med.get_child(0)
+	h.add_child(med)
 	h.add_child(UI.label(_resultado, 17, UI.TEXTO, true))
 	v.add_child(h)
-	v.add_child(UI.botao("Voltar ao turno", func(): voltar.emit(_resultado), 18))
+	v.add_child(UI.botao_principal("Voltar ao turno", func(): voltar.emit(_resultado), 18))
 	_painel.add_child(v)
 	ret.call_deferred("reagir", reacao)
 	patio.reagir(nome, reacao)

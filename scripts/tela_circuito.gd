@@ -7,6 +7,8 @@ extends Control
 
 signal voltar
 
+## Cor de cada nível (Bronze, Prata, Ouro).
+const COR_NIVEL := [Color("#d08a4e"), Color("#8fa6bf"), Color("#f5b301")]
 
 var perfil: Perfil
 var nivel := 0
@@ -34,9 +36,10 @@ func _montar() -> void:
 		c.queue_free()
 	var v := UI.vbox(12)
 	var topo := UI.hbox(12)
-	var titulo := UI.label("Circuito · rotação %d" % (perfil.giro + 1), 30, UI.DESTAQUE)
-	titulo.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	topo.add_child(titulo)
+	topo.add_child(UI.faixa("Circuito · rotação %d" % (perfil.giro + 1), UI.LARANJA, 30))
+	var esp := Control.new()
+	esp.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	topo.add_child(esp)
 	topo.add_child(UI.moedas(perfil.moeda))
 	if evento_id != "":
 		topo.add_child(UI.botao("Voltar às copas", func(): _abrir(""), 18))
@@ -51,8 +54,13 @@ func _montar() -> void:
 	var rolagem := ScrollContainer.new()
 	rolagem.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	v.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	rolagem.add_child(v)
-	add_child(UI.margem(rolagem, 28))
+	var mg := MarginContainer.new()
+	mg.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	for lado in ["left", "right", "top", "bottom"]:
+		mg.add_theme_constant_override("margin_" + lado, 6)
+	mg.add_child(v)
+	rolagem.add_child(mg)
+	add_child(UI.margem(rolagem, 18))
 
 
 func _abrir(id: String) -> void:
@@ -68,12 +76,14 @@ func _painel_eventos() -> Control:
 	var v := UI.vbox(10)
 	v.add_child(UI.label("Cada copa tem 3 corridas e pede 3 garotas salvas diferentes; o Campeonato Final tem 5 e pede 5. Pontos por colocação: %s. Vence quem somar mais que cada uma das 3 casas rivais (%s). O clima e o traçado de cada corrida mudam a cada rotação da pool, e cada evento aceita %d tentativas por rotação: se a semana não favorece o seu elenco, a próxima pode favorecer." % [
 		", ".join(Dados.endgame.circuito.pontos.map(func(x): return str(int(x)))), ", ".join(Dados.endgame.circuito.casas),
-		int(Dados.endgame.circuito.tentativas_por_rotacao)], 15, UI.SUAVE, true))
+		int(Dados.endgame.circuito.tentativas_por_rotacao)], 14, UI.SUAVE, true))
 	var abas := UI.hbox(8)
 	for n in Endgame.niveis().size():
 		var nv: Dictionary = Endgame.niveis()[n]
 		var b := UI.botao("%s · força %d" % [nv.nome, int(nv.forca)], func(): _trocar_nivel(n), 18)
-		b.disabled = n == nivel
+		if n == nivel:
+			UI.colorir_botao(b, COR_NIVEL[n % COR_NIVEL.size()])
+			b.custom_minimum_size.y = 50
 		abas.add_child(b)
 	v.add_child(abas)
 	var aptas := perfil.aptas_circuito()
@@ -95,21 +105,26 @@ func _trocar_nivel(n: int) -> void:
 
 
 func _cartao_evento(ev: Dictionary, n_aptas: int) -> Control:
-	var p := UI.painel()
+	var reg := perfil.registro_circuito(nivel, ev.id)
+	var cor_n: Color = COR_NIVEL[nivel % COR_NIVEL.size()]
+	var p := UI.painel_titulo("%s %s" % [ev.nome, Endgame.niveis()[nivel].nome], UI.ROSA if ev.id == "final" else cor_n)
 	p.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	p.custom_minimum_size.x = 520
-	var v := UI.vbox(4)
-	var reg := perfil.registro_circuito(nivel, ev.id)
-	var cab := UI.hbox(8)
-	var nome := UI.label("%s %s" % [ev.nome, Endgame.niveis()[nivel].nome], 19, UI.DESTAQUE if ev.id == "final" else UI.TEXTO)
-	nome.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	cab.add_child(nome)
+	var v: VBoxContainer = p.get_meta("corpo")
+	v.add_theme_constant_override("separation", 5)
 	if reg.vitorias > 0:
-		cab.add_child(UI.label("✓ vencida %d×" % reg.vitorias, 14, UI.OK))
-	v.add_child(cab)
+		# o PanelContainer encaixa os filhos: a cápsula fica numa camada solta por cima
+		var camada := Control.new()
+		camada.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		p.add_child(camada)
+		var cv := UI.capsula("✓ vencida %d×" % reg.vitorias, UI.VERDE, 13)
+		camada.add_child(cv)
+		cv.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
+		cv.position += Vector2(-12, 8)
+		cv.grow_horizontal = Control.GROW_DIRECTION_BEGIN
 	var conds := Endgame.condicoes(perfil.giro, ev.id)
 	for i in ev.corridas.size():
-		v.add_child(UI.label(_texto_corrida(ev.corridas[i], conds[i]), 13, UI.SUAVE, true))
+		v.add_child(_linha_corrida(ev.corridas[i], conds[i]))
 	var aberto := perfil.evento_aberto(nivel, ev.id)
 	var precisa: int = ev.corridas.size()
 	var linha := UI.hbox(8)
@@ -123,27 +138,38 @@ func _cartao_evento(ev: Dictionary, n_aptas: int) -> Control:
 	else:
 		var primeira: bool = reg.vitorias == 0
 		var ja_pago: bool = not primeira and int(reg.giro_premio) == perfil.giro
-		info = "Prêmio: %d moedas%s" % [Endgame.premio(nivel, ev.id, primeira),
+		linha.add_child(UI.Moeda.new(22))
+		info = "%d moedas%s" % [Endgame.premio(nivel, ev.id, primeira),
 			" (1ª vitória)" if primeira else (" — já recebido nesta rotação" if ja_pago else " (repetição, 1 vez por rotação)")]
 		if reg.melhor > 0:
 			info += " · recorde %d pts" % reg.melhor
 		info += " · %d de %d tentativas nesta rotação" % [perfil.tentativas_restantes(nivel, ev.id),
 			int(Dados.endgame.circuito.tentativas_por_rotacao)]
-	var l := UI.label(info, 14, UI.TEXTO if aberto else UI.SUAVE, true)
+	var l := UI.label(info, 13, UI.TEXTO if aberto else UI.SUAVE, true)
+	l.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	linha.add_child(l)
 	var b := UI.botao("Escalar", func(): _abrir(ev.id), 16)
 	b.disabled = not aberto or n_aptas < precisa or perfil.tentativas_restantes(nivel, ev.id) <= 0
+	if not b.disabled:
+		UI.colorir_botao(b, UI.VERDE)
+	b.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	linha.add_child(b)
 	v.add_child(linha)
-	p.add_child(v)
 	return p
 
 
-func _texto_corrida(corrida: Dictionary, cond: Dictionary) -> String:
+## Uma corrida da copa em cápsulas: distância, piso e metros, e o clima e o traçado.
+func _linha_corrida(corrida: Dictionary, cond: Dictionary) -> Control:
+	var h := UI.hbox(5)
 	var t := Endgame.tracado(cond.tracado)
 	var cl: Dictionary = Dados.calendario.climas.get(cond.clima, {})
-	return "%s %s · %s · %d m · %s · %s" % [cl.get("icone", ""), Dados.DIST_NOME[corrida.dist],
-		corrida.piso.capitalize(), int(corrida.metros), cl.get("nome", cond.clima), t.get("nome", "")]
+	h.add_child(UI.capsula(Dados.DIST_NOME[corrida.dist], UI.DIST_COR.get(corrida.dist, UI.CEU), 12))
+	h.add_child(UI.capsula(str(corrida.piso).capitalize(), UI.PISO_COR.get(corrida.piso, UI.VERDE), 12))
+	var l := UI.label("%d m · %s %s · %s" % [int(corrida.metros), cl.get("icone", ""), cl.get("nome", cond.clima), t.get("nome", "")], 13, UI.SUAVE)
+	l.tooltip_text = t.get("descricao", "")
+	l.mouse_filter = Control.MOUSE_FILTER_PASS
+	h.add_child(l)
+	return h
 
 
 # ---------- escalação ----------
@@ -180,7 +206,12 @@ static func forca_efetiva(p: Perfil, nome: String, corrida: Dictionary) -> float
 func _painel_escalacao() -> Control:
 	var ev := Endgame.evento(evento_id)
 	var v := UI.vbox(10)
-	v.add_child(UI.label("%s %s · NPCs com força média %d" % [ev.nome, Endgame.niveis()[nivel].nome, int(Endgame.niveis()[nivel].forca)], 22, UI.DESTAQUE))
+	var hc := UI.hbox(10)
+	hc.add_child(UI.faixa("Escalação · %s %s" % [ev.nome, Endgame.niveis()[nivel].nome], COR_NIVEL[nivel % COR_NIVEL.size()], 22))
+	var cf := UI.capsula("NPCs com força média %d" % int(Endgame.niveis()[nivel].forca), UI.ROXO, 14)
+	cf.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	hc.add_child(cf)
+	v.add_child(hc)
 	v.add_child(UI.label("Escolha uma garota diferente para cada corrida. A letra mostra a aptidão dela na distância e no piso; o traçado e o clima pesam diferente em cada estilo.", 14, UI.SUAVE, true))
 	var conds := Endgame.condicoes(perfil.giro, evento_id)
 	var aptas := perfil.aptas_circuito()
@@ -188,10 +219,13 @@ func _painel_escalacao() -> Control:
 	var usadas := escalacao.map(func(e): return e.nome)
 	for i in ev.corridas.size():
 		var corrida: Dictionary = ev.corridas[i]
-		var p := UI.painel()
-		var pv := UI.vbox(4)
+		var p := UI.painel(UI.PAINEL, 12)
+		var pv := UI.vbox(6)
 		var t := Endgame.tracado(conds[i].tracado)
-		pv.add_child(UI.label("Corrida %d · %s" % [i + 1, _texto_corrida(corrida, conds[i])], 16, UI.TEXTO, true))
+		var hl := UI.hbox(8)
+		hl.add_child(UI.capsula("Corrida %d" % (i + 1), UI.CEU, 14))
+		hl.add_child(_linha_corrida(corrida, conds[i]))
+		pv.add_child(hl)
 		if t.get("descricao", "") != "":
 			pv.add_child(UI.label("%s: %s" % [t.nome, t.descricao], 13, UI.SUAVE, true))
 		var linha := UI.hbox(8)
@@ -215,14 +249,16 @@ func _painel_escalacao() -> Control:
 		ins.item_selected.connect(func(j): escalacao[i].instrucao = chaves[j])
 		linha.add_child(ins)
 		if usadas.count(escalacao[i].nome) > 1:
-			linha.add_child(UI.label("repetida!", 14, UI.PERIGO))
+			linha.add_child(UI.capsula("repetida!", UI.PERIGO, 14))
+		if escalacao[i].nome != "":
+			linha.add_child(UI.medalhao(escalacao[i].nome, 40))
 		pv.add_child(linha)
 		p.add_child(pv)
 		v.add_child(p)
 	var valida: bool = usadas.size() == ev.corridas.size() and not usadas.has("") \
 		and usadas.all(func(n): return usadas.count(n) == 1)
 	var restantes := perfil.tentativas_restantes(nivel, evento_id)
-	var b := UI.botao("Correr %s (%d tentativa(s) nesta rotação)" % [ev.nome, restantes], _correr, 20)
+	var b := UI.botao_principal("Correr %s (%d tentativa(s) nesta rotação)" % [ev.nome, restantes], _correr, 20)
 	b.disabled = not valida or restantes <= 0
 	v.add_child(b)
 	if not valida:
@@ -254,14 +290,29 @@ func _painel_resultado() -> Control:
 	var casas: Array = Dados.endgame.circuito.casas
 	var v := UI.vbox(10)
 	var titulo := "Vitória na %s %s!" % [ev.nome, Endgame.niveis()[nivel].nome] if resultado.venceu else "%s %s: não foi desta vez" % [ev.nome, Endgame.niveis()[nivel].nome]
-	v.add_child(UI.label(titulo, 26, UI.OK if resultado.venceu else UI.PERIGO))
+	var ft := UI.faixa(titulo, UI.VERDE if resultado.venceu else UI.PERIGO, 26)
+	v.add_child(ft)
+	UI.pop(ft)
 	for i in resultado.corridas.size():
 		var r: Dictionary = resultado.corridas[i]
-		var p := UI.painel()
+		var p := UI.painel(UI.PAINEL, 10)
+		var ph := UI.hbox(12)
+		ph.add_child(UI.medalhao(escalacao[i].nome, 56, "feliz" if r.posicao <= 3 else "normal"))
 		var pv := UI.vbox(3)
-		pv.add_child(UI.label("Corrida %d · %s" % [i + 1, _texto_corrida(r.corrida, r.condicao)], 15, UI.SUAVE, true))
-		pv.add_child(UI.label("%s: %dº (%d pts)" % [escalacao[i].nome, r.posicao, Endgame.pontos(r.posicao)], 17,
-			UI.OK if r.posicao <= 3 else UI.TEXTO))
+		pv.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		var hl := UI.hbox(8)
+		hl.add_child(UI.capsula("Corrida %d" % (i + 1), UI.CEU, 13))
+		hl.add_child(_linha_corrida(r.corrida, r.condicao))
+		pv.add_child(hl)
+		var cor_pos: Color = {1: UI.OURO, 2: Color("#9fb3c8"), 3: Color("#d08a4e")}.get(r.posicao, UI.SUAVE)
+		var hp := UI.hbox(8)
+		var lp := UI.label_contorno("%dº" % r.posicao, 24, cor_pos, Color.WHITE, 6)
+		hp.add_child(lp)
+		var ln := UI.label("%s · %d pts" % [escalacao[i].nome, Endgame.pontos(r.posicao)], 17)
+		ln.add_theme_font_override("font", UI.negrito())
+		ln.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		hp.add_child(ln)
+		pv.add_child(hp)
 		var partes := []
 		for c in casas.size():
 			var pos: int = r.posicoes_casas[c]
@@ -270,15 +321,23 @@ func _painel_resultado() -> Control:
 		var vencedora: String = r.nomes[r.ordem[0]]
 		if r.ordem[0] != 0:
 			pv.add_child(UI.label("Vencedora: %s" % vencedora, 13, UI.SUAVE))
-		p.add_child(pv)
+		ph.add_child(pv)
+		p.add_child(ph)
 		v.add_child(p)
-	var placar := UI.painel(Color("#2a3150"))
+	var placar := UI.painel(Color("#fff3c4"), 12)
+	var sbp: StyleBoxFlat = placar.get_theme_stylebox("panel").duplicate()
+	sbp.border_color = UI.OURO
+	sbp.set_border_width_all(3)
+	placar.add_theme_stylebox_override("panel", sbp)
 	var pl := UI.vbox(4)
-	pl.add_child(UI.label("Você: %d pts" % resultado.total, 20, UI.DESTAQUE))
+	pl.add_child(UI.label_contorno("Você: %d pts" % resultado.total, 24, UI.DESTAQUE, Color.WHITE, 6))
 	for c in casas.size():
 		pl.add_child(UI.label("%s: %d pts" % [casas[c], resultado.casas[c]], 16))
 	if resultado.premio > 0:
-		pl.add_child(UI.label("+%d moedas%s" % [resultado.premio, " (1ª vitória)" if resultado.primeira else ""], 18, UI.OK))
+		var hm := UI.hbox(8)
+		hm.add_child(UI.Moeda.new(26))
+		hm.add_child(UI.label_contorno("+%d moedas%s" % [resultado.premio, " (1ª vitória)" if resultado.primeira else ""], 20, Color.WHITE, Color("#b07a00"), 6))
+		pl.add_child(hm)
 	elif resultado.venceu:
 		pl.add_child(UI.label("O prêmio de repetição desta copa já foi recebido nesta rotação.", 15, UI.SUAVE, true))
 	placar.add_child(pl)
@@ -289,6 +348,6 @@ func _painel_resultado() -> Control:
 		_montar(), 18)
 	de_novo.disabled = perfil.tentativas_restantes(nivel, evento_id) <= 0
 	botoes.add_child(de_novo)
-	botoes.add_child(UI.botao("Voltar às copas", func(): _abrir(""), 18))
+	botoes.add_child(UI.botao_principal("Voltar às copas", func(): _abrir(""), 18))
 	v.add_child(botoes)
 	return v

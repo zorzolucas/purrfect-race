@@ -38,9 +38,11 @@ static func _soma(a: Dictionary) -> float:
 func _ready() -> void:
 	var v := UI.vbox(12)
 	var topo := UI.hbox(12)
-	var titulo := UI.label("Escolha a madrinha de %s" % nome, 30, UI.DESTAQUE)
-	titulo.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	topo.add_child(titulo)
+	topo.add_child(UI.medalhao(nome, 56))
+	topo.add_child(UI.faixa("Escolha a madrinha de %s" % nome, UI.ROSA, 28))
+	var esp := Control.new()
+	esp.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	topo.add_child(esp)
 	topo.add_child(UI.botao("Voltar", func(): voltar.emit(), 16))
 	v.add_child(topo)
 	var b := Carreira.BAL
@@ -69,17 +71,18 @@ func _ready() -> void:
 
 
 func _cartao_sem() -> Control:
-	var p := UI.painel()
+	var p := UI.painel(UI.PAINEL, 12)
 	p.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var v := UI.vbox(8)
-	v.add_child(UI.label("Sem madrinha", 20))
+	v.add_child(UI.faixa("Sem madrinha", Color("#8a96ad"), 20))
 	var leg := Carreira.bonus_legado(vinculo, {})
 	v.add_child(UI.label("Só o bônus do vínculo: +%d em cada atributo." % leg.vel if vinculo > 0
 		else "Começa só com os atributos dela.", 14, UI.SUAVE, true))
 	var esp := Control.new()
 	esp.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	v.add_child(esp)
-	v.add_child(UI.botao("Começar sem madrinha", func(): escolheu.emit({}), 16))
+	var bs := UI.botao("Começar sem madrinha", func(): escolheu.emit({}), 16)
+	v.add_child(bs)
 	p.add_child(v)
 	return p
 
@@ -90,19 +93,38 @@ func _cartao(n: String) -> Control:
 	var p := CartaoGarota.criar(n, perfil.elenco[n].vinculo)
 	var v: VBoxContainer = p.get_child(0)
 	var a: Dictionary = salva.attrs
-	v.add_child(UI.label("Nota %s · %d objetivo(s)" % [salva.get("nota", "?"), int(salva.get("objetivos", 0))], 14, UI.OK))
-	v.add_child(UI.label("Vel %d · Est %d · Pod %d · Det %d · Int %d" % [a.vel, a.est, a.pod, a.det, a.int], 13, UI.SUAVE))
+	var hs := UI.hbox(8)
+	hs.add_child(UI.SeloNota.new(str(salva.get("nota", "G")), 40))
+	var sv := UI.vbox(2)
+	sv.add_child(UI.label("Versão salva · %d/8 objetivos" % int(salva.get("objetivos", 0)), 14, UI.OK))
+	sv.add_child(UI.linha_attrs(a, 13))
+	hs.add_child(sv)
+	v.add_child(hs)
 	var leg := Carreira.bonus_legado(vinculo, md)
-	var partes := []
 	var no_teto := false
+	var bonus := {}
 	for k in SimCorrida.KEYS:
-		partes.append("%s +%d" % [Dados.ATTR_CURTO[k], roundi(leg[k])])
+		bonus[k] = roundi(leg[k])
 		no_teto = no_teto or leg[k] >= Carreira.BAL.legado_teto
-	v.add_child(UI.label("Bônus inicial: " + " · ".join(partes) + (" (teto)" if no_teto else ""), 14, UI.DESTAQUE, true))
+	var pb := UI.painel(Color("#fff3c4"), 8)
+	var bv := UI.vbox(4)
+	bv.add_child(UI.label("Bônus inicial%s" % (" (no teto)" if no_teto else ""), 13, UI.DESTAQUE))
+	var lb := UI.hbox(10)
+	for k in SimCorrida.KEYS:
+		var hk := UI.hbox(3)
+		hk.add_child(UI.Icone.new(k, 16))
+		hk.add_child(UI.label_contorno("+%d" % bonus[k], 14, UI.ATTR_COR[k], Color.WHITE, 4))
+		lb.add_child(hk)
+	bv.add_child(lb)
+	pb.add_child(bv)
+	v.add_child(pb)
 	if md.dist != "":
 		v.add_child(UI.label("Pode inspirar: %s e %s" % [Dados.DIST_NOME[md.dist], md.piso.capitalize()], 13, UI.SUAVE, true))
 	var tit: Array = salva.get("titulos", [])
 	if not tit.is_empty():
 		v.add_child(UI.label("Títulos: " + ", ".join(tit), 13, UI.DESTAQUE, true))
-	v.add_child(UI.botao("Escolher %s" % n, func(): escolheu.emit(md), 16))
+	var esp := Control.new()
+	esp.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	v.add_child(esp)
+	v.add_child(UI.botao_principal("Escolher %s" % n, func(): escolheu.emit(md), 16))
 	return p

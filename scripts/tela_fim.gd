@@ -96,8 +96,9 @@ func _ready() -> void:
 
 	v.add_child(UI.label("Fica uma versão salva por garota. Ela é a que vai correr nas copas do circuito. A moeda você recebe de qualquer jeito, e a pool gira.", 15, UI.SUAVE, true))
 	var botoes := UI.hbox(12)
-	botoes.add_child(UI.botao("Substituir a versão salva" if not salva.is_empty() else "Salvar esta versão", func(): decidiu.emit(true), 20))
-	botoes.add_child(UI.botao("Descartar o resultado", func(): decidiu.emit(false), 20))
+	botoes.add_child(UI.botao_principal("Substituir a versão salva" if not salva.is_empty() else "Salvar esta versão", func(): decidiu.emit(true), 20))
+	botoes.add_child(UI.botao_confirmar("Descartar o resultado", func(): decidiu.emit(false), 20,
+		"Descartar esta versão? Clique de novo para confirmar"))
 	v.add_child(botoes)
 	_montar(v)
 

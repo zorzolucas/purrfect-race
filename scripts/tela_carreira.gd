@@ -6,6 +6,7 @@ extends Control
 signal ir_correr
 signal ir_patio
 signal atualizou(msg: String)
+signal ir_academia
 
 var c: Carreira
 var msg: String
@@ -19,6 +20,11 @@ func _init(carreira: Carreira, mensagem: String) -> void:
 
 
 func _ready() -> void:
+	_registrar_delta()
+	_montar()
+
+
+func _montar() -> void:
 	var raiz := UI.hbox(18)
 	raiz.add_child(_painel_garota())
 	var rolagem := ScrollContainer.new()
@@ -33,14 +39,86 @@ func _ready() -> void:
 
 # ---------- painel da garota ----------
 
-func _linha_barra(rotulo: String, valor: float, maximo: float, cor: Color) -> Control:
+## Estado da tela anterior (atributos e energia), para mostrar o que mudou com a última ação
+## ou corrida. Vale só para a mesma carreira.
+static var anterior := {}
+## Aba do painel da garota (0 = Status, 1 = Relações e equipamento) e loja aberta ou não.
+static var aba := 0
+static var loja_aberta := false
+
+var _delta := {}
+## Atalhos de teclado da tela atual: keycode -> Callable.
+var _atalhos := {}
+
+
+func _registrar_delta() -> void:
+	var id := c.get_instance_id()
+	if anterior.get("id", -1) == id and int(anterior.get("turno_save", -1)) <= c.turno:
+		for k in SimCorrida.KEYS:
+			var d: float = c.attrs[k] - float(anterior.attrs[k])
+			if absf(d) >= 1.0:
+				_delta[k] = d
+		var de: int = c.energia - int(anterior.energia)
+		if de != 0:
+			_delta["energia"] = de
+	anterior = {"id": id, "turno_save": c.turno, "attrs": c.attrs.duplicate(), "energia": c.energia}
+
+
+func _linha_barra(rotulo: String, valor: float, maximo: float, cor: Color, chave: String = "", marca: float = -1.0) -> Control:
 	var h := UI.hbox(8)
 	var l := UI.label(rotulo, 14)
 	l.custom_minimum_size.x = 104
 	h.add_child(l)
-	h.add_child(UI.barra(valor, maximo, cor, 190))
-	h.add_child(UI.label("%d" % valor, 14))
+	var d: float = _delta.get(chave, 0.0)
+	var b := UI.barra(valor - d if d > 0 else valor, maximo, cor, 170)
+	if d > 0:
+		# a barra cresce do valor antigo até o novo
+		b.create_tween().tween_property(b, "value", valor, 0.6).set_delay(0.15).set_trans(Tween.TRANS_CUBIC)
+	if marca > 0.0:
+		var m := MarcaBarra.new()
+		m.frac = clampf(marca / maximo, 0.0, 1.0)
+		m.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		m.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		b.add_child(m)
+	h.add_child(b)
+	var num := UI.label("%d" % valor, 14)
+	num.custom_minimum_size.x = 34
+	h.add_child(num)
+	if chave in SimCorrida.KEYS:
+		h.add_child(UI.label(Dados.nota({chave: valor}), 13, UI.SUAVE))
+	if d != 0.0:
+		var dl := UI.label("%+d" % roundi(d), 14, UI.OK if d > 0 else UI.PERIGO)
+		h.add_child(dl)
+		dl.create_tween().tween_property(dl, "modulate:a", 0.0, 1.2).set_delay(3.0)
 	return h
+
+
+## Risco vertical na barra: a força média das adversárias do próximo objetivo.
+class MarcaBarra extends Control:
+	var frac := 0.0
+
+	func _draw() -> void:
+		var x := size.x * frac
+		draw_line(Vector2(x, -3), Vector2(x, size.y + 3), Color("#f2c14e"), 2.0)
+
+
+static func _cor_apt(a: String) -> Color:
+	return {"R": UI.PERIGO, "O": UI.SUAVE, "B": Color("#7fb3e6"), "X": UI.OK}[a]
+
+
+func _chips_aptidao() -> Control:
+	var f := HFlowContainer.new()
+	f.add_theme_constant_override("h_separation", 4)
+	f.add_theme_constant_override("v_separation", 4)
+	var nomes := {"sprint": "Sprint", "milha": "Milha", "media": "Média", "longa": "Longa", "grama": "Grama", "terra": "Terra"}
+	for d in nomes:
+		var a: String = c.aptidao[d]
+		var p := UI.painel(_cor_apt(a).darkened(0.65), 4)
+		var l := UI.label("%s %s" % [nomes[d], Dados.APT_NOME[a]], 12, _cor_apt(a).lightened(0.2))
+		p.add_child(l)
+		p.tooltip_text = "Aptidão %s em %s" % [Dados.APT_NOME[a], nomes[d]]
+		f.add_child(p)
+	return f
 
 
 func _painel_garota() -> Control:
@@ -54,92 +132,141 @@ func _painel_garota() -> Control:
 	nomes.add_child(UI.label("%s · Nota %s · Fama %d" % [Dados.ESTILO_NOME[c.estilo], Dados.nota(c.attrs), c.fama], 15, UI.DESTAQUE))
 	topo.add_child(nomes)
 	v.add_child(topo)
+
+	var abas := UI.hbox(6)
+	for i in 2:
+		var idx := i
+		var b := UI.botao(["Status", "Relações e itens"][i], func(): _trocar_aba(idx), 13)
+		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		b.toggle_mode = true
+		b.button_pressed = aba == i
+		abas.add_child(b)
+	v.add_child(abas)
+
+	var corpo := UI.vbox(7)
+	if aba == 0:
+		_aba_status(corpo)
+	else:
+		_aba_relacoes(corpo)
+	var rol := ScrollContainer.new()
+	rol.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	rol.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	corpo.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	rol.add_child(corpo)
+	v.add_child(rol)
+	p.add_child(v)
+	return p
+
+
+func _trocar_aba(i: int) -> void:
+	aba = i
+	_reconstruir()
+
+
+func _reconstruir() -> void:
+	for filho in get_children():
+		filho.queue_free()
+	_atalhos.clear()
+	_montar()
+
+
+func _aba_status(v: VBoxContainer) -> void:
+	var o := c.proximo_objetivo()
+	var marca := c.forca_prevista(o) if not o.is_empty() else -1.0
 	for k in SimCorrida.KEYS:
-		v.add_child(_linha_barra(Dados.ATTR_NOME[k], c.attrs[k], c.limite, c.cor))
+		v.add_child(_linha_barra(Dados.ATTR_NOME[k], c.attrs[k], c.limite, c.cor, k, marca))
+	if marca > 0.0:
+		v.add_child(UI.label("▏ Média das adversárias do próximo objetivo: %d" % roundi(marca), 12, UI.DESTAQUE, true))
 	v.add_child(HSeparator.new())
 	var cor_e := UI.OK if c.energia >= 60 else (UI.DESTAQUE if c.energia >= Carreira.BAL.limite_falha else UI.PERIGO)
-	v.add_child(_linha_barra("Energia", c.energia, 100, cor_e))
+	v.add_child(_linha_barra("Energia", c.energia, 100, cor_e, "energia"))
 	var cor_h: Color = [UI.PERIGO, UI.DESTAQUE, UI.TEXTO, UI.OK, UI.OK][c.humor]
 	var humor_txt := "Humor: %s" % Carreira.HUMOR_NOME[c.humor]
 	if c.lesionada:
 		humor_txt += " · Lesionada (treino rende metade)"
 	v.add_child(UI.label(humor_txt, 15, UI.PERIGO if c.lesionada else cor_h, true))
-	var apt := []
-	for d in ["sprint", "milha", "media", "longa", "grama", "terra"]:
-		apt.append("%s %s" % [d.capitalize().substr(0, 3), Dados.APT_NOME[c.aptidao[d]]])
-	v.add_child(UI.label(" · ".join(apt), 12, UI.SUAVE, true))
+	v.add_child(_chips_aptidao())
 
 	v.add_child(HSeparator.new())
 	var titulo_obj := "Objetivos"
 	if c.caminho != "":
 		titulo_obj += " · caminho \"%s\"" % c.campanha.caminhos[c.caminho].nome
 	v.add_child(UI.label(titulo_obj, 15, UI.SUAVE))
-	for o in c.objetivos:
-		var res := c.resultados.filter(func(r): return r.turno == o.turno and r.objetivo > 0)
-		var marca := "○"
+	for ob in c.objetivos:
+		var res := c.resultados.filter(func(r): return r.turno == ob.turno and r.objetivo > 0)
+		var m := "○"
 		var cor := UI.TEXTO
 		if not res.is_empty():
-			marca = "✓" if res[0].ok else "✗"
+			m = "✓" if res[0].ok else "✗"
 			cor = UI.OK if res[0].ok else UI.PERIGO
-		elif o.turno == c.turno:
-			marca = "►"
+		elif ob.turno == c.turno:
+			m = "►"
 			cor = UI.DESTAQUE
-		var txt := "%s Turno %d · %s · %s %s" % [marca, o.turno, o.texto, Dados.DIST_NOME[o.dist], o.piso]
+		var txt := "%s Turno %d · %s · %s %s" % [m, ob.turno, ob.texto, Dados.DIST_NOME[ob.dist], ob.piso]
 		v.add_child(UI.label(txt, 13, cor, true))
+	if c.magnitude > 0 or c.desafio > 0 or not c.maldicoes.is_empty():
+		v.add_child(HSeparator.new())
+		_linha_endgame(v)
 
-	v.add_child(HSeparator.new())
+
+func _linha_endgame(v: VBoxContainer) -> void:
+	var partes := []
+	if c.desafio > 0:
+		partes.append("Desafio da semana #%d · regra: %s" % [c.desafio, Endgame.regra(c.regra).get("nome", c.regra)])
+	if c.magnitude > 0:
+		partes.append("Magnitude %d" % c.magnitude)
+	if not c.maldicoes.is_empty():
+		partes.append("Maldições: %s" % ", ".join(c.maldicoes.map(func(id): return Dados.amuleto(id).nome)))
+	v.add_child(UI.label(" · ".join(partes), 13, UI.PERIGO, true))
+	var dicas := []
+	if c.magnitude > 0:
+		dicas.append(Endgame.resumo_magnitude(c.magnitude))
+	if c.desafio > 0:
+		dicas.append(Endgame.regra(c.regra).get("descricao", ""))
+	for id in c.maldicoes:
+		dicas.append("%s: %s" % [Dados.amuleto(id).nome, Dados.amuleto(id).descricao])
+	for d in dicas:
+		if d != "":
+			v.add_child(UI.label(d, 12, UI.SUAVE, true))
+
+
+func _aba_relacoes(v: VBoxContainer) -> void:
 	var grade := GridContainer.new()
 	grade.columns = 2
 	grade.add_theme_constant_override("h_separation", 10)
 	for colega in c.afinidade:
 		var h := UI.hbox(5)
-		var l := UI.label(colega.split(" ")[0], 12)
-		l.custom_minimum_size.x = 58
+		var l := UI.label(colega.split(" ")[0], 13)
+		l.custom_minimum_size.x = 62
 		h.add_child(l)
 		var af: int = c.afinidade[colega]
 		var cor := UI.PERIGO if af < 0 else (UI.OK if af >= Carreira.BAL.afinidade_dupla else Color("#b07cc6"))
 		h.add_child(UI.barra(maxi(af, 0), 100, cor, 70))
-		h.add_child(UI.label(str(af), 12, UI.SUAVE))
+		h.add_child(UI.label(str(af), 13, UI.SUAVE))
 		grade.add_child(h)
-	v.add_child(UI.label("Afinidade (%d+ treina em dupla)" % Carreira.BAL.afinidade_dupla, 13, UI.SUAVE))
+	v.add_child(UI.label("Afinidade (%d+ treina em dupla)" % Carreira.BAL.afinidade_dupla, 14, UI.SUAVE))
 	v.add_child(grade)
 
 	v.add_child(HSeparator.new())
-	var amu: Array = c.amuletos.map(func(id): return Dados.amuleto(id).nome)
-	var l_amu := UI.label("Amuletos (%d/%d): %s" % [c.amuletos.size(), c.limite_amuletos(),
-		", ".join(amu) if not amu.is_empty() else "nenhum ainda"], 13, UI.TEXTO, true)
-	l_amu.tooltip_text = "\n".join(c.amuletos.map(func(id): return "%s: %s" % [Dados.amuleto(id).nome, Dados.amuleto(id).descricao]))
-	l_amu.mouse_filter = Control.MOUSE_FILTER_PASS
-	v.add_child(l_amu)
+	v.add_child(UI.label("Amuletos (%d/%d)" % [c.amuletos.size(), c.limite_amuletos()], 14, UI.SUAVE))
+	if c.amuletos.is_empty():
+		v.add_child(UI.label("Nenhum ainda. Objetivos cumpridos e o top 3 num Desafio dão amuletos.", 13, UI.SUAVE, true))
+	for id in c.amuletos:
+		var a := Dados.amuleto(id)
+		v.add_child(UI.label("%s: %s" % [a.nome, a.descricao], 13, UI.DESTAQUE if a.tipo == "raro" else UI.TEXTO, true))
+
+	v.add_child(HSeparator.new())
+	v.add_child(UI.label("Habilidades (%d/%d)" % [c.habilidades.size(), Dados.habilidades.limite], 14, UI.SUAVE))
+	if c.unica != "":
+		v.add_child(UI.label("%s ★ (única)" % SimCorrida.UNICAS[c.unica].nome, 13, UI.DESTAQUE, true))
+	for id in c.habilidades:
+		var hb := Dados.habilidade(id)
+		v.add_child(UI.label("%s: %s" % [hb.nome, hb.descricao], 13, UI.TEXTO, true))
 	if not c.titulos.is_empty():
+		v.add_child(HSeparator.new())
 		v.add_child(UI.label("Títulos: %s" % ", ".join(c.titulos.map(func(t): return t.nome)), 13, UI.DESTAQUE, true))
-	if c.magnitude > 0 or c.desafio > 0 or not c.maldicoes.is_empty():
-		var partes := []
-		if c.desafio > 0:
-			partes.append("Desafio da semana #%d · regra: %s" % [c.desafio, Endgame.regra(c.regra).get("nome", c.regra)])
-		if c.magnitude > 0:
-			partes.append("Magnitude %d" % c.magnitude)
-		if not c.maldicoes.is_empty():
-			partes.append("Maldições: %s" % ", ".join(c.maldicoes.map(func(id): return Dados.amuleto(id).nome)))
-		var l_end := UI.label(" · ".join(partes), 13, UI.PERIGO, true)
-		var dicas := []
-		if c.magnitude > 0:
-			dicas.append(Endgame.resumo_magnitude(c.magnitude))
-		if c.desafio > 0:
-			dicas.append(Endgame.regra(c.regra).get("descricao", ""))
-		for id in c.maldicoes:
-			dicas.append("%s: %s" % [Dados.amuleto(id).nome, Dados.amuleto(id).descricao])
-		l_end.tooltip_text = "\n".join(dicas)
-		l_end.mouse_filter = Control.MOUSE_FILTER_PASS
-		v.add_child(l_end)
 	if not c.madrinha.is_empty():
 		v.add_child(UI.label("Madrinha: %s (inspira nos turnos 25 e 49)" % c.madrinha.get("nome", "?"), 13, UI.SUAVE, true))
-	var hab: Array = c.habilidades.map(func(id): return Dados.habilidade(id).nome)
-	if c.unica != "":
-		hab.push_front(SimCorrida.UNICAS[c.unica].nome + " ★")
-	v.add_child(UI.label("Habilidades: %s" % ", ".join(hab), 13, UI.TEXTO, true))
-	p.add_child(v)
-	return p
 
 
 # ---------- painel do turno ----------
@@ -153,6 +280,10 @@ func _painel_turno() -> VBoxContainer:
 	data.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	cab.add_child(data)
 	cab.add_child(UI.label("Turno %d de %d" % [c.turno, Carreira.BAL.turnos], 15, UI.SUAVE))
+	var b_menu := UI.botao("Academia (Esc)", func(): ir_academia.emit(), 13)
+	b_menu.tooltip_text = "Volta à academia. A carreira fica salva e continua de onde parou."
+	cab.add_child(b_menu)
+	_atalhos[KEY_ESCAPE] = func(): ir_academia.emit()
 	tv.add_child(cab)
 	var cl: Dictionary = Dados.calendario.climas[c.clima()]
 	tv.add_child(UI.label("%s %s%s" % [cl.icone, cl.nome, ": " + cl.descricao if cl.has("descricao") else ""], 14, UI.TEXTO, true))
@@ -227,29 +358,52 @@ func _acoes(v: VBoxContainer) -> void:
 	if not corridas.is_empty():
 		v.add_child(UI.label("Correr (gasta %d de energia, sem treino neste turno)" % c.energia_corrida(), 16, UI.SUAVE))
 		var hc := UI.hbox(8)
-		for cr in corridas:
-			hc.add_child(_cartao_corrida(cr))
+		for i in corridas.size():
+			var bc := _cartao_corrida(corridas[i])
+			if i < 3:
+				var tecla: String = ["Q", "W", "R"][i]
+				bc.text = "[%s]\n%s" % [tecla, bc.text]
+				bc.custom_minimum_size.y += 20
+				_atalho([KEY_Q, KEY_W, KEY_R][i], bc)
+			hc.add_child(bc)
 		v.add_child(hc)
 
-	v.add_child(UI.label("Treinar", 16, UI.SUAVE))
+	v.add_child(UI.label("Treinar  (teclas 1 a 5)", 16, UI.SUAVE))
 	var grade := GridContainer.new()
 	grade.columns = 5
 	grade.add_theme_constant_override("h_separation", 6)
-	for t in Carreira.TREINOS:
-		grade.add_child(_botao_treino(t))
+	var lista_treinos: Array = Carreira.TREINOS.keys()
+	for i in lista_treinos.size():
+		var b := _botao_treino(lista_treinos[i])
+		b.text = UI.com_tecla(str(i + 1), b.text)
+		_atalho(KEY_1 + i, b)
+		grade.add_child(b)
 	v.add_child(grade)
 
 	v.add_child(UI.label("Outras ações", 16, UI.SUAVE))
 	var h := UI.hbox(8)
-	h.add_child(_botao_acao("Descansar\n+%d energia" % c.descanso_previsto(), c.descansar))
+	var b_desc := _botao_acao(UI.com_tecla("D", "Descansar\n+%d energia" % c.descanso_previsto()), c.descansar)
+	_atalho(KEY_D, b_desc)
+	h.add_child(b_desc)
 	var sair_txt := "Sair\n+humor, +%d energia" % Carreira.BAL.sair_energia
 	if c.tipo_no() == "festival" or c.em_ferias():
 		sair_txt += "\nencontro garantido"
-	h.add_child(_botao_acao(sair_txt, c.sair))
+	var b_sair := _botao_acao(UI.com_tecla("S", sair_txt), c.sair)
+	_atalho(KEY_S, b_sair)
+	h.add_child(b_sair)
 	if c.lesionada:
-		h.add_child(_botao_acao("Enfermaria\ncura a lesão", c.enfermaria))
+		var b_enf := _botao_acao(UI.com_tecla("E", "Enfermaria\ncura a lesão"), c.enfermaria)
+		_atalho(KEY_E, b_enf)
+		h.add_child(b_enf)
+	var b_loja := _botao_acao(UI.com_tecla("H", "Habilidades\n%d pontos\n%s" % [c.pontos, "fechar ▴" if loja_aberta else "abrir ▾"]), Callable())
+	b_loja.pressed.connect(_alternar_loja)
+	_atalho(KEY_H, b_loja)
+	if _alguma_compravel():
+		b_loja.add_theme_color_override("font_color", UI.DESTAQUE)
+	h.add_child(b_loja)
 	v.add_child(h)
-	v.add_child(_loja_habilidades())
+	if loja_aberta:
+		v.add_child(_loja_habilidades())
 
 
 ## Entrada do pátio: o evento do turno e se ainda dá para conversar (não gasta o turno).
@@ -266,7 +420,8 @@ func _faixa_patio() -> Control:
 	var extra := " Conversa disponível." if c.pode_conversar_no_patio() else " Já conversaram neste turno."
 	tv.add_child(UI.label(c.texto_patio(info.get("banner", ""), ev.outra) + extra, 13, UI.TEXTO, true))
 	h.add_child(tv)
-	var b := UI.botao("Ir ao pátio", func(): ir_patio.emit(), 16)
+	var b := UI.botao("[P] Ir ao pátio", func(): ir_patio.emit(), 16)
+	_atalho(KEY_P, b)
 	b.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	h.add_child(b)
 	p.add_child(h)
@@ -307,15 +462,18 @@ func _painel_amuleto() -> Control:
 	if amuleto_escolhido == "":
 		v.add_child(UI.label("Escolha um amuleto", 22, UI.DESTAQUE))
 		v.add_child(UI.label("Ele vale até o fim da carreira, mas não passa para a versão salva. Máximo de %d." % c.limite_amuletos(), 14, UI.SUAVE, true))
-		for id in c.oferta_amuleto:
+		for n_of in c.oferta_amuleto.size():
+			var id: String = c.oferta_amuleto[n_of]
 			var a := Dados.amuleto(id)
 			var tipo: String = {"simples": "Simples", "troca": "Troca", "estilo": "Estilo", "raro": "Raro"}[a.tipo]
-			var b := UI.botao("%s  (%s)\n%s" % [a.nome, tipo, a.descricao], func(): _escolher_amuleto(id), 16)
+			var b := UI.botao("[%d] %s  (%s)\n%s" % [n_of + 1, a.nome, tipo, a.descricao], func(): _escolher_amuleto(id), 16)
 			b.custom_minimum_size.y = 62
+			_atalho(KEY_1 + n_of, b)
 			if a.tipo == "raro":
 				b.add_theme_color_override("font_color", UI.DESTAQUE)
 			v.add_child(b)
-		v.add_child(UI.botao("Não quero nenhum", func(): atualizou.emit(c.descartar_oferta()), 14))
+		v.add_child(UI.botao_confirmar("Não quero nenhum", func(): atualizou.emit(c.descartar_oferta()), 14,
+			"Ficar sem amuleto desta vez? Clique de novo para confirmar"))
 	else:
 		v.add_child(UI.label("Os %d espaços estão cheios. Qual amuleto sai para entrar %s?" % [
 			c.limite_amuletos(), Dados.amuleto(amuleto_escolhido).nome], 18, UI.DESTAQUE, true))
@@ -332,9 +490,7 @@ func _escolher_amuleto(id: String) -> void:
 		atualizou.emit(c.escolher_amuleto(id))
 		return
 	amuleto_escolhido = id
-	for filho in get_children():
-		filho.queue_free()
-	_ready()
+	_reconstruir()
 
 
 func _cartao_corrida(cr: Dictionary) -> Control:
@@ -391,8 +547,14 @@ func _painel_olheiro(cr: Dictionary, e_objetivo: bool) -> Control:
 	rv.add_child(UI.label("Força média do pelotão: %d · %s, com aptidão e humor: %d" % [
 		roundi(ol.forca), c.nome, roundi(ol.media)], 15, UI.TEXTO, true))
 	rv.add_child(UI.label("Rival: %s" % ol.rival if ol.rival != "" else "Sem rival com nome nesta corrida.", 15, UI.TEXTO, true))
+	if e_objetivo and ol.has("chance_meta"):
+		var cm: float = ol.chance_meta
+		var cor_m := UI.OK if cm >= 0.7 else (UI.DESTAQUE if cm >= 0.4 else UI.PERIGO)
+		rv.add_child(UI.label("Chance de cumprir a meta (%s): ~%d%%" % [cr.texto, roundi(cm * 100)], 22, cor_m, true))
+		if cr.has("maratona"):
+			rv.add_child(UI.label("Conta só esta corrida; a maratona soma as boas colocações desde o último objetivo.", 13, UI.SUAVE, true))
 	var etq := UI.label("%s · chance de vencer ~%d%% · fama ×%s" % [Carreira.nome_etiqueta(ol.etiqueta),
-		roundi(ol.chance * 100), _mult_txt(ol.mult)], 20, _cor_etiqueta(ol.etiqueta))
+		roundi(ol.chance * 100), _mult_txt(ol.mult)], 17 if e_objetivo else 20, _cor_etiqueta(ol.etiqueta))
 	rv.add_child(etq)
 	rv.add_child(UI.label("Favorita rende menos fama (×0,75); Azarão rende mais (×1,5).", 13, UI.SUAVE, true))
 	if cr.get("fixa", false):
@@ -410,10 +572,13 @@ func _painel_olheiro(cr: Dictionary, e_objetivo: bool) -> Control:
 			partes.append("Sprint %s" % _pct(x.sprint))
 		partes.append("fôlego %s" % _pct(x.folego))
 		desc[ins] = ",\n".join(partes)
-	for ins in ["poupar", "normal", "forcar"]:
-		var txt := "%s%s\n%s\nchance ~%d%%" % [SimCorrida.INSTRUCAO_NOME[ins], " ★" if ins == ol.sugestao else "",
+	var ordem_ins := ["poupar", "normal", "forcar"]
+	for n_ins in 3:
+		var ins: String = ordem_ins[n_ins]
+		var txt := "[%d] %s%s\n%s\nvitória ~%d%%" % [n_ins + 1, SimCorrida.INSTRUCAO_NOME[ins], " ★" if ins == ol.sugestao else "",
 			desc[ins], roundi(ol.chances[ins] * 100)]
 		var b := UI.botao(txt, func(): _largar(ins), 15)
+		_atalho(KEY_1 + n_ins, b)
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		b.custom_minimum_size.y = 96
 		if ins == ol.sugestao:
@@ -421,7 +586,7 @@ func _painel_olheiro(cr: Dictionary, e_objetivo: bool) -> Control:
 		h.add_child(b)
 	v.add_child(h)
 	if not e_objetivo:
-		v.add_child(UI.botao("Desistir desta corrida e voltar às ações", func(): atualizou.emit(c.cancelar_corrida()), 14))
+		v.add_child(UI.botao_confirmar("Desistir desta corrida e voltar às ações", func(): atualizou.emit(c.cancelar_corrida()), 14))
 	p.add_child(v)
 	return p
 
@@ -452,14 +617,29 @@ func _painel_mapa() -> Control:
 		aviso += " No semestre de base não há corridas: só treino, encontros e história."
 	v.add_child(UI.label(aviso, 13, UI.SUAVE, true))
 	var turno0: int = Dados.calendario.trechos[t].turnos[0]
+	# alcance: a partir das opções desta linha, cada linha seguinte abre os vizinhos
+	var alcance := {}
+	var atual: Array = opcoes.duplicate()
+	for i in range(feitas.size(), mapa.size()):
+		alcance[i] = atual
+		var prox := []
+		for col in atual:
+			for viz in Calendario.vizinhos(col):
+				if not viz in prox:
+					prox.append(viz)
+		atual = prox
+	var linhas := UI.vbox(30)
+	var botoes := []   # botoes[i][col]
 	for i in mapa.size():
 		var turno_linha: int = turno0 + i * 2
 		var h := UI.hbox(8)
-		var cl: Dictionary = Dados.calendario.climas[c.clima_em(turno_linha)]
+		var cl: Dictionary = Dados.calendario.climas[Calendario.clima(c.semente, turno_linha)]
 		var mes := UI.label("%s %s" % [Dados.calendario.meses[Calendario.mes_idx(turno_linha) % 12].substr(0, 3), cl.icone], 15)
 		mes.custom_minimum_size.x = 64
 		mes.tooltip_text = cl.nome
+		mes.mouse_filter = Control.MOUSE_FILTER_PASS
 		h.add_child(mes)
+		var linha_b := []
 		for col in 3:
 			var no: Dictionary = mapa[i][col]
 			var info: Dictionary = Dados.calendario.nos[no.tipo]
@@ -473,11 +653,36 @@ func _painel_mapa() -> Control:
 			var escolhida: bool = i < feitas.size() and feitas[i] == col
 			var disponivel: bool = i == feitas.size() and col in opcoes
 			b.disabled = not disponivel
+			if disponivel:
+				b.text = "[%d] %s" % [col + 1, b.text]
+				_atalho(KEY_1 + col, b)
 			if escolhida:
 				b.text = "● " + b.text
 				b.add_theme_color_override("font_disabled_color", UI.DESTAQUE)
+			elif i < feitas.size() or (i > feitas.size() and not col in alcance.get(i, [])):
+				# caminho que já passou ou que a escolha de agora não alcança mais
+				b.modulate.a = 0.35
 			h.add_child(b)
-		v.add_child(h)
+			linha_b.append(b)
+		botoes.append(linha_b)
+		linhas.add_child(h)
+	# ligações entre os nós, desenhadas atrás dos botões
+	linhas.draw.connect(func():
+		for i in range(botoes.size() - 1):
+			for col in 3:
+				for viz in Calendario.vizinhos(col):
+					var a: Button = botoes[i][col]
+					var b: Button = botoes[i + 1][viz]
+					var pa := a.get_global_rect().get_center() - linhas.get_global_rect().position
+					var pb := b.get_global_rect().get_center() - linhas.get_global_rect().position
+					pa.y += a.size.y / 2.0
+					pb.y -= b.size.y / 2.0
+					var no_caminho: bool = i + 1 < feitas.size() and feitas[i] == col and feitas[i + 1] == viz
+					var abre: bool = (i < feitas.size() and feitas[i] == col and i + 1 == feitas.size() and viz in opcoes) \
+						or (i >= feitas.size() and col in alcance.get(i, []) and viz in alcance.get(i + 1, []))
+					var cor := UI.DESTAQUE if no_caminho else (Color("#6d7a9c") if abre else Color("#2b3247"))
+					linhas.draw_line(pa, pb, cor, 3.0 if no_caminho else 2.0, true))
+	v.add_child(linhas)
 	var tr: Dictionary = Dados.calendario.trechos[t]
 	var depois := []
 	for f in Dados.calendario.ferias:
@@ -498,8 +703,12 @@ func _painel_ferias() -> Control:
 	var v := UI.vbox(10)
 	v.add_child(UI.label("Férias de verão: escolha o acampamento", 22, UI.DESTAQUE))
 	v.add_child(UI.label("Durante as férias não há corridas, Sair sempre gera encontro e o descanso rende +50%.", 15, UI.TEXTO, true))
-	v.add_child(_botao_grande("Serra: Estamina e Determinação contam 1 nível acima", func(): atualizou.emit(c.escolher_acampamento("serra"))))
-	v.add_child(_botao_grande("Praia: Velocidade e Poder contam 1 nível acima", func(): atualizou.emit(c.escolher_acampamento("praia"))))
+	var b1 := _botao_grande("[1] Serra: Estamina e Determinação contam 1 nível acima", func(): atualizou.emit(c.escolher_acampamento("serra")))
+	var b2 := _botao_grande("[2] Praia: Velocidade e Poder contam 1 nível acima", func(): atualizou.emit(c.escolher_acampamento("praia")))
+	_atalho(KEY_1, b1)
+	_atalho(KEY_2, b2)
+	v.add_child(b1)
+	v.add_child(b2)
 	p.add_child(v)
 	return p
 
@@ -523,8 +732,9 @@ func _painel_encontro(e: Dictionary) -> Control:
 	v.add_child(UI.label(c.texto(e.texto), 17, UI.TEXTO, true))
 	for i in e.escolhas.size():
 		var idx: int = i
-		var b := UI.botao(c.texto(e.escolhas[i].texto), func(): atualizou.emit(c.escolher(idx)), 17)
+		var b := UI.botao(UI.com_tecla(str(i + 1), c.texto(e.escolhas[i].texto)), func(): atualizou.emit(c.escolher(idx)), 17)
 		b.custom_minimum_size.y = 48
+		_atalho(KEY_1 + i, b)
 		v.add_child(b)
 	p.add_child(v)
 	return p
@@ -553,6 +763,41 @@ func _botao_treino(t: String) -> Button:
 
 
 func _botao_acao(texto: String, acao: Callable) -> Button:
-	var b := UI.botao(texto, func(): atualizou.emit(acao.call()), 14)
+	var b: Button
+	if acao.is_valid():
+		b = UI.botao(texto, func(): atualizou.emit(acao.call()), 14)
+	else:
+		b = UI.botao(texto, func(): pass, 14)
 	b.custom_minimum_size = Vector2(130, 112)
 	return b
+
+
+## Liga uma tecla a um botão: a tecla aperta o botão (respeitando se está desabilitado).
+func _atalho(tecla: int, b: Button) -> void:
+	_atalhos[tecla] = func():
+		if is_instance_valid(b) and not b.disabled and b.is_visible_in_tree():
+			b.pressed.emit()
+
+
+func _unhandled_key_input(event: InputEvent) -> void:
+	var k := event as InputEventKey
+	if k == null or not k.pressed or k.echo:
+		return
+	var tecla := k.keycode
+	if tecla >= KEY_KP_1 and tecla <= KEY_KP_9:
+		tecla = KEY_1 + (tecla - KEY_KP_1)
+	if _atalhos.has(tecla):
+		get_viewport().set_input_as_handled()
+		_atalhos[tecla].call()
+
+
+func _alternar_loja() -> void:
+	loja_aberta = not loja_aberta
+	_reconstruir()
+
+
+func _alguma_compravel() -> bool:
+	for h in Dados.habilidades.lista:
+		if c.pode_comprar(h.id):
+			return true
+	return false

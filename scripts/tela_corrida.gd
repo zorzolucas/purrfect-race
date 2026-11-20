@@ -115,15 +115,17 @@ func _ready() -> void:
 	sobre.add_child(faixa_aviso)
 	# cartão de resultado no centro da vista 3D, com outro botão de continuar
 	resultado = UI.painel(Color(0.08, 0.1, 0.16, 0.92), 20)
-	resultado.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+	# embaixo, no centro: a chegada continua visível atrás
+	resultado.set_anchors_and_offsets_preset(Control.PRESET_CENTER_BOTTOM)
+	resultado.position.y -= 110
 	resultado.grow_horizontal = Control.GROW_DIRECTION_BOTH
-	resultado.grow_vertical = Control.GROW_DIRECTION_BOTH
+	resultado.grow_vertical = Control.GROW_DIRECTION_BEGIN
 	resultado.visible = false
 	var rv := UI.vbox(12)
 	resultado_txt = UI.label("", 26, UI.DESTAQUE)
 	resultado_txt.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	rv.add_child(resultado_txt)
-	var b := UI.botao("Continuar (Enter)", _continuar, 20)
+	var b := UI.botao_principal("Continuar (Enter)", _continuar, 20)
 	b.custom_minimum_size = Vector2(260, 48)
 	rv.add_child(b)
 	resultado.add_child(rv)
@@ -254,9 +256,18 @@ func _finalizar() -> void:
 	continuar.visible = true
 	aviso_vida = 0.0
 	var meta := ""
-	if dados.objetivo > 0:
-		meta = "
-Objetivo: %s." % dados.get("texto_objetivo", "top %d" % dados.objetivo)
+	resultado_txt.add_theme_color_override("font_color", UI.DESTAQUE)
+	if dados.get("texto_objetivo", "") != "":
+		var ok: bool = pos <= (int(dados.objetivo) if int(dados.objetivo) > 0 else 12)
+		var ri: int = dados.get("rival_idx", -1)
+		if dados.get("meta_rival", false) and ri >= 0:
+			ok = ok and sim.classificacao().find(ri) + 1 > pos
+		var txt_obj: String = dados.get("texto_objetivo", "top %d" % dados.objetivo)
+		if dados.get("maratona", 0) > 0:
+			meta = "\n%s nesta corrida (%s)" % ["✓ Dentro da meta" if ok else "✗ Fora da meta", txt_obj]
+		else:
+			meta = "\n%s · %s" % ["✓ Objetivo cumprido" if ok else "✗ Objetivo não cumprido", txt_obj]
+		resultado_txt.add_theme_color_override("font_color", UI.OK if ok else UI.PERIGO)
 	resultado_txt.text = "%s terminou em %dº%s" % [dados.field[0].nome.split(" ")[0], pos, meta]
 	resultado.visible = true
 

@@ -582,7 +582,7 @@ func montar_corrida(elenco: Array) -> Dictionary:
 	return {"nome": c.nome, "objetivo": int(c.get("meta", 0)), "distancia": Calendario.metros(c),
 		"field": m.field, "clima": clima(), "seed": hash([semente, turno, c.get("id", "x")]),
 		"rival_idx": m.rival_idx, "texto_objetivo": c.get("texto", "") if corrida_atual.is_empty() else "",
-		"instrucao": instrucao}
+		"instrucao": instrucao, "meta_rival": c.get("meta_rival", false), "maratona": int(c.get("maratona", 0))}
 
 
 ## A corrida que ela vai correr agora: a opcional escolhida ou o objetivo do turno.
@@ -687,6 +687,17 @@ func olheiro(c: Dictionary) -> Dictionary:
 	var r := {"forca": npcs / maxf(1.0, field.size() - 1), "rival": p.rival, "chances": chances,
 		"sugestao": melhor, "chance": chance, "etiqueta": etq, "mult": float(ol.mult[etq]),
 		"media": _media_attrs() * float(field[0].mult)}
+	# Só para mostrar na tela: chance de cumprir a meta de um objetivo (top N e, se pedir, à
+	# frente da rival) com a instrução sugerida. Usa um RNG próprio, então não mexe em nada
+	# do jogo nem na etiqueta.
+	var meta := int(c.get("meta", 0))
+	if meta > 0 or c.get("meta_rival", false):
+		field[0].instrucao = melhor
+		var sim_m := SimCorrida.new(field, Calendario.metros(c), 1, clima(), true)
+		sim_m.rodar_ate_o_fim()
+		var ri: int = p.rival_idx if c.get("meta_rival", false) else -1
+		r["chance_meta"] = _chance_meta(sim_m, hash([semente, turno, c.get("id", "x"), "meta"]),
+			int(ol.sorteios), float(ol.k_sorte), meta if meta > 0 else 12, ri)
 	_cache_olheiro[chave] = r
 	return r
 
@@ -711,6 +722,41 @@ static func _chance_por_sorteio(sim: SimCorrida, seed_: int, n: int, k_sorte: fl
 		if venceu:
 			vitorias += 1
 	return float(vitorias) / n
+
+
+## Força média das adversárias de uma corrida (a mesma conta do olheiro, sem simular).
+## Só para a interface: a marca na barra de atributos mostra o nível do próximo objetivo.
+func forca_prevista(c: Dictionary) -> float:
+	var field: Array = _pelotao(c, Dados.garotas).field
+	var s := 0.0
+	for i in range(1, field.size()):
+		for k in SimCorrida.KEYS:
+			s += field[i].attrs[k]
+	return s / 5.0 / maxf(1.0, field.size() - 1)
+
+
+## Chance da jogadora terminar entre as `meta` primeiras (e à frente de `rival_idx`, se >= 0).
+static func _chance_meta(sim: SimCorrida, seed_: int, n: int, k_sorte: float, meta: int, rival_idx: int) -> float:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = seed_
+	var tempos := []
+	var sigmas := []
+	for r in sim.rs:
+		tempos.append(float(r.t))
+		sigmas.append(SimCorrida.SORTE * (1.0 - float(r.e.int) / 2400.0) * k_sorte)
+	var boas := 0
+	for i in n:
+		var minha: float = tempos[0] * (1.0 - rng.randfn(0.0, sigmas[0]))
+		var na_frente := 0
+		var rival_na_frente := false
+		for j in range(1, tempos.size()):
+			if tempos[j] * (1.0 - rng.randfn(0.0, sigmas[j])) < minha:
+				na_frente += 1
+				if j == rival_idx:
+					rival_na_frente = true
+		if na_frente < meta and not rival_na_frente:
+			boas += 1
+	return float(boas) / n
 
 
 func _media_attrs() -> float:

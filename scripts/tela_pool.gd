@@ -25,8 +25,15 @@ func _montar() -> void:
 	titulo.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	topo.add_child(titulo)
 	topo.add_child(UI.label("%d moedas" % perfil.moeda, 24, UI.DESTAQUE))
+	var b := UI.botao_principal("Tirar 1 (%d moedas)" % Perfil.BAL.custo_tiragem, _tirar, 18)
+	b.disabled = not perfil.pode_tirar()
+	if b.disabled:
+		b.tooltip_text = "Moedas insuficientes. Conclua uma carreira para ganhar mais."
+	topo.add_child(b)
 	topo.add_child(UI.botao("Voltar à academia", func(): voltar.emit(), 18))
 	v.add_child(topo)
+	if not resultado.is_empty():
+		v.add_child(_painel_resultado())
 	v.add_child(UI.label("Cada tiragem custa %d moedas e sempre traz uma destas garotas. Garota nova entra no elenco; repetida sobe o vínculo. A rotação muda a cada carreira concluída." % Perfil.BAL.custo_tiragem, 15, UI.SUAVE, true))
 	v.add_child(UI.label("Marcada: %s. Ela vem garantida em no máximo %d tiragem(ns)." % [
 		perfil.escolhida, perfil.faltam_para_garantia()], 16, UI.TEXTO, true))
@@ -38,14 +45,6 @@ func _montar() -> void:
 	for nome in perfil.pool:
 		grade.add_child(_cartao(nome))
 	v.add_child(grade)
-
-	var acoes := UI.hbox(12)
-	var b := UI.botao("Tirar 1 (%d moedas)" % Perfil.BAL.custo_tiragem, _tirar, 22)
-	b.disabled = not perfil.pode_tirar()
-	acoes.add_child(b)
-	if not resultado.is_empty():
-		acoes.add_child(_painel_resultado())
-	v.add_child(acoes)
 	add_child(UI.margem(v, 28))
 
 
@@ -58,7 +57,7 @@ func _cartao(nome: String) -> Control:
 		sb.set_border_width_all(3)
 		p.add_theme_stylebox_override("panel", sb)
 	var v: VBoxContainer = p.get_child(0)
-	var status := "No elenco" if tem else "Nova"
+	var status := "Já está no elenco (repetida sobe o vínculo)" if tem else "Nova"
 	v.add_child(UI.label("Chance %d%% · %s" % [roundi(perfil.chance(nome) * 100), status], 14, UI.OK if not tem else UI.SUAVE))
 	if nome != perfil.escolhida:
 		v.add_child(UI.botao("Marcar para a garantia", func(): _marcar(nome), 14))

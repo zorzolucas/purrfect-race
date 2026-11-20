@@ -270,6 +270,11 @@ func _finalizar() -> void:
 		resultado_txt.add_theme_color_override("font_color", UI.OK if ok else UI.PERIGO)
 	resultado_txt.text = "%s terminou em %dº%s" % [dados.field[0].nome.split(" ")[0], pos, meta]
 	resultado.visible = true
+	UI.pop(resultado)
+	var comemora: bool = pos == 1 or (dados.get("texto_objetivo", "") != "" and resultado_txt.get_theme_color("font_color") == UI.OK)
+	if comemora:
+		var alvo: Control = resultado.get_parent()
+		UI.confete(alvo, Vector2(alvo.size.x / 2.0, alvo.size.y - 120), 140)
 
 
 func posicao_jogadora() -> int:

@@ -45,8 +45,11 @@ static var anterior := {}
 ## Aba do painel da garota (0 = Status, 1 = Relações e equipamento) e loja aberta ou não.
 static var aba := 0
 static var loja_aberta := false
+## Quantos resultados já tinham banner mostrado (para o banner de objetivo sair uma vez só).
+static var resultados_vistos := -1
 
 var _delta := {}
+var anterior_attrs := {}
 ## Atalhos de teclado da tela atual: keycode -> Callable.
 var _atalhos := {}
 
@@ -61,19 +64,32 @@ func _registrar_delta() -> void:
 		var de: int = c.energia - int(anterior.energia)
 		if de != 0:
 			_delta["energia"] = de
-	anterior = {"id": id, "turno_save": c.turno, "attrs": c.attrs.duplicate(), "energia": c.energia}
+		anterior_attrs = anterior.attrs
+		var df: int = c.fama - int(anterior.get("fama", c.fama))
+		if df != 0:
+			_delta["fama"] = df
+	anterior = {"id": id, "turno_save": c.turno, "attrs": c.attrs.duplicate(), "energia": c.energia, "fama": c.fama}
 
 
 func _linha_barra(rotulo: String, valor: float, maximo: float, cor: Color, chave: String = "", marca: float = -1.0) -> Control:
 	var h := UI.hbox(8)
+	if chave in SimCorrida.KEYS:
+		h.add_child(UI.Icone.new(chave, 20))
+		cor = UI.ATTR_COR[chave]
 	var l := UI.label(rotulo, 14)
-	l.custom_minimum_size.x = 104
+	l.custom_minimum_size.x = 128 if not chave in SimCorrida.KEYS else 100
 	h.add_child(l)
 	var d: float = _delta.get(chave, 0.0)
-	var b := UI.barra(valor - d if d > 0 else valor, maximo, cor, 170)
+	var b := UI.barra(valor - d if d > 0 else valor, maximo, cor, 150)
 	if d > 0:
-		# a barra cresce do valor antigo até o novo
+		# a barra cresce do valor antigo até o novo, com um brilho e o ganho subindo
 		b.create_tween().tween_property(b, "value", valor, 0.6).set_delay(0.15).set_trans(Tween.TRANS_CUBIC)
+		b.modulate = Color(1.8, 1.8, 1.8)
+		b.create_tween().tween_property(b, "modulate", Color.WHITE, 0.9).set_delay(0.2)
+		var txt_f := "+%d" % roundi(d)
+		b.ready.connect(func():
+			UI.numero_flutuante(b, txt_f, cor.lightened(0.3), Vector2(b.size.x * clampf(valor / maximo, 0.0, 1.0) - 10, -14), 18),
+			CONNECT_ONE_SHOT)
 	if marca > 0.0:
 		var m := MarcaBarra.new()
 		m.frac = clampf(marca / maximo, 0.0, 1.0)
@@ -84,8 +100,11 @@ func _linha_barra(rotulo: String, valor: float, maximo: float, cor: Color, chave
 	var num := UI.label("%d" % valor, 14)
 	num.custom_minimum_size.x = 34
 	h.add_child(num)
+	if d != 0.0:
+		UI.contar(num, valor - d, valor)
 	if chave in SimCorrida.KEYS:
-		h.add_child(UI.label(Dados.nota({chave: valor}), 13, UI.SUAVE))
+		var n := Dados.nota({chave: valor})
+		h.add_child(UI.label(n, 14, UI.NOTA_COR.get(n, UI.SUAVE)))
 	if d != 0.0:
 		var dl := UI.label("%+d" % roundi(d), 14, UI.OK if d > 0 else UI.PERIGO)
 		h.add_child(dl)
@@ -128,9 +147,26 @@ func _painel_garota() -> Control:
 	var topo := UI.hbox(12)
 	topo.add_child(RetratoGarota.new(c.nome, 72, SpritesGarota.expressao_do_humor(c.humor)))
 	var nomes := UI.vbox(2)
+	nomes.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	nomes.add_child(UI.label(c.nome, 22))
-	nomes.add_child(UI.label("%s · Nota %s · Fama %d" % [Dados.ESTILO_NOME[c.estilo], Dados.nota(c.attrs), c.fama], 15, UI.DESTAQUE))
+	nomes.add_child(UI.label(Dados.ESTILO_NOME[c.estilo], 14, UI.SUAVE))
+	var hf := UI.hbox(6)
+	hf.add_child(UI.label("★ Fama", 15, UI.DESTAQUE))
+	var l_fama := UI.label(str(c.fama), 15, UI.DESTAQUE)
+	hf.add_child(l_fama)
+	var dfama: int = _delta.get("fama", 0)
+	if dfama != 0:
+		UI.contar(l_fama, c.fama - dfama, c.fama)
+		var lf := UI.label("%+d" % dfama, 14, UI.OK if dfama > 0 else UI.PERIGO)
+		hf.add_child(lf)
+		UI.pop(lf, 0.3)
+	nomes.add_child(hf)
 	topo.add_child(nomes)
+	var selo := UI.SeloNota.new(Dados.nota(c.attrs), 58)
+	selo.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	topo.add_child(selo)
+	if not _delta.is_empty() and Dados.nota(c.attrs) != Dados.nota(anterior_attrs):
+		UI.pop(selo, 0.4)
 	v.add_child(topo)
 
 	var abas := UI.hbox(6)
@@ -285,6 +321,7 @@ func _painel_turno() -> VBoxContainer:
 	cab.add_child(b_menu)
 	_atalhos[KEY_ESCAPE] = func(): ir_academia.emit()
 	tv.add_child(cab)
+	tv.add_child(_trilha())
 	var cl: Dictionary = Dados.calendario.climas[c.clima()]
 	tv.add_child(UI.label("%s %s%s" % [cl.icone, cl.nome, ": " + cl.descricao if cl.has("descricao") else ""], 14, UI.TEXTO, true))
 	var no := c.no_atual()
@@ -318,6 +355,10 @@ func _painel_turno() -> VBoxContainer:
 		else:
 			pm.add_child(UI.label(msg, 15, UI.TEXTO, true))
 		v.add_child(pm)
+
+	var banner := _banner_objetivo()
+	if banner:
+		v.add_child(banner)
 
 	match c.pendencia():
 		"encontro":
@@ -469,8 +510,10 @@ func _painel_amuleto() -> Control:
 			var b := UI.botao("[%d] %s  (%s)\n%s" % [n_of + 1, a.nome, tipo, a.descricao], func(): _escolher_amuleto(id), 16)
 			b.custom_minimum_size.y = 62
 			_atalho(KEY_1 + n_of, b)
+			UI.colorir_botao(b, {"simples": Color("#7d8499"), "troca": Color("#b48cff"), "estilo": Color("#4fa3ff"), "raro": UI.DESTAQUE}[a.tipo])
 			if a.tipo == "raro":
 				b.add_theme_color_override("font_color", UI.DESTAQUE)
+			UI.pop(b, 0.08 * n_of)
 			v.add_child(b)
 		v.add_child(UI.botao_confirmar("Não quero nenhum", func(): atualizou.emit(c.descartar_oferta()), 14,
 			"Ficar sem amuleto desta vez? Clique de novo para confirmar"))
@@ -753,12 +796,23 @@ func _botao_treino(t: String) -> Button:
 		linhas.append("+%d %s" % [round(g[k]), Dados.ATTR_CURTO[k]])
 	linhas.append("−%d energia" % c.custo(t))
 	var falha := c.chance_falha(t)
-	linhas.append("Falha %d%%" % round(falha * 100))
+	linhas.append(("⚠ Falha %d%%" if falha > 0.0 else "Falha %d%%") % round(falha * 100))
 	var b := _botao_acao("\n".join(linhas), func(): return c.treinar(t))
 	b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	b.tooltip_text = Dados.ATTR_NOME[t]
+	b.custom_minimum_size.y = 128
+	UI.colorir_botao(b, UI.ATTR_COR[t])
+	# ícone do atributo no canto do cartão de treino
+	var ic := UI.Icone.new(t, 22)
+	ic.position = Vector2(6, 6)
+	b.add_child(ic)
 	if falha > 0.0:
-		b.add_theme_color_override("font_color", UI.PERIGO if falha >= 0.25 else UI.DESTAQUE)
+		# risco de falha: borda vermelha/dourada (o texto fica branco para ler sobre a cor)
+		var sb: StyleBoxFlat = b.get_theme_stylebox("normal").duplicate()
+		sb.border_color = UI.PERIGO if falha >= 0.25 else UI.DESTAQUE
+		sb.set_border_width_all(3)
+		sb.border_width_bottom = 5
+		b.add_theme_stylebox_override("normal", sb)
 	return b
 
 
@@ -801,3 +855,88 @@ func _alguma_compravel() -> bool:
 		if c.pode_comprar(h.id):
 			return true
 	return false
+
+
+# ---------- progressão e recompensa ----------
+
+## Banner grande quando a última corrida foi um objetivo (cumprido ou não). Sai uma vez.
+func _banner_objetivo() -> Control:
+	var n := c.resultados.size()
+	if resultados_vistos < 0 or n <= resultados_vistos:
+		resultados_vistos = n
+		return null
+	resultados_vistos = n
+	var r: Dictionary = c.resultados[-1]
+	if int(r.get("objetivo", 0)) <= 0:
+		return null
+	var ok: bool = r.ok
+	var p := UI.painel(Color("#1f4a35") if ok else Color("#4a1f24"), 14)
+	var h := UI.hbox(14)
+	var l := UI.label("✓ OBJETIVO CUMPRIDO!" if ok else "✗ OBJETIVO NÃO CUMPRIDO", 26, UI.DESTAQUE if ok else UI.PERIGO)
+	l.add_theme_constant_override("outline_size", 6)
+	l.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.6))
+	h.add_child(l)
+	var sub := UI.label("%s · %dº lugar · +%d de fama" % [r.nome, r.posicao, r.fama], 16, UI.TEXTO, true)
+	sub.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	h.add_child(sub)
+	p.add_child(h)
+	UI.pop(p, 0.15)
+	if ok:
+		p.ready.connect(func():
+			await get_tree().process_frame
+			if is_instance_valid(p):
+				UI.confete(self, p.get_global_rect().get_center() - get_global_rect().position, 110),
+			CONNECT_ONE_SHOT)
+	return p
+
+
+func _trilha() -> Control:
+	var t := TrilhaCarreira.new()
+	t.carreira = c
+	t.custom_minimum_size = Vector2(0, 34)
+	return t
+
+
+## Trilha da carreira: os 72 turnos numa linha, com os anos, os objetivos (✓, ✗, ★ o próximo)
+## e a garota andando nela.
+class TrilhaCarreira extends Control:
+	var carreira: Carreira
+	var _t := 0.0
+
+	func _process(delta: float) -> void:
+		_t += delta
+		queue_redraw()
+
+	func _draw() -> void:
+		var c := carreira
+		var total: float = Carreira.BAL.turnos
+		var x0 := 10.0
+		var x1 := size.x - 10.0
+		var y := size.y * 0.55
+		var px := func(turno: float) -> float: return lerpf(x0, x1, (turno - 1.0) / maxf(1.0, total - 1.0))
+		draw_line(Vector2(x0, y), Vector2(x1, y), Color("#2b3247"), 6.0, true)
+		draw_line(Vector2(x0, y), Vector2(px.call(c.turno), y), c.cor, 6.0, true)
+		var f := get_theme_default_font()
+		for ano in 3:
+			var xa: float = px.call(ano * total / 3.0 + 1.0)
+			if ano > 0:
+				draw_line(Vector2(xa, y - 10), Vector2(xa, y + 10), Color("#3d4867"), 2.0)
+			draw_string(f, Vector2(xa + 4, y - 9), "Ano %d" % (ano + 1), HORIZONTAL_ALIGNMENT_LEFT, -1, 11, UI.SUAVE)
+		var prox := c.proximo_objetivo()
+		for o in c.objetivos:
+			var xo: float = px.call(o.turno)
+			var res := c.resultados.filter(func(r): return r.turno == o.turno and r.objetivo > 0)
+			var cor := Color("#5d6478")
+			var raio := 6.0
+			if not res.is_empty():
+				cor = UI.OK if res[0].ok else UI.PERIGO
+			elif not prox.is_empty() and o.turno == prox.turno:
+				cor = UI.DESTAQUE
+				raio = 7.0 + sin(_t * 4.0) * 1.5
+			draw_circle(Vector2(xo, y), raio + 2.0, Color("#141824"))
+			draw_circle(Vector2(xo, y), raio, cor)
+		# a garota: um disco da cor dela que pulsa
+		var xg: float = px.call(c.turno)
+		var pulso := 1.0 + sin(_t * 5.0) * 0.12
+		draw_circle(Vector2(xg, y), 9.0 * pulso, Color.WHITE)
+		draw_circle(Vector2(xg, y), 6.5 * pulso, c.cor)

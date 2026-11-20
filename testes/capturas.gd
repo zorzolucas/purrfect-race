@@ -77,6 +77,7 @@ func _initialize() -> void:
 			_salvar("5_chegada")
 			main.tela._continuar(),
 		func():
+			_salvar("5a_banner_objetivo")
 			_resolver_encontro()
 			main.mostrar_carreira(""),
 		func():
@@ -155,7 +156,7 @@ func _salvar(nome: String) -> void:
 
 func _process(_delta: float) -> bool:
 	espera += 1
-	if espera < 20:
+	if espera < 75:
 		return false
 	espera = 0
 	if passo >= passos.size():

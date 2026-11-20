@@ -37,7 +37,7 @@ func _montar() -> void:
 	var titulo := UI.label("Circuito · rotação %d" % (perfil.giro + 1), 30, UI.DESTAQUE)
 	titulo.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	topo.add_child(titulo)
-	topo.add_child(UI.label("%d moedas" % perfil.moeda, 24, UI.DESTAQUE))
+	topo.add_child(UI.moedas(perfil.moeda))
 	if evento_id != "":
 		topo.add_child(UI.botao("Voltar às copas", func(): _abrir(""), 18))
 	topo.add_child(UI.botao("Voltar à academia", func(): voltar.emit(), 18))

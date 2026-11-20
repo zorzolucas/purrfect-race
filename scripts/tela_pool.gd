@@ -24,7 +24,7 @@ func _montar() -> void:
 	var titulo := UI.label("Pool semanal · rotação %d" % (perfil.giro + 1), 30, UI.DESTAQUE)
 	titulo.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	topo.add_child(titulo)
-	topo.add_child(UI.label("%d moedas" % perfil.moeda, 24, UI.DESTAQUE))
+	topo.add_child(UI.moedas(perfil.moeda))
 	var b := UI.botao_principal("Tirar 1 (%d moedas)" % Perfil.BAL.custo_tiragem, _tirar, 18)
 	b.disabled = not perfil.pode_tirar()
 	if b.disabled:

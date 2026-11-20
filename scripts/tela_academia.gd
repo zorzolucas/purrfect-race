@@ -26,7 +26,7 @@ func _ready() -> void:
 	var titulo := UI.label("Academia Estelar", 34, UI.DESTAQUE)
 	titulo.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	topo.add_child(titulo)
-	topo.add_child(UI.label("%d moedas" % perfil.moeda, 24, UI.DESTAQUE))
+	topo.add_child(UI.moedas(perfil.moeda))
 	topo.add_child(UI.botao("Pátio", func(): abrir_patio.emit(), 18))
 	topo.add_child(UI.botao("Circuito", func(): abrir_circuito.emit(), 18))
 	topo.add_child(UI.botao("Pool semanal", func(): abrir_pool.emit(), 18))
@@ -78,7 +78,12 @@ func _cartao(nome: String) -> Control:
 		v.add_child(UI.label("Ainda sem versão salva", 14, UI.SUAVE))
 	else:
 		var a: Dictionary = salva.attrs
-		v.add_child(UI.label("Versão salva: nota %s · %d objetivo(s)" % [salva.nota, salva.objetivos], 14, UI.OK))
+		var hs := UI.hbox(8)
+		hs.add_child(UI.SeloNota.new(salva.nota, 34))
+		var ls := UI.label("Versão salva · %d objetivo(s)" % salva.objetivos, 14, UI.OK)
+		ls.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		hs.add_child(ls)
+		v.add_child(hs)
 		v.add_child(UI.label("Vel %d · Est %d · Pod %d · Det %d · Int %d" % [a.vel, a.est, a.pod, a.det, a.int], 13, UI.SUAVE))
 		var tit: Array = salva.get("titulos", [])
 		if not tit.is_empty():

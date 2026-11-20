@@ -65,6 +65,8 @@ O que se libera depois do começo **dá variedade, não força**:
 | **Circuito em níveis** | As 5 copas e o Campeonato Final (GDD §7) ganham 3 níveis: **Bronze, Prata e Ouro**. Cada nível sobe a força das NPCs (inicial: 600 / 800 / 950). O Ouro só abre com o Prata vencido. | Quem quer usar o elenco salvo. É onde a garota forte e o vínculo 5 fazem diferença. |
 | **Desafio da semana** | A cada rotação da pool, uma carreira com **semente fixa**, garota fixa e uma regra especial (ex.: "só Pratas", "sempre chove"). Mostra o melhor resultado do jogador. Tudo offline. | Quem quer comparar carreiras em condições iguais. |
 
+Os três modos estão no protótipo desde 2026-11-19, com as regras completas, as condições da semana do circuito e as medições para não haver meta em [endgame.md](endgame.md).
+
 ---
 
 ## 3. Campanhas do MVP

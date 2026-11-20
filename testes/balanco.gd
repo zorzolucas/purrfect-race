@@ -106,7 +106,8 @@ func _rodar(nome: String, n: int, conta: String) -> Dictionary:
 		# o pelotão e até o sorteio de sorte da jogadora em cada corrida, e o erro de uma casa ou
 		# de um arquétipo andava junto com o das outras (campanhas.md §7.1)
 		var semente: int = 1 + absi(hash([nome, i + 1 + int(OS.get_environment("SEMENTE0"))])) % 1000000000
-		var c = CarreiraS.new(dd.garota(nome), ini, semente, vinculo, madrinha)
+		# MAGNITUDE=n joga na magnitude n (endgame, calendario.md §10); sem ela, 0
+		var c = CarreiraS.new(dd.garota(nome), ini, semente, vinculo, madrinha, {"magnitude": int(OS.get_environment("MAGNITUDE"))})
 		arquetipo = c.campanha.arquetipo
 		var peso := PESO_ALVO.duplicate()
 		if c.distancia in ["media", "longa"]:

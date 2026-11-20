@@ -22,6 +22,11 @@ var sem_escolhida := 0       # tiragens seguidas sem a escolhida
 var giro := 0                # quantas vezes a pool girou (= carreiras concluídas)
 var semente := 0
 var tiragens := 0
+# endgame (docs/campanhas.md §2.3)
+var magnitudes := {}         # nome -> {liberada: maior magnitude que pode escolher, vencida: maior com o GP final vencido (-1 = nenhuma)}
+var circuito := {}           # "nivel:evento" -> {vitorias, melhor (pontos), giro_premio (rotação do último prêmio), giro_tentativas e tentativas (nesta rotação)}
+var tentativas_circuito := 0
+var desafios := {}           # semana (texto) -> {tentativas, melhor: placar, pago: bool}
 
 
 static func existe() -> bool:
@@ -58,12 +63,27 @@ static func carregar() -> Perfil:
 	p.giro = int(d.get("giro", 0))
 	p.semente = int(str(d.get("semente", "0")))
 	p.tiragens = int(d.get("tiragens", 0))
+	var mags: Dictionary = d.get("magnitudes", {})
+	for n in mags:
+		p.magnitudes[n] = {"liberada": int(mags[n].get("liberada", 0)), "vencida": int(mags[n].get("vencida", -1))}
+	var circ: Dictionary = d.get("circuito", {})
+	for k in circ:
+		p.circuito[k] = {"vitorias": int(circ[k].get("vitorias", 0)), "melhor": int(circ[k].get("melhor", 0)),
+			"giro_premio": int(circ[k].get("giro_premio", -1)), "giro_tentativas": int(circ[k].get("giro_tentativas", -1)),
+			"tentativas": int(circ[k].get("tentativas", 0))}
+	p.tentativas_circuito = int(d.get("tentativas_circuito", 0))
+	var des: Dictionary = d.get("desafios", {})
+	for k in des:
+		p.desafios[k] = {"tentativas": int(des[k].get("tentativas", 0)), "melhor": des[k].get("melhor", {}),
+			"pago": bool(des[k].get("pago", false))}
 	return p
 
 
 func salvar() -> void:
 	var d := {"versao": 1, "moeda": moeda, "elenco": elenco, "pool": pool, "escolhida": escolhida,
-		"sem_escolhida": sem_escolhida, "giro": giro, "semente": str(semente), "tiragens": tiragens}
+		"sem_escolhida": sem_escolhida, "giro": giro, "semente": str(semente), "tiragens": tiragens,
+		"magnitudes": magnitudes, "circuito": circuito, "tentativas_circuito": tentativas_circuito,
+		"desafios": desafios}
 	var f := FileAccess.open(CAMINHO, FileAccess.WRITE)
 	if f:
 		f.store_string(JSON.stringify(d, "  ", false))
@@ -156,10 +176,119 @@ func tirar() -> Dictionary:
 
 # ---------- fim de carreira (GDD §4.8) ----------
 
-## Recebe a moeda da carreira, guarda (ou não) a nova versão e gira a pool.
+## Recebe a moeda da carreira, guarda (ou não) a nova versão, libera a próxima magnitude
+## (vencendo o GP final na maior liberada) e gira a pool. O desafio da semana tem regras próprias.
 func concluir_carreira(c: Carreira, substituir: bool) -> void:
+	if c.desafio > 0:
+		concluir_desafio(c)
+		return
 	moeda += c.moeda_total().total
 	if substituir and elenco.has(c.nome):
 		elenco[c.nome].salva = c.versao_salva()
+	if c.venceu_gp():
+		var m := magnitude_de(c.nome)
+		m.vencida = maxi(int(m.vencida), c.magnitude)
+		if c.magnitude >= int(m.liberada):
+			m.liberada = mini(Endgame.mag_max(), c.magnitude + 1)
+		magnitudes[c.nome] = m
 	girar_pool()
 	salvar()
+
+
+# ---------- Magnitude (calendario.md §10) ----------
+
+func magnitude_de(nome: String) -> Dictionary:
+	return magnitudes.get(nome, {"liberada": 0, "vencida": -1}).duplicate()
+
+
+# ---------- Desafio da semana ----------
+
+func desafio_atual() -> Dictionary:
+	return Endgame.desafio_da_semana(giro)
+
+
+func registro_desafio(semana: int) -> Dictionary:
+	return desafios.get(str(semana), {"tentativas": 0, "melhor": {}, "pago": false}).duplicate(true)
+
+
+## Moeda que a carreira de desafio vai render: só a 1ª tentativa concluída da semana paga.
+func moeda_desafio(c: Carreira) -> int:
+	return 0 if registro_desafio(c.desafio).pago else c.moeda_total().total
+
+
+## O desafio não gira a pool nem guarda versão: registra a tentativa e o melhor placar.
+func concluir_desafio(c: Carreira) -> void:
+	var reg := registro_desafio(c.desafio)
+	moeda += moeda_desafio(c)
+	reg.pago = true
+	reg.tentativas += 1
+	var placar := Endgame.placar_desafio(c)
+	if Endgame.placar_melhor(placar, reg.melhor):
+		reg.melhor = placar
+	desafios[str(c.desafio)] = reg
+	salvar()
+
+
+# ---------- Circuito (GDD §7) ----------
+
+func registro_circuito(nivel: int, id: String) -> Dictionary:
+	return circuito.get(Endgame.chave(nivel, id), {"vitorias": 0, "melhor": 0, "giro_premio": -1,
+		"giro_tentativas": -1, "tentativas": 0}).duplicate()
+
+
+## Tentativas que ainda restam nesta rotação. O limite faz a força do elenco e as condições
+## da semana pesarem: sem ele, bastava repetir até a sorte ajudar.
+func tentativas_restantes(nivel: int, id: String) -> int:
+	var reg := registro_circuito(nivel, id)
+	var usadas: int = int(reg.get("tentativas", 0)) if int(reg.get("giro_tentativas", -1)) == giro else 0
+	return maxi(0, int(Dados.endgame.circuito.tentativas_por_rotacao) - usadas)
+
+
+func venceu_evento(nivel: int, id: String) -> bool:
+	return registro_circuito(nivel, id).vitorias > 0
+
+
+## Bronze sempre aberto; Prata e Ouro de uma copa abrem com o nível anterior dela vencido.
+## O Campeonato Final de um nível abre com as 5 copas daquele nível vencidas.
+func evento_aberto(nivel: int, id: String) -> bool:
+	if id == "final":
+		for ev in Endgame.eventos():
+			if ev.id != "final" and not venceu_evento(nivel, ev.id):
+				return false
+		return nivel == 0 or venceu_evento(nivel - 1, "final")
+	return nivel == 0 or venceu_evento(nivel - 1, id)
+
+
+## Garotas do elenco que podem correr no circuito (precisam de versão salva).
+func aptas_circuito() -> Array:
+	return elenco.keys().filter(func(n): return not elenco[n].salva.is_empty())
+
+
+## Corre um evento com a escalação [{nome, instrucao}] e paga o prêmio. Devolve o resultado
+## de Endgame.correr_evento com {premio, primeira}.
+func correr_circuito(nivel: int, id: String, escalacao: Array) -> Dictionary:
+	if not evento_aberto(nivel, id) or tentativas_restantes(nivel, id) <= 0:
+		return {}
+	var esc := []
+	for e in escalacao:
+		esc.append({"nome": e.nome, "salva": elenco[e.nome].salva, "instrucao": e.get("instrucao", "normal")})
+	tentativas_circuito += 1
+	var r := Endgame.correr_evento(nivel, giro, id, esc, hash([semente, "circuito", tentativas_circuito]))
+	var reg := registro_circuito(nivel, id)
+	if int(reg.get("giro_tentativas", -1)) != giro:
+		reg.giro_tentativas = giro
+		reg.tentativas = 0
+	reg.tentativas = int(reg.tentativas) + 1
+	reg.melhor = maxi(int(reg.melhor), int(r.total))
+	r.primeira = r.venceu and reg.vitorias == 0
+	r.premio = 0
+	if r.venceu:
+		# prêmio cheio na 1ª vitória; depois, uma fração, uma vez por rotação da pool
+		if r.primeira or int(reg.giro_premio) != giro:
+			r.premio = Endgame.premio(nivel, id, r.primeira)
+			reg.giro_premio = giro
+		reg.vitorias += 1
+	moeda += r.premio
+	circuito[Endgame.chave(nivel, id)] = reg
+	salvar()
+	return r

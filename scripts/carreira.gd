@@ -125,6 +125,11 @@ var oferta_amuleto: Array = []  # amuletos oferecidos, esperando a escolha
 var estrela_usada := false
 var instrucao := "normal"    # instrução da próxima corrida (GDD §5.7)
 var titulos: Array = []      # séries completadas: [{id, nome, turno}] (calendario.md §7.4)
+# endgame (data/endgame.json, scripts/endgame.gd)
+var magnitude := 0           # 0 a 5 (calendario.md §10)
+var regra := ""              # regra do Desafio da semana ("" = carreira normal)
+var desafio := 0             # número da semana do desafio (0 = carreira normal)
+var maldicoes: Array = []    # ids das maldições (amuletos negativos que não ocupam vaga)
 var conversa_turno := 0     # último turno em que ela conversou no pátio (1 por turno)
 var patio_vistos: Array = [] # conversas próprias de cada colega já vistas no pátio
 ## Reação de quem falou na última escolha (encontro ou pátio), para o retrato mostrar.
@@ -133,8 +138,13 @@ var ultima_reacao := {}
 var _cache_olheiro := {}
 
 
-func _init(g: Dictionary, ini: Dictionary, semente_: int = 0, vinculo_: int = 0, madrinha_: Dictionary = {}) -> void:
+## opcoes (endgame): {magnitude, regra, desafio}. Tudo que elas mudam sai da semente, então
+## o save só guarda as opções e a carreira recarregada repete as mesmas maldições e metas.
+func _init(g: Dictionary, ini: Dictionary, semente_: int = 0, vinculo_: int = 0, madrinha_: Dictionary = {}, opcoes: Dictionary = {}) -> void:
 	semente = semente_ if semente_ != 0 else randi()
+	magnitude = clampi(int(opcoes.get("magnitude", 0)), 0, Endgame.mag_max())
+	regra = str(opcoes.get("regra", ""))
+	desafio = int(opcoes.get("desafio", 0))
 	nome = g.nome
 	estilo = g.estilo
 	aptidao = g.aptidao
@@ -157,10 +167,19 @@ func _init(g: Dictionary, ini: Dictionary, semente_: int = 0, vinculo_: int = 0,
 			afinidade[colega] = int(iniciais_af.get(colega, 0))
 	habilidades = Dados.habilidades.get("iniciais", []).duplicate()
 	campanha = Campanha.montar(nome, estilo, aptidao, distancia, piso, semente)
+	if magnitude >= int(Dados.endgame.magnitude.meta_degrau):
+		campanha = campanha.duplicate(true)
+		Endgame.subir_metas(campanha)
 	objetivos = campanha.objetivos.duplicate(true)
 	for i in Dados.calendario.trechos.size():
 		mapas.append(Calendario.gerar_mapa(semente, i))
+		if magnitude >= int(Dados.endgame.magnitude.menos_recuperacao):
+			Endgame.tirar_recuperacao(mapas[i], semente, i)
 		rota.append([])
+	var n_mald := Endgame.n_maldicoes(magnitude)
+	if regra == "amaldicoada":
+		n_mald += int(Dados.endgame.desafio.maldicoes_amaldicoada)
+	maldicoes = Endgame.sortear_maldicoes(semente, n_mald)
 	_sortear_duplas()
 	_abrir_capitulo()
 
@@ -197,10 +216,40 @@ static func _curto(n: String) -> String:
 	return n.split(" ")[0]
 
 
+# ---------- endgame: magnitude e desafio ----------
+
+func opcoes() -> Dictionary:
+	return {"magnitude": magnitude, "regra": regra, "desafio": desafio}
+
+
+## Força extra das NPCs pela magnitude e pela regra "Pelotão de elite" do desafio.
+func mult_npc() -> float:
+	var m := Endgame.forca_npc(magnitude)
+	if regra == "elite":
+		m *= float(Dados.endgame.desafio.forca_elite)
+	return m
+
+
 # ---------- contexto do turno ----------
 
 func clima() -> String:
-	return Calendario.clima(semente, turno)
+	return clima_em(turno)
+
+
+## Clima de um turno, com a regra "Sempre chove" do desafio e a maldição Nuvem Carregada
+## (um 2º sorteio de chuva com a chance da estação: p vira 2p − p²).
+func clima_em(t: int) -> String:
+	if regra == "sempre_chove":
+		return "chuva"
+	var cl := Calendario.clima(semente, t)
+	if cl != "chuva" and tem_efeito("chuva_dobro") and not Calendario.e_ferias(t):
+		var pesos: Dictionary = Dados.calendario.chance_clima[Calendario.estacao(t)]
+		var total := 0.0
+		for k in pesos:
+			total += float(pesos[k])
+		if Calendario.rng(semente, ["nuvem", Calendario.mes_idx(t)]).randf() < float(pesos.get("chuva", 0)) / total:
+			return "chuva"
+	return cl
 
 
 func trecho() -> int:
@@ -318,12 +367,13 @@ func nivel_efetivo(t: String) -> int:
 
 
 func chance_falha(t: String = "") -> float:
+	var minimo := _soma("falha_min")  # maldição Coleira Frouxa
 	if energia >= BAL.limite_falha:
-		return 0.0
+		return minimo
 	var c: float = BAL.falha_max * float(BAL.limite_falha - energia) / BAL.limite_falha
 	if serra and t in ["est", "det"]:
 		c *= 2.0
-	return minf(c, 0.95)
+	return minf(maxf(c, minimo), 0.95)
 
 
 func custo(t: String) -> int:
@@ -427,7 +477,7 @@ func descanso_previsto() -> int:
 		d *= BAL.descanso_extra
 	if clima() == "frio":
 		d *= 0.9
-	for a in amuletos:
+	for a in amuletos + maldicoes:
 		d *= float(Dados.amuleto(a).get("efeito", {}).get("descanso_mult", 1.0))
 	d += _soma("descanso")
 	return roundi(d)
@@ -478,6 +528,8 @@ func corridas_opcionais() -> Array:
 	elif tipo == "desafio" and not turno in desafios_feitos \
 			and (turno - int(Dados.calendario.trechos[trecho()].turnos[0])) % 2 == 1:
 		lista.append(Calendario.corrida_desafio(semente, turno, distancia, piso))
+	if regra == "so_pratas":
+		lista = lista.filter(func(c): return c.cat == "prata")
 	return lista
 
 
@@ -536,7 +588,7 @@ func montar_corrida(elenco: Array) -> Dictionary:
 	return {"nome": c.nome, "objetivo": int(c.get("meta", 0)), "distancia": Calendario.metros(c),
 		"field": m.field, "clima": clima(), "seed": hash([semente, turno, c.get("id", "x")]),
 		"rival_idx": m.rival_idx, "texto_objetivo": c.get("texto", "") if corrida_atual.is_empty() else "",
-		"instrucao": instrucao}
+		"instrucao": instrucao, "meta_rival": c.get("meta_rival", false), "maratona": int(c.get("maratona", 0))}
 
 
 ## A corrida que ela vai correr agora: a opcional escolhida ou o objetivo do turno.
@@ -548,7 +600,7 @@ func corrida_da_vez() -> Dictionary:
 ## então o olheiro vê exatamente as adversárias que vão correr.
 func _pelotao(c: Dictionary, elenco: Array) -> Dictionary:
 	var cal: Dictionary = Dados.calendario
-	var forca := forca_categoria(c.cat, c.dist)
+	var forca := forca_categoria(c.cat, c.dist) * mult_npc()
 	if c.get("desafio", false):
 		forca *= cal.forca_desafio
 	if c.get("fixa", false):
@@ -587,7 +639,7 @@ func _pelotao(c: Dictionary, elenco: Array) -> Dictionary:
 			rival_idx = field.size()
 			# o objetivo pode pedir a rival mais fraca (ex.: a primeira Prata, campanhas.md §7)
 			# forca_rival_extra compensa a única de cada rival com nome (a da Algol rende menos que a da Polaris)
-			var extra_rival: float = float(cal.get("forca_rival_extra", {}).get(rival, 1.0))
+			var extra_rival: float = float(cal.get("forca_rival_extra", {}).get(rival, 1.0)) * Endgame.extra_rival(magnitude)
 			var adv := _adversaria(rv, forca * float(c.get("forca_rival", cal.forca_rival)) * extra_rival, rv.get("unica", ""), c)
 			# a rival corre sempre como se estivesse em casa: sem isso, Polaris na Longa e Algol
 			# na Milha (aptidão Boa) eram mais fracas que a campeã da casa (Ótima nos dois)
@@ -641,6 +693,17 @@ func olheiro(c: Dictionary) -> Dictionary:
 	var r := {"forca": npcs / maxf(1.0, field.size() - 1), "rival": p.rival, "chances": chances,
 		"sugestao": melhor, "chance": chance, "etiqueta": etq, "mult": float(ol.mult[etq]),
 		"media": _media_attrs() * float(field[0].mult)}
+	# Só para mostrar na tela: chance de cumprir a meta de um objetivo (top N e, se pedir, à
+	# frente da rival) com a instrução sugerida. Usa um RNG próprio, então não mexe em nada
+	# do jogo nem na etiqueta.
+	var meta := int(c.get("meta", 0))
+	if meta > 0 or c.get("meta_rival", false):
+		field[0].instrucao = melhor
+		var sim_m := SimCorrida.new(field, Calendario.metros(c), 1, clima(), true)
+		sim_m.rodar_ate_o_fim()
+		var ri: int = p.rival_idx if c.get("meta_rival", false) else -1
+		r["chance_meta"] = _chance_meta(sim_m, hash([semente, turno, c.get("id", "x"), "meta"]),
+			int(ol.sorteios), float(ol.k_sorte), meta if meta > 0 else 12, ri)
 	_cache_olheiro[chave] = r
 	return r
 
@@ -665,6 +728,41 @@ static func _chance_por_sorteio(sim: SimCorrida, seed_: int, n: int, k_sorte: fl
 		if venceu:
 			vitorias += 1
 	return float(vitorias) / n
+
+
+## Força média das adversárias de uma corrida (a mesma conta do olheiro, sem simular).
+## Só para a interface: a marca na barra de atributos mostra o nível do próximo objetivo.
+func forca_prevista(c: Dictionary) -> float:
+	var field: Array = _pelotao(c, Dados.garotas).field
+	var s := 0.0
+	for i in range(1, field.size()):
+		for k in SimCorrida.KEYS:
+			s += field[i].attrs[k]
+	return s / 5.0 / maxf(1.0, field.size() - 1)
+
+
+## Chance da jogadora terminar entre as `meta` primeiras (e à frente de `rival_idx`, se >= 0).
+static func _chance_meta(sim: SimCorrida, seed_: int, n: int, k_sorte: float, meta: int, rival_idx: int) -> float:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = seed_
+	var tempos := []
+	var sigmas := []
+	for r in sim.rs:
+		tempos.append(float(r.t))
+		sigmas.append(SimCorrida.SORTE * (1.0 - float(r.e.int) / 2400.0) * k_sorte)
+	var boas := 0
+	for i in n:
+		var minha: float = tempos[0] * (1.0 - rng.randfn(0.0, sigmas[0]))
+		var na_frente := 0
+		var rival_na_frente := false
+		for j in range(1, tempos.size()):
+			if tempos[j] * (1.0 - rng.randfn(0.0, sigmas[j])) < minha:
+				na_frente += 1
+				if j == rival_idx:
+					rival_na_frente = true
+		if na_frente < meta and not rival_na_frente:
+			boas += 1
+	return float(boas) / n
 
 
 func _media_attrs() -> float:
@@ -724,7 +822,7 @@ func registrar_corrida(posicao: int, extra: Dictionary = {}) -> String:
 	instrucao = "normal"
 	var ganho_fama := fama_prevista(c, posicao, ol.mult)
 	fama += ganho_fama
-	var premio := ganho_fama / BAL.moeda_por_fama
+	var premio := int(ganho_fama / BAL.moeda_por_fama * maxf(0.0, 1.0 + _soma("moeda_corrida")))
 	moeda_corridas += premio
 	var ganho_pontos := pontos_previstos(c, posicao)
 	pontos += ganho_pontos
@@ -885,7 +983,10 @@ func _checar_series() -> String:
 
 ## Limite de amuletos, com o espaço extra da Volta ao Céu.
 func limite_amuletos() -> int:
-	return int(Dados.amuletos.limite) + (int(Dados.calendario.series.volta.limite_amuleto) if tem_titulo("volta") else 0)
+	var lim := int(Dados.amuletos.limite) + (int(Dados.calendario.series.volta.limite_amuleto) if tem_titulo("volta") else 0)
+	if regra == "poucos_amuletos":
+		lim = mini(lim, int(Dados.endgame.desafio.limite_amuletos))
+	return lim
 
 
 # ---------- campanha (docs/campanhas.md) ----------
@@ -1328,7 +1429,7 @@ const CAMPOS_SAVE := ["attrs", "energia", "humor", "lesionada", "turno", "usos_t
 ## Salva também a carreira terminada: ela só é apagada depois que o jogador decide
 ## entre substituir e descartar, para não perder a moeda se o jogo fechar antes.
 func salvar() -> void:
-	var d := {"versao": 3, "nome": nome, "vinculo": vinculo, "semente": str(semente)}
+	var d := {"versao": 3, "nome": nome, "vinculo": vinculo, "semente": str(semente), "opcoes": opcoes()}
 	for campo in CAMPOS_SAVE:
 		d[campo] = get(campo)
 	var f := FileAccess.open(CAMINHO_SAVE, FileAccess.WRITE)
@@ -1372,7 +1473,7 @@ static func carregar() -> Carreira:
 	var ini: Dictionary = dados.config_carreira(d.nome)
 	if g.is_empty() or ini.is_empty():
 		return null
-	var c := Carreira.new(g, ini, int(str(d.semente)), int(d.get("vinculo", 0)))
+	var c := Carreira.new(g, ini, int(str(d.semente)), int(d.get("vinculo", 0)), {}, d.get("opcoes", {}))
 	for campo in CAMPOS_SAVE:
 		if d.has(campo):
 			c.set(campo, d[campo])
@@ -1406,12 +1507,14 @@ func venceu_gp() -> bool:
 	return resultados.any(func(r): return r.turno == BAL.turnos and r.posicao == 1)
 
 
-## Moeda total da carreira: prêmios das corridas + bônus por desempenho e fama.
+## Moeda total da carreira: prêmios das corridas + bônus por desempenho e fama, com
+## +20% por nível de magnitude (calendario.md §10).
 func moeda_total() -> Dictionary:
 	var bonus: int = BAL.moeda_base + BAL.moeda_objetivo * objetivos_cumpridos() + fama / BAL.moeda_fama_final
 	if venceu_gp():
 		bonus += BAL.moeda_gp
-	return {"corridas": moeda_corridas, "bonus": bonus, "total": moeda_corridas + bonus}
+	var extra := roundi((moeda_corridas + bonus) * (Endgame.mult_moeda(magnitude) - 1.0))
+	return {"corridas": moeda_corridas, "bonus": bonus, "magnitude": extra, "total": moeda_corridas + bonus + extra}
 
 
 ## O que fica guardado no elenco se o jogador escolher substituir a versão salva.
@@ -1422,7 +1525,7 @@ func versao_salva() -> Dictionary:
 	return {"attrs": a, "nota": Dados.nota(attrs), "objetivos": objetivos_cumpridos(),
 		"fama": fama, "habilidades": habilidades.duplicate(), "resultados": resultados.duplicate(true),
 		"titulos": titulos.map(func(t): return t.nome), "estilo": estilo,
-		"dist": distancia, "piso": piso,
+		"dist": distancia, "piso": piso, "aptidao": aptidao.duplicate(), "magnitude": magnitude,
 		"vinculo": vinculo, "semente": str(semente)}
 
 
@@ -1430,7 +1533,7 @@ func versao_salva() -> Dictionary:
 
 func _efeito(chave: String) -> Array:
 	var lista := []
-	for a in amuletos:
+	for a in amuletos + maldicoes:
 		var ef: Dictionary = Dados.amuleto(a).get("efeito", {})
 		if ef.has(chave):
 			lista.append(ef[chave])

@@ -10,9 +10,8 @@ var tela: Control
 
 
 func _ready() -> void:
-	var fundo := ColorRect.new()
 	theme = UI.tema()
-	fundo.color = UI.FUNDO
+	var fundo := UI.Fundo.new()
 	fundo.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(fundo)
 	perfil = Perfil.carregar()

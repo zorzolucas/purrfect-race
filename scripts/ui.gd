@@ -1,23 +1,36 @@
 class_name UI
 extends RefCounted
-## Atalhos para montar a interface placeholder em código.
+## Atalhos para montar a interface em código, com a linguagem visual do jogo:
+## tema claro em tons pastel, fundo listrado em diagonal, cartões brancos com sombra suave,
+## faixas de título inclinadas, botões em pílula com volume e fonte arredondada.
 
-const FUNDO := Color("#141824")
-const PAINEL := Color("#1f2536")
-const TEXTO := Color("#e9ecf5")
-const SUAVE := Color("#9aa3b8")
-const DESTAQUE := Color("#f2c14e")
-const PERIGO := Color("#e5534b")
-const OK := Color("#4caf7d")
-const BOTAO := Color("#2c3550")
-const BORDA := Color("#3d4867")
+const FUNDO := Color("#eef6fb")
+const PAINEL := Color("#ffffff")
+const TEXTO := Color("#2c3550")
+const SUAVE := Color("#6b7a99")
+const DESTAQUE := Color("#f0761b")
+const OURO := Color("#f5b301")
+const PERIGO := Color("#e0453a")
+const OK := Color("#22a35a")
+const BOTAO := Color("#ffffff")
+const BORDA := Color("#d3dfea")
+const VERDE := Color("#3cc96f")
+const CEU := Color("#3fa9f5")
+const ROSA := Color("#ff6fa8")
+const LARANJA := Color("#ff9a1f")
+const ROXO := Color("#9b7bff")
 
 ## Cor e ícone de cada atributo: aparecem nas barras, nos treinos e nos ganhos.
-const ATTR_COR := {"vel": Color("#4fa3ff"), "est": Color("#4cd18a"), "pod": Color("#ff6b5b"),
-	"det": Color("#ffb347"), "int": Color("#b48cff")}
+const ATTR_COR := {"vel": Color("#2f97f0"), "est": Color("#2fbf71"), "pod": Color("#f2554a"),
+	"det": Color("#ff9a1f"), "int": Color("#9b6bff")}
 ## Cor de cada nota, do G ao S.
-const NOTA_COR := {"S": Color("#ffd75e"), "A": Color("#ff8fd0"), "B": Color("#b48cff"), "C": Color("#4fa3ff"),
-	"D": Color("#4cd18a"), "E": Color("#9aa3b8"), "F": Color("#7d8499"), "G": Color("#5d6478")}
+const NOTA_COR := {"S": Color("#ffb300"), "A": Color("#ff5fa2"), "B": Color("#9b6bff"), "C": Color("#2f97f0"),
+	"D": Color("#2fbf71"), "E": Color("#8a96ad"), "F": Color("#a3abbd"), "G": Color("#b8bfcc")}
+
+## Cor de cada estilo de corrida, distância e piso (cápsulas dos cartões).
+const ESTILO_COR := {"pon": Color("#ff6a3d"), "per": Color("#3f8cf5"), "arr": Color("#9b6bff"), "fec": Color("#22b573")}
+const DIST_COR := {"sprint": Color("#ff6fa8"), "milha": Color("#ff9a1f"), "media": Color("#3fa9f5"), "longa": Color("#7b6bff")}
+const PISO_COR := {"grama": Color("#3cc96f"), "terra": Color("#c98a4b")}
 
 ## Escala de fontes: use estas em vez de números soltos.
 const F_TITULO := 30
@@ -27,34 +40,91 @@ const F_PEQUENO := 14
 const F_LEGENDA := 13
 
 static var _tema: Theme
+static var _fonte_negrito: Font
 ## Última quantidade de moedas mostrada: quando muda, o contador sobe/desce até a nova.
 static var _ultima_moeda := -1
 
 
-## Tema único do jogo (aplicado na raiz do main): estados de botão bem distintos, foco
-## visível e campos com a mesma paleta. Telas que montam botões com UI.botao herdam tudo.
+## Fonte arredondada (M PLUS Rounded 1c, OFL) no peso pedido, com a fonte padrão do Godot
+## como reserva para os símbolos (★ ✓ ◆ ...), que o subconjunto latino não tem.
+static func fonte(peso: int = 700) -> Font:
+	var caminho := "res://fontes/m-plus-rounded-1c-latin-%d-normal.woff2" % peso
+	var f: FontFile = load(caminho) if ResourceLoader.exists(caminho) else null
+	if f == null:
+		return ThemeDB.fallback_font
+	f = f.duplicate()
+	f.fallbacks = [ThemeDB.fallback_font]
+	return f
+
+
+static func negrito() -> Font:
+	if _fonte_negrito == null:
+		_fonte_negrito = fonte(800)
+	return _fonte_negrito
+
+
+## Clareia uma cor escura para o tom pastel do tema (os painéis especiais das telas foram
+## escritos com cores escuras; aqui viram a versão clara da mesma cor).
+static func pastel(cor: Color) -> Color:
+	if cor.v >= 0.6:
+		return cor
+	if cor.s < 0.12:
+		return PAINEL
+	return Color.from_hsv(cor.h, clampf(cor.s * 0.35 + 0.06, 0.08, 0.22), 0.99)
+
+
+## Tema único do jogo (aplicado na raiz do main). Telas que montam botões com UI.botao
+## herdam tudo.
 static func tema() -> Theme:
 	if _tema:
 		return _tema
 	var t := Theme.new()
+	t.default_font = fonte(700)
 	t.default_font_size = F_CORPO
 	for nome in ["normal", "hover", "pressed", "disabled", "focus"]:
 		t.set_stylebox(nome, "Button", estilo_botao(BOTAO, nome))
 	t.set_color("font_color", "Button", TEXTO)
-	t.set_color("font_hover_color", "Button", Color.WHITE)
+	t.set_color("font_hover_color", "Button", TEXTO)
 	t.set_color("font_pressed_color", "Button", DESTAQUE)
-	t.set_color("font_disabled_color", "Button", Color("#5d6478"))
-	t.set_color("font_focus_color", "Button", Color.WHITE)
+	t.set_color("font_disabled_color", "Button", Color("#a9b4c8"))
+	t.set_color("font_focus_color", "Button", TEXTO)
+	t.set_color("font_hover_pressed_color", "Button", DESTAQUE)
 	t.set_color("font_color", "Label", TEXTO)
+	for nome in ["normal", "hover", "pressed", "disabled", "focus"]:
+		t.set_stylebox(nome, "OptionButton", estilo_botao(BOTAO, nome))
+	t.set_color("font_color", "OptionButton", TEXTO)
+	t.set_color("font_hover_color", "OptionButton", TEXTO)
+	var pop_sb := StyleBoxFlat.new()
+	pop_sb.bg_color = PAINEL
+	pop_sb.border_color = BORDA
+	pop_sb.set_border_width_all(2)
+	pop_sb.set_corner_radius_all(10)
+	pop_sb.set_content_margin_all(6)
+	t.set_stylebox("panel", "PopupMenu", pop_sb)
+	t.set_color("font_color", "PopupMenu", TEXTO)
+	t.set_color("font_hover_color", "PopupMenu", DESTAQUE)
 	var tip := StyleBoxFlat.new()
-	tip.bg_color = Color("#0d1018")
-	tip.border_color = BORDA
-	tip.set_border_width_all(1)
-	tip.set_corner_radius_all(6)
+	tip.bg_color = Color("#2c3550")
+	tip.set_corner_radius_all(8)
 	tip.set_content_margin_all(8)
 	t.set_stylebox("panel", "TooltipPanel", tip)
-	t.set_color("font_color", "TooltipLabel", TEXTO)
+	t.set_color("font_color", "TooltipLabel", Color.WHITE)
 	t.set_font_size("font_size", "TooltipLabel", F_PEQUENO)
+	var sep := StyleBoxLine.new()
+	sep.color = BORDA
+	sep.thickness = 2
+	t.set_stylebox("separator", "HSeparator", sep)
+	t.set_constant("separation", "HSeparator", 6)
+	var grab := StyleBoxFlat.new()
+	grab.bg_color = Color("#c3d2e2")
+	grab.set_corner_radius_all(6)
+	t.set_stylebox("grabber", "VScrollBar", grab)
+	t.set_stylebox("grabber_highlight", "VScrollBar", grab)
+	var trilho := StyleBoxFlat.new()
+	trilho.bg_color = Color(1, 1, 1, 0.5)
+	trilho.set_corner_radius_all(6)
+	trilho.content_margin_left = 6
+	t.set_stylebox("scroll", "VScrollBar", trilho)
 	_tema = t
 	return t
 
@@ -65,10 +135,21 @@ static func label(texto: String, tamanho: int = 16, cor: Color = TEXTO, quebra: 
 	l.text = texto
 	l.add_theme_font_size_override("font_size", tamanho)
 	l.add_theme_color_override("font_color", cor)
+	if tamanho >= 20:
+		l.add_theme_font_override("font", negrito())
 	if quebra:
 		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		l.custom_minimum_size.x = 120
+	return l
+
+
+## Texto branco com contorno (números grandes, títulos sobre faixas coloridas).
+static func label_contorno(texto: String, tamanho: int, cor: Color, contorno: Color, espessura: int = 6) -> Label:
+	var l := label(texto, tamanho, cor)
+	l.add_theme_font_override("font", negrito())
+	l.add_theme_constant_override("outline_size", espessura)
+	l.add_theme_color_override("font_outline_color", contorno)
 	return l
 
 
@@ -95,72 +176,73 @@ static func pulsar_no_hover(b: Control) -> void:
 		b.button_up.connect(func(): b.create_tween().tween_property(b, "scale", Vector2(1.035, 1.035), 0.08))
 
 
-## Estilo "de jogo" para um botão de cor `cor`: borda de cima clara e de baixo grossa e
-## escura (parece que dá para apertar); pressionado, a borda de baixo some e o texto desce.
+## Estilo de botão em pílula com volume: uma "base" mais escura embaixo (sombra dura) que
+## some quando ele é apertado, e um aro claro por dentro.
 static func estilo_botao(cor: Color, estado: String) -> StyleBoxFlat:
 	var sb := StyleBoxFlat.new()
-	sb.set_corner_radius_all(9)
-	sb.content_margin_left = 12
-	sb.content_margin_right = 12
-	sb.content_margin_top = 6
-	sb.content_margin_bottom = 6
+	sb.set_corner_radius_all(14)
+	sb.corner_detail = 10
+	sb.content_margin_left = 16
+	sb.content_margin_right = 16
+	sb.content_margin_top = 7
+	sb.content_margin_bottom = 9
 	var base := cor
+	var branco := cor.v > 0.95 and cor.s < 0.05
 	match estado:
 		"hover":
-			base = cor.lightened(0.14)
+			base = cor.lightened(0.12) if not branco else Color("#f3f9ff")
 		"pressed":
-			base = cor.darkened(0.18)
+			base = cor.darkened(0.08)
 		"disabled":
-			base = Color("#1b2030")
+			base = Color("#eef2f7")
 	sb.bg_color = base
-	sb.border_color = base.lightened(0.22)
-	sb.border_width_top = 1
-	sb.border_width_left = 1
-	sb.border_width_right = 1
-	sb.border_width_bottom = 4
-	sb.border_blend = false
-	if estado == "pressed":
-		sb.border_width_bottom = 1
-		sb.border_width_top = 2
-		sb.content_margin_top = 9
-		sb.content_margin_bottom = 3
-		sb.border_color = DESTAQUE
-	elif estado == "hover":
-		sb.border_color = DESTAQUE.darkened(0.15)
+	sb.border_color = Color("#d3dfea") if branco else cor.lightened(0.35)
+	sb.set_border_width_all(2)
+	sb.shadow_color = Color("#b9c8d8") if branco else cor.darkened(0.35)
+	sb.shadow_size = 1
+	sb.shadow_offset = Vector2(0, 4)
+	if estado == "hover":
+		sb.border_color = DESTAQUE if branco else Color.WHITE
+	elif estado == "pressed":
+		sb.shadow_offset = Vector2(0, 1)
+		sb.content_margin_top = 10
+		sb.content_margin_bottom = 6
+		sb.border_color = DESTAQUE if branco else cor.lightened(0.5)
 	elif estado == "disabled":
-		sb.border_color = Color("#262c3d")
-		sb.border_width_bottom = 1
+		sb.border_color = Color("#e1e7ef")
+		sb.shadow_color = Color("#dde4ed")
+		sb.shadow_offset = Vector2(0, 2)
 	if estado == "focus":
 		sb.draw_center = false
 		sb.border_color = DESTAQUE
-		sb.set_border_width_all(2)
-	if estado in ["normal", "hover"]:
-		# a borda de baixo é a "espessura" do botão: mais escura que o resto
-		sb.shadow_color = Color(0, 0, 0, 0.35)
-		sb.shadow_size = 3
-		sb.shadow_offset = Vector2(0, 2)
+		sb.set_border_width_all(3)
+		sb.shadow_size = 0
 	return sb
 
 
-## Aplica a cor `cor` a um botão já criado (treinos com a cor do atributo, raros em ouro...).
+## Pinta um botão já criado com a cor `cor` (treinos na cor do atributo, raros em ouro...):
+## fundo colorido, texto branco com contorno escuro.
 static func colorir_botao(b: Button, cor: Color) -> void:
 	for nome in ["normal", "hover", "pressed"]:
-		var sb := estilo_botao(cor.darkened(0.55), nome)
-		if nome == "normal":
-			sb.border_color = cor.darkened(0.1)
-		b.add_theme_stylebox_override(nome, sb)
+		b.add_theme_stylebox_override(nome, estilo_botao(cor, nome))
+	for k in ["font_color", "font_hover_color", "font_pressed_color", "font_hover_pressed_color"]:
+		b.add_theme_color_override(k, Color.WHITE)
+	b.add_theme_color_override("font_outline_color", cor.darkened(0.45))
+	b.add_theme_constant_override("outline_size", 5)
+	b.add_theme_font_override("font", negrito())
 
 
-## Botão da ação principal da tela: fundo dourado e texto escuro.
+## Botão da ação principal da tela: verde, texto branco com contorno.
 static func botao_principal(texto: String, acao: Callable, tamanho: int = 18) -> Button:
 	var b := botao(texto, acao, tamanho)
-	for nome in ["normal", "hover", "pressed"]:
-		var sb: StyleBoxFlat = tema().get_stylebox(nome, "Button").duplicate()
-		sb.bg_color = {"normal": DESTAQUE.darkened(0.1), "hover": DESTAQUE, "pressed": DESTAQUE.darkened(0.3)}[nome]
-		sb.border_color = DESTAQUE.darkened(0.35) if nome != "pressed" else DESTAQUE.darkened(0.5)
-		b.add_theme_stylebox_override(nome, sb)
-	for k in ["font_color", "font_hover_color", "font_pressed_color"]:
-		b.add_theme_color_override(k, FUNDO)
+	colorir_botao(b, VERDE)
+	return b
+
+
+## Botão em pílula numa cor qualquer (texto branco contornado).
+static func botao_cor(texto: String, acao: Callable, cor: Color, tamanho: int = 16) -> Button:
+	var b := botao(texto, acao, tamanho)
+	colorir_botao(b, cor)
 	return b
 
 
@@ -201,48 +283,77 @@ static func com_tecla(tecla: String, texto: String) -> String:
 	return "[%s] %s" % [tecla, texto]
 
 
-## Painel com moldura de jogo: borda clara em cima, mais escura embaixo e sombra.
-static func painel(cor: Color = PAINEL, margem: int = 14) -> PanelContainer:
+## Plaquinha com a tecla de atalho no canto de cima à direita de um botão.
+static func tecla(b: Control, t: String) -> void:
+	var p := PanelContainer.new()
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(1, 1, 1, 0.92)
+	sb.border_color = Color("#c3d2e2")
+	sb.set_border_width_all(1)
+	sb.set_corner_radius_all(5)
+	sb.content_margin_left = 5
+	sb.content_margin_right = 5
+	p.add_theme_stylebox_override("panel", sb)
+	var l := label(t, 11, SUAVE)
+	p.add_child(l)
+	p.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	b.add_child(p)
+	p.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
+	p.position += Vector2(-4, 4)
+	p.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+
+
+## Cápsula: pílula colorida com texto branco contornado (humor, turno, clima, aptidão...).
+static func capsula(texto: String, cor: Color, tamanho: int = 14) -> PanelContainer:
 	var p := PanelContainer.new()
 	var sb := StyleBoxFlat.new()
 	sb.bg_color = cor
-	sb.set_corner_radius_all(12)
-	sb.set_content_margin_all(margem)
-	sb.border_color = cor.lightened(0.16)
+	sb.set_corner_radius_all(20)
+	sb.corner_detail = 8
+	sb.content_margin_left = 10
+	sb.content_margin_right = 10
+	sb.content_margin_top = 2
+	sb.content_margin_bottom = 3
+	sb.border_color = cor.lightened(0.4)
 	sb.border_width_top = 2
-	sb.border_width_left = 1
-	sb.border_width_right = 1
-	sb.border_width_bottom = 1
-	sb.shadow_color = Color(0, 0, 0, 0.4)
-	sb.shadow_size = 6
-	sb.shadow_offset = Vector2(0, 3)
+	sb.shadow_color = cor.darkened(0.35)
+	sb.shadow_size = 1
+	sb.shadow_offset = Vector2(0, 2)
+	p.add_theme_stylebox_override("panel", sb)
+	p.add_child(label_contorno(texto, tamanho, Color.WHITE, cor.darkened(0.45), 4))
+	return p
+
+
+## Cartão branco (ou no tom pastel da cor pedida) com cantos bem redondos e sombra suave.
+static func painel(cor: Color = PAINEL, margem: int = 14) -> PanelContainer:
+	var p := PanelContainer.new()
+	var c := pastel(cor)
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = c
+	sb.set_corner_radius_all(16)
+	sb.corner_detail = 10
+	sb.set_content_margin_all(margem)
+	sb.border_color = Color("#d9e5ef") if c == PAINEL else c.darkened(0.1)
+	sb.set_border_width_all(2)
+	sb.shadow_color = Color(0.16, 0.27, 0.43, 0.13)
+	sb.shadow_size = 10
+	sb.shadow_offset = Vector2(0, 4)
 	p.add_theme_stylebox_override("panel", sb)
 	return p
 
 
-## Painel com uma faixa de título colorida em cima (o "cabeçalho" de janela de jogo).
-## Devolve o painel; o conteúdo vai no VBox que fica em get_meta("corpo").
+## Cartão com uma faixa de título colorida e inclinada em cima. Devolve o painel; o
+## conteúdo vai no VBox que fica em get_meta("corpo").
 static func painel_titulo(titulo: String, cor_faixa: Color, cor: Color = PAINEL) -> PanelContainer:
 	var p := painel(cor, 0)
 	var v := vbox(0)
-	var faixa := PanelContainer.new()
-	var sf := StyleBoxFlat.new()
-	sf.bg_color = cor_faixa
-	sf.corner_radius_top_left = 12
-	sf.corner_radius_top_right = 12
-	sf.content_margin_left = 16
-	sf.content_margin_top = 6
-	sf.content_margin_bottom = 6
-	sf.border_color = cor_faixa.lightened(0.25)
-	sf.border_width_top = 2
-	faixa.add_theme_stylebox_override("panel", sf)
-	var l := label(titulo, 18, FUNDO)
-	faixa.add_child(l)
-	v.add_child(faixa)
+	v.add_child(faixa(titulo, cor_faixa))
 	var corpo := vbox(10)
 	var mc := MarginContainer.new()
-	for lado in ["left", "right", "top", "bottom"]:
+	for lado in ["left", "right", "bottom"]:
 		mc.add_theme_constant_override("margin_" + lado, 16)
+	mc.add_theme_constant_override("margin_top", 8)
 	mc.add_child(corpo)
 	v.add_child(mc)
 	p.add_child(v)
@@ -250,6 +361,50 @@ static func painel_titulo(titulo: String, cor_faixa: Color, cor: Color = PAINEL)
 	return p
 
 
+## Faixa de título: paralelogramo colorido com texto branco contornado e listras finas.
+static func faixa(texto: String, cor: Color, tamanho: int = 18) -> Control:
+	var f := Faixa.new()
+	f.cor = cor
+	var l := label_contorno(texto, tamanho, Color.WHITE, cor.darkened(0.4), 5)
+	f.add_child(l)
+	f.rotulo = l
+	return f
+
+
+class Faixa extends Container:
+	var cor := Color.WHITE
+	var rotulo: Label
+	var inclinacao := 14.0
+
+	func _notification(what: int) -> void:
+		if what == NOTIFICATION_SORT_CHILDREN and rotulo:
+			var ms := rotulo.get_combined_minimum_size()
+			fit_child_in_rect(rotulo, Rect2(Vector2(inclinacao + 10, 3), ms))
+
+	func _get_minimum_size() -> Vector2:
+		if rotulo == null:
+			return Vector2.ZERO
+		var ms := rotulo.get_combined_minimum_size()
+		return Vector2(ms.x + inclinacao * 2 + 24, ms.y + 6)
+
+	func _draw() -> void:
+		var w := get_combined_minimum_size().x
+		var h := size.y
+		var pts := PackedVector2Array([Vector2(inclinacao, 0), Vector2(w, 0), Vector2(w - inclinacao, h), Vector2(0, h)])
+		draw_colored_polygon(pts + PackedVector2Array(), cor.darkened(0.25))
+		var desloc := PackedVector2Array()
+		for p in pts:
+			desloc.append(p + Vector2(-3, -3))
+		draw_colored_polygon(desloc, cor)
+		# listras finas em diagonal por cima
+		for i in range(0, int(w) + int(h), 9):
+			var a := Vector2(i, -3)
+			var b := Vector2(i - h, h - 3)
+			draw_line(a, b, Color(1, 1, 1, 0.12), 3.0)
+		draw_line(Vector2(inclinacao - 3, -3), Vector2(w - 3, -3), cor.lightened(0.4), 2.0)
+
+
+## Barra arredondada com brilho em cima (atributos, energia, afinidade).
 static func barra(valor: float, maximo: float, cor: Color, largura: float = 220.0) -> ProgressBar:
 	var b := ProgressBar.new()
 	b.max_value = maximo
@@ -257,17 +412,16 @@ static func barra(valor: float, maximo: float, cor: Color, largura: float = 220.
 	b.show_percentage = false
 	b.custom_minimum_size = Vector2(largura, 16)
 	var fundo := StyleBoxFlat.new()
-	fundo.bg_color = Color("#151a28")
-	fundo.set_corner_radius_all(6)
-	fundo.border_color = Color("#2b3247")
+	fundo.bg_color = Color("#e4ebf3")
+	fundo.set_corner_radius_all(8)
+	fundo.border_color = Color("#d3dfea")
 	fundo.set_border_width_all(1)
 	var cheio := StyleBoxFlat.new()
 	cheio.bg_color = cor
-	cheio.set_corner_radius_all(6)
-	# brilho em cima e sombra embaixo dão volume à barra
-	cheio.border_color = cor.lightened(0.35)
-	cheio.border_width_top = 2
-	cheio.border_width_bottom = 2
+	cheio.set_corner_radius_all(8)
+	cheio.border_color = cor.lightened(0.45)
+	cheio.border_width_top = 3
+	cheio.border_width_bottom = 1
 	cheio.border_blend = true
 	b.add_theme_stylebox_override("background", fundo)
 	b.add_theme_stylebox_override("fill", cheio)
@@ -310,27 +464,76 @@ class Retrato extends Control:
 
 	func _draw() -> void:
 		var r := minf(size.x, size.y) / 2.0
-		draw_circle(size / 2.0, r, cor)
-		draw_circle(size / 2.0, r * 0.82, cor.darkened(0.35))
-		var f := get_theme_default_font()
+		draw_circle(size / 2.0, r, Color.WHITE)
+		draw_circle(size / 2.0, r * 0.9, cor)
+		draw_circle(size / 2.0, r * 0.74, cor.lightened(0.25))
+		var f := UI.negrito()
 		var fs := int(r)
 		var ts := f.get_string_size(letra, HORIZONTAL_ALIGNMENT_CENTER, -1, fs)
-		draw_string(f, size / 2.0 + Vector2(-ts.x / 2.0, fs * 0.35), letra, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color.WHITE)
+		var pos := size / 2.0 + Vector2(-ts.x / 2.0, fs * 0.35)
+		draw_string_outline(f, pos, letra, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, 6, cor.darkened(0.4))
+		draw_string(f, pos, letra, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color.WHITE)
+
+
+## Fundo das telas: degradê céu → menta, listras diagonais brancas que deslizam devagar e
+## patinhas de gato espalhadas.
+class Fundo extends Control:
+	var _t := 0.0
+	var _patas: Array = []
+
+	func _ready() -> void:
+		mouse_filter = Control.MOUSE_FILTER_IGNORE
+		var r := RandomNumberGenerator.new()
+		r.seed = 7
+		for i in 26:
+			_patas.append([Vector2(r.randf(), r.randf()), r.randf_range(10.0, 22.0), r.randf_range(-0.6, 0.6)])
+
+	func _process(delta: float) -> void:
+		_t += delta
+		queue_redraw()
+
+	func _draw() -> void:
+		var w := size.x
+		var h := size.y
+		draw_polygon(PackedVector2Array([Vector2.ZERO, Vector2(w, 0), Vector2(w, h), Vector2(0, h)]),
+			PackedColorArray([Color("#dff1ff"), Color("#e9f6ff"), Color("#effbea"), Color("#e6f7f0")]))
+		var passo := 46.0
+		var desloc := fmod(_t * 12.0, passo * 2.0)
+		var i := -h - passo * 2.0
+		while i < w + passo * 2.0:
+			var x := i + desloc
+			draw_colored_polygon(PackedVector2Array([Vector2(x, 0), Vector2(x + passo, 0),
+				Vector2(x + passo + h * 0.5, h), Vector2(x + h * 0.5, h)]), Color(1, 1, 1, 0.28))
+			i += passo * 2.0
+		for p in _patas:
+			_pata(Vector2(p[0].x * w, fmod(p[0].y * h - _t * 6.0 + h, h)), p[1], p[2])
+
+	func _pata(c: Vector2, r: float, ang: float) -> void:
+		var cor := Color(0.55, 0.75, 0.9, 0.16)
+		draw_circle(c, r * 0.55, cor)
+		for k in 4:
+			var a := ang - 0.9 + k * 0.6
+			draw_circle(c + Vector2(sin(a), -cos(a)) * r * 0.85, r * 0.22, cor)
 
 
 ## Número que sobe e some a partir de `origem` (ganho de atributo, fama, moeda...).
 static func numero_flutuante(pai: Control, texto: String, cor: Color, origem: Vector2, tamanho: int = 20) -> void:
-	var l := label(texto, tamanho, cor)
-	l.add_theme_constant_override("outline_size", 6)
-	l.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.8))
+	var l := label_contorno(texto, tamanho, cor, Color.WHITE, 7)
 	l.position = origem
 	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	l.z_index = 10
-	pai.add_child(l)
+	# dentro de um Container o número iria para o layout: usa uma camada livre por cima
+	var camada: Control = l
+	if pai is Container:
+		camada = Control.new()
+		camada.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		camada.z_index = 10
+		camada.add_child(l)
+	pai.add_child(camada)
 	var tw := l.create_tween().set_parallel()
 	tw.tween_property(l, "position:y", origem.y - 34, 1.1).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	tw.tween_property(l, "modulate:a", 0.0, 0.5).set_delay(0.8)
-	tw.chain().tween_callback(l.queue_free)
+	tw.chain().tween_callback(camada.queue_free)
 
 
 ## Conta de `de` até `ate` num Label, com o formato `fmt` ("%d" por padrão).
@@ -444,21 +647,21 @@ class SeloNota extends Control:
 		draw_colored_polygon(hexa.call(r), cor.darkened(0.5))
 		draw_colored_polygon(hexa.call(r * 0.84), cor)
 		draw_colored_polygon(hexa.call(r * 0.68), cor.darkened(0.25))
-		var f := get_theme_default_font()
+		var f := UI.negrito()
 		var fs := int(r * 1.05)
 		var ts := f.get_string_size(nota, HORIZONTAL_ALIGNMENT_LEFT, -1, fs)
 		var pos := c + Vector2(-ts.x / 2.0, fs * 0.36)
-		draw_string_outline(f, pos, nota, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, 5, Color(0, 0, 0, 0.6))
+		draw_string_outline(f, pos, nota, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, 6, cor.darkened(0.55))
 		draw_string(f, pos, nota, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color.WHITE)
 
 
 ## Contador de moedas: pílula dourada com uma moeda desenhada. Quando o valor mudou desde a
 ## última vez que apareceu, conta até o novo e mostra a diferença.
 static func moedas(valor: int) -> Control:
-	var p := painel(Color("#3a3220"), 6)
+	var p := painel(Color("#ffe9a8"), 6)
 	var h := hbox(8)
 	h.add_child(Moeda.new(26))
-	var l := label(str(valor), 22, DESTAQUE)
+	var l := label_contorno(str(valor), 22, Color.WHITE, Color("#b07a00"), 6)
 	h.add_child(l)
 	p.add_child(h)
 	p.tooltip_text = "Moedas: servem para tirar garotas na pool"
@@ -491,3 +694,140 @@ class Moeda extends Control:
 			var rr := r * (0.42 if i % 2 == 0 else 0.18)
 			pts.append(c + Vector2(cos(ang), sin(ang)) * rr)
 		draw_colored_polygon(pts, Color("#fff1b8"))
+
+
+## A garota em pé no palco: holofote, sombra no chão e o corpo da ficha conceitual
+## balançando de leve. Sem ficha, um círculo grande com a inicial.
+class Palco extends Control:
+	var nome := ""
+	var cor := Color.WHITE
+	var _sprite: Control
+	var _t := 0.0
+
+	func _ready() -> void:
+		clip_contents = true
+		var tex := SpritesGarota.corpo(nome)
+		if tex:
+			var tr := TextureRect.new()
+			tr.texture = tex
+			tr.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			tr.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			tr.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+			_sprite = tr
+		else:
+			_sprite = UI.retrato(nome, cor, 150)
+		_sprite.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		add_child(_sprite)
+		move_child(_sprite, 0)
+		resized.connect(_posicionar)
+		_posicionar()
+
+	func _posicionar() -> void:
+		if _sprite is TextureRect:
+			_sprite.size = Vector2(size.x, size.y - 4)
+			_sprite.position = Vector2(0, 6)
+		else:
+			_sprite.size = Vector2(150, 150)
+			_sprite.position = Vector2((size.x - 150) / 2.0, size.y - 175)
+
+	func _process(delta: float) -> void:
+		_t += delta
+		if _sprite:
+			var base := 6.0 if _sprite is TextureRect else size.y - 175
+			_sprite.position.y = base + sin(_t * 2.2) * 3.0
+		queue_redraw()
+
+	func _draw() -> void:
+		var c := Vector2(size.x / 2.0, size.y * 0.5)
+		# holofote: círculos concêntricos claros na cor dela
+		for i in 6:
+			var r := size.y * (0.55 - i * 0.07)
+			draw_circle(c, r, Color(cor.r, cor.g, cor.b, 0.05 + i * 0.025).lerp(Color(1, 1, 1, 0.3), 0.4))
+		# raios girando bem devagar
+		for i in 12:
+			var a := _t * 0.15 + TAU / 12.0 * i
+			var p1 := c + Vector2(cos(a), sin(a)) * size.y * 0.7
+			var p2 := c + Vector2(cos(a + 0.12), sin(a + 0.12)) * size.y * 0.7
+			draw_colored_polygon(PackedVector2Array([c, p1, p2]), Color(1, 1, 1, 0.18))
+		# sombra no chão
+		var chao := Vector2(size.x / 2.0, size.y - 8)
+		draw_set_transform(chao, 0.0, Vector2(1.0, 0.22))
+		draw_circle(Vector2.ZERO, 70.0 - sin(_t * 2.2) * 2.0, Color(0.16, 0.27, 0.43, 0.18))
+		draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+
+
+## Cor de uma garota: a da ficha de carreira ou, sem ela, a primeira da paleta visual.
+static func cor_garota(nome: String) -> Color:
+	var dd: Node = (Engine.get_main_loop() as SceneTree).root.get_node("Dados")
+	var c = dd.config_carreira(nome).get("cor", null)
+	if c != null:
+		return Color(c)
+	return SpritesGarota.paleta(nome)[0]
+
+
+## Medalhão: o rosto da garota dentro de um círculo na cor dela, com aro branco.
+static func medalhao(nome: String, tamanho: float = 72.0, expressao: String = "normal") -> Control:
+	var cor := cor_garota(nome)
+	var p := PanelContainer.new()
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = cor.lightened(0.62)
+	sb.set_corner_radius_all(int(tamanho))
+	sb.corner_detail = 16
+	sb.border_color = Color.WHITE
+	sb.set_border_width_all(3)
+	sb.shadow_color = Color(cor.darkened(0.3), 0.55)
+	sb.shadow_size = 3
+	sb.set_content_margin_all(3)
+	p.add_theme_stylebox_override("panel", sb)
+	p.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	# num HBox/VBox ele esticaria e viraria oval
+	p.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	p.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	p.add_child(RetratoGarota.new(nome, tamanho - 6, expressao))
+	return p
+
+
+## Os cinco atributos lado a lado, cada um com o ícone e o valor.
+static func linha_attrs(attrs: Dictionary, tamanho: int = 14, comparar: Dictionary = {}) -> Control:
+	var h := hbox(10)
+	for k in SimCorrida.KEYS:
+		var hk := hbox(3)
+		hk.add_child(Icone.new(k, tamanho + 3))
+		var val := int(attrs.get(k, 0))
+		var cor := TEXTO
+		if not comparar.is_empty():
+			var ref := int(comparar.get(k, 0))
+			cor = OK if val > ref else (PERIGO if val < ref else TEXTO)
+		var l := label(str(val), tamanho, cor)
+		l.add_theme_font_override("font", negrito())
+		hk.add_child(l)
+		h.add_child(hk)
+	return h
+
+
+## Fila de estrelas douradas (vínculo, dificuldade...).
+class Estrelas extends Control:
+	var n := 0
+	var total := 5
+
+	func _init(n_: int, total_: int = 5, tamanho: float = 16.0) -> void:
+		n = n_
+		total = total_
+		custom_minimum_size = Vector2(total * (tamanho + 3), tamanho)
+		size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+	func _estrela(c: Vector2, r: float) -> PackedVector2Array:
+		var pts := PackedVector2Array()
+		for j in 10:
+			var ang := PI / 5.0 * j - PI / 2.0
+			pts.append(c + Vector2(cos(ang), sin(ang)) * r * (1.0 if j % 2 == 0 else 0.46))
+		return pts
+
+	func _draw() -> void:
+		var t := size.y
+		for i in total:
+			var c := Vector2(i * (t + 3) + t / 2.0, t / 2.0 + 1)
+			var cheia := i < n
+			draw_colored_polygon(_estrela(c + Vector2(0, 1), t * 0.56), Color("#c47f00") if cheia else Color("#c3cfdc"))
+			draw_colored_polygon(_estrela(c, t * 0.46), Color("#ffc21a") if cheia else Color("#eef2f7"))

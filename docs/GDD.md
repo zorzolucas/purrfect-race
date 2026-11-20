@@ -394,12 +394,13 @@ Da análise de UI das referências: personagem grande no centro e informação e
 
 ## 12. Pendências de balanceamento
 
-- Corrida: Ponteira forte no nível 400 em Média/Longa (ver [corrida.md](corrida.md) §8).
+- ~~Corrida: Ponteira forte no nível 400 em Média/Longa~~ Resolvido com a correção de estilo por nível ([corrida.md](corrida.md) §8.5).
 - Ganho por treino e por nível de treino.
 - Custo da tiragem, valor de N da garantia e moeda por fonte.
 - Limite de energia para falha e chance de lesão.
 - Lista de habilidades genéricas e seus gatilhos.
-- Corrida em nível baixo (200–330): Fechadora forte na Sprint e Ponteira na Longa ([calendário](calendario.md) §11).
+- ~~Corrida em nível baixo (200–330): Fechadora forte na Sprint e Ponteira na Longa~~ Resolvido com a correção de estilo por nível ([corrida.md](corrida.md) §8.5).
+- ~~Estamina sem valor em nível alto e Velocidade melhor em tudo~~ Resolvido com o fôlego do pelotão ([corrida.md](corrida.md) §6 e §8.6). Falta conferir os traçados do endgame com a simulação nova.
 - Calor na Longa favorece a Ponteira e a Estamina; vento ainda sem efeito na corrida ([calendário](calendario.md) §4.4).
 - Maldições e força das NPCs por magnitude.
 - Afobação (§5.5): chance, duração e custo de fôlego, testados no simulador.

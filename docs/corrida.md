@@ -1,6 +1,6 @@
 # Nekomusume — Fórmula da Corrida
 
-> Versão 0.5 — 2026-11-12 (teto de velocidade 60–65 km/h). Complementa o [GDD](GDD.md) §5.
+> Versão 0.6 — 2026-11-20 (fôlego do pelotão e correção de estilo por nível). Complementa o [GDD](GDD.md) §5.
 > Todos os números são **(inicial)**, calibrados com [`tools/sim_corrida.py`](../tools/sim_corrida.py) e [`tools/ajustar_ritmo.py`](../tools/ajustar_ritmo.py).
 
 ## 1. Modelo
@@ -22,10 +22,11 @@ A simulação não depende da tela, então roda headless para testes e balanceam
 Antes da largada, cada atributo vira um valor **efetivo**:
 
 ```
-efetivo = atributo × peso_estilo × aptidão_distância × aptidão_piso × humor
+efetivo = atributo × peso_estilo × aptidão_distância × aptidão_piso × humor × correção_estilo
 ```
 
 - **peso_estilo**: tabela §3.1.
+- **correção_estilo**: multiplicador do estilo pelo nível médio do pelotão e pela distância (§8.5). Fica entre 0,93 e 1,05.
 - **aptidão**: Ruim 0,90 · Ok 0,95 · Boa 1,00 · Ótima 1,05 (GDD §3.3).
 - **humor**: Péssimo 0,95 · Mal 0,975 · Normal 1,00 · Bem 1,025 · Ótimo 1,05. Na v0.1 era ±8%, o que pesava mais que a aptidão (§8.3).
 - Se a garota correr no **estilo secundário**, tudo recebe ×0,95.
@@ -119,14 +120,19 @@ chance = E × 1,5% × (1 − Pod/1500) × (1 − Int/2000)
 ## 6. Fôlego
 
 ```
-fôlego_máx = 0,6 × D + 1,5 × Est
+fôlego_máx = 0,6 × D + 1,5 × max(Est − desconto, 0)
+desconto   = max(0, nível do pelotão − 350)      ← nível = média dos atributos de todas
 
 gasto por segundo = 20 × E × (v / V0)²
   no Meio:   × (1,2 − Int/1500)      ← ritmo bem dosado
   no Sprint: × (1,1 − Det/2000)
 ```
 
-Com atributos medianos (600), o fôlego sobra no Sprint e na Milha, fica justo na Média e decide a Longa.
+**Fôlego do pelotão (v0.6):** um pelotão forte corre num ritmo que cansa mais. Acima do nível 350, cada ponto que a média do pelotão sobe tira 1 ponto da Estamina que conta no fôlego de todas. Uma garota com a Estamina igual à média do pelotão tem o mesmo fôlego em qualquer nível, e quem tem Estamina acima das outras leva a vantagem de antes.
+
+Antes disso, a partir do nível ~550 o fôlego nunca acabava: com atributos em 800, +10% de Estamina não mudava nenhuma colocação, nem em 3200 m, e a Velocidade valia mais que tudo ([endgame](endgame.md) §5.2). Agora a Estamina decide as corridas longas em todo nível e a Velocidade e o Poder decidem as curtas (§8.6).
+
+Os números ficam em `SimCorrida.FOLEGO_PELOTAO` (`nivel` 350, `fracao` 1,0).
 
 ## 7. Habilidades
 
@@ -227,6 +233,54 @@ Cada combinação de distância × piso tem 6 especialistas (todas **Ótima** al
 
 **O que sobrou:** as Fechadoras de Sprint ainda estão um pouco baixas (13–15%) e a Antares, um pouco alta (21%). As outras diferenças são do tamanho da oscilação do teste somada à personalidade de cada perfil.
 
+### 8.5 Correção de estilo por nível (v0.6)
+
+O ritmo (§3.2) foi calibrado nos níveis 500 a 1000, mas a carreira passa os 2 primeiros anos entre 200 e 600. Ali os estilos se desviavam bastante (12 corredoras, 3 de cada estilo, atributos iguais, vitória em %):
+
+| Nível | 1200 | 1600 | 2400 | 3200 |
+|---|---|---|---|---|
+| **350** | 17 / 21 / 20 / **42** | 27 / 22 / 20 / 31 | 30 / 30 / 21 / 19 | **37** / 29 / 19 / 16 |
+| **450** | 20 / 24 / 23 / 33 | 15 / 20 / 25 / **41** | **37** / 28 / 18 / 17 | **40** / 28 / 16 / 17 |
+
+*Ponteira / Perseguidora / Arrancadora / Fechadora. Ideal 25%.*
+
+Na Sprint e na Milha, o teto de velocidade quase não corta o sprint da Fechadora em nível baixo. Na Média e na Longa, todas ficam sem fôlego e quem está na frente segura. Era o "Fechadora forte na Sprint, Ponteira forte na Longa" do calendário §11.
+
+A correção é um multiplicador nos atributos de cada estilo, numa grade de **9 níveis** (200 a 1000) × **5 distâncias** (1200, 1600, 2000, 2400 e 3200 m), interpolada entre os pontos: `SimCorrida.CORRECAO_ESTILO`. `testes/ajustar_estilo.gd` ajusta cada célula até a média entre a vitória e o top 3 de cada estilo ficar em 25% (12 iterações com sementes novas e passo decrescente, média das últimas). Na conferência, com 400 corridas de sementes que o ajuste não viu, as 45 células ficam entre **21% e 29%** (±2,5 de sorte). Fora da grade (`testes/estilos_nivel.gd`, níveis 250, 375, 525 e 700) fica entre 16% e 34% na vitória e 21% e 31% no top 3.
+
+**Na carreira, o perfil de treino pesa mais que a correção.** `testes/estilo_jogadora.gd` põe a jogadora contra 11 garotas do elenco com o mesmo pelotão e a mesma sorte para os 4 estilos (top 3 em %, média dos níveis 300 e 550 e das 5 distâncias):
+
+| Perfil da jogadora | Ponteira | Perseguidora | Arrancadora | Fechadora |
+|---|---|---|---|---|
+| Todos os atributos iguais | 31 | 31 | 30 | 30 |
+| O do bot (Vel 1,2, Est 1,0 ou 1,3, Pod 0,9, Det 0,8, Int 0,7) | 40 | 42 | 42 | **47** |
+| O do bot × os pesos do estilo (§3.1) | 43 | 42 | 39 | 43 |
+
+Com o treino igual para todos, a Fechadora sobra, porque o sprint dela converte melhor a Estamina que sobra e ela usa pouco a Inteligência que fica para trás. Treinando o que o estilo usa (a Ponteira puxa Inteligência), os 4 empatam. O bot de balanceamento passou a treinar assim ([campanhas](campanhas.md) §6.3).
+
+### 8.6 Quanto vale +10% em cada atributo (v0.6)
+
+`testes/valor_atributo.gd`: 12 corredoras com atributos iguais (3 de cada estilo), uma delas com +10% num atributo, mesma semente nas variantes. Posições ganhas na média (40 corridas × 4 estilos por célula):
+
+| Nível | Distância | Vel | Est | Pod | Det | Int |
+|---|---|---|---|---|---|---|
+| 550 | 1200 | +0,62 | +0,12 | **+0,68** | +0,38 | +0,06 |
+| 550 | 1600 | +0,38 | **+0,48** | +0,34 | +0,44 | +0,24 |
+| 550 | 2000 | +0,81 | **+1,86** | +0,58 | +0,67 | +0,96 |
+| 550 | 2400 | +0,19 | **+2,06** | +0,38 | +0,39 | +1,14 |
+| 550 | 3200 | +0,42 | **+1,21** | −0,05 | +0,41 | +0,92 |
+| 800 | 1200 | **+0,97** | +0,00 | +0,77 | +0,00 | +0,02 |
+| 800 | 1600 | **+0,92** | +0,01 | +0,43 | +0,21 | +0,18 |
+| 800 | 2000 | **+0,77** | +0,14 | +0,16 | +0,32 | +0,36 |
+| 800 | 2400 | +0,81 | **+1,28** | +0,66 | +0,57 | +1,14 |
+| 800 | 3200 | +0,50 | **+2,43** | +0,01 | +0,60 | +1,94 |
+
+Na média das 5 distâncias, no nível 800: Vel +0,79, **Est +0,77**, Int +0,73, Pod +0,40, Det +0,34. Antes do fôlego do pelotão era Vel +0,79, **Est 0,00**, Pod +0,39, Int +0,20, Det +0,19. No nível 550 a Estamina ia de +0,07 para +1,15.
+
+- **Sprint e Milha:** Velocidade e Poder. **Média:** Velocidade e Estamina. **Longa:** Estamina e Inteligência.
+- A Determinação é a que menos vale sozinha: ela pesa no sprint, que o teto de velocidade corta. É o atributo da Fechadora (peso ×1,10).
+- No nível 300 o fôlego já acabava antes da mudança, e nada mudou ali: a Estamina já era o melhor atributo de 1600 m para cima.
+
 ## 9. Como recalibrar
 
 ```bash
@@ -246,6 +300,17 @@ python tools/ajustar_ritmo.py
 ```
 
 Ajusta automaticamente a tabela de ritmo (§3.2) para que cada estilo vença ~25% na média dos níveis 500 e 800, e imprime a tabela nova para colar em `sim_corrida.py`. Rode depois de mudar qualquer outra constante.
+
+Depois de mudar o ritmo, o fôlego ou os pesos, recalibre a correção de estilo (§8.5) e confira:
+
+```bash
+Godot --headless --path . --script res://testes/ajustar_estilo.gd -- 12 200 0/4   # 4 processos: 0/4 a 3/4
+Godot --headless --path . --script res://testes/estilos_nivel.gd -- 300 250,375    # conferência fora da grade
+Godot --headless --path . --script res://testes/valor_atributo.gd -- 40 550,800    # valor de cada atributo
+Godot --headless --path . --script res://testes/estilo_jogadora.gd -- 200 estilo   # estilos na carreira
+```
+
+O `ajustar_estilo` imprime uma linha por célula; os valores vão para `CORRECAO_ESTILO` em `scripts/sim_corrida.gd`, `tools/sim_corrida.py` e `visualizador/sim.js`.
 
 A versão em Godot deve usar **as mesmas fórmulas**. Este documento é a referência.
 

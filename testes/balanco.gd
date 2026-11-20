@@ -112,6 +112,11 @@ func _rodar(nome: String, n: int, conta: String) -> Dictionary:
 		var peso := PESO_ALVO.duplicate()
 		if c.distancia in ["media", "longa"]:
 			peso.est = 1.3
+		# treina mais o que o estilo usa (corrida.md §3.1), como faria quem lê a ficha. Sem isso a
+		# Ponteira, que precisa de Inteligência, completava 14 pontos a menos que a Fechadora
+		# (campanhas.md §7.4); com o perfil puxado pelo estilo, os 4 ficam iguais no simulador.
+		for t in peso:
+			peso[t] *= SimCorrida.PESOS[c.estilo][t]
 		var guard := 0
 		var ultimo_turno := 0
 		while not c.terminou and guard < 600 and c.turno < parar_em:

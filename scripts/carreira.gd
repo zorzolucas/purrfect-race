@@ -535,11 +535,17 @@ func corridas_opcionais() -> Array:
 
 ## Força média das NPCs da categoria neste turno. Pode ser um número ou uma lista com
 ## um valor por ano: o pelotão fica mais forte a cada ano (docs/campanhas.md §7).
-## O multiplicador por distância compensa a sorte maior das corridas curtas.
+## O multiplicador por distância compensa a sorte maior das corridas curtas, e o por categoria e
+## distância acerta as corridas em que uma casa sobrava ou virava muro (campanhas.md §7.4).
 func forca_categoria(cat: String, dist: String = "") -> float:
-	var f = Dados.calendario.categorias[cat].forca
-	var base: float = float(f[mini(f.size() - 1, Calendario.mes_idx(turno) / 12)]) if f is Array else float(f)
-	return base * float(Dados.calendario.get("forca_distancia", {}).get(dist, 1.0))
+	var cal: Dictionary = Dados.calendario
+	var f = cal.categorias[cat].forca
+	var ano := Calendario.mes_idx(turno) / 12
+	var base: float = float(f[mini(f.size() - 1, ano)]) if f is Array else float(f)
+	# por categoria e distância: um número ou uma lista com um valor por ano
+	var pc = cal.get("forca_distancia_cat", {}).get(cat, {}).get(dist, 1.0)
+	var por_cat: float = float(pc[mini(pc.size() - 1, ano)]) if pc is Array else float(pc)
+	return base * float(cal.get("forca_distancia", {}).get(dist, 1.0)) * por_cat
 
 
 func pode_entrar(c: Dictionary) -> bool:
@@ -643,6 +649,12 @@ func _pelotao(c: Dictionary, elenco: Array) -> Dictionary:
 	var v: float = cal.variacao_npc
 	for g in pool.slice(0, vagas):
 		field.append(_adversaria(g, forca * r.randf_range(1.0 - v, 1.0 + v), "", c))
+	# força por estilo na carreira (calendario.md §2): a grade de estilo da simulação empata os
+	# estilos com atributos iguais, mas na carreira, contra o pelotão do elenco, a Perseguidora
+	# completava 4 pontos a menos (campanhas.md §7.4). Vale para a jogadora e para as NPCs.
+	var fe: Dictionary = cal.get("forca_estilo", {})
+	for x in field:
+		x.mult = float(x.mult) * float(fe.get(x.estilo, 1.0))
 	return {"field": field, "rival_idx": rival_idx, "rival": rival if rival_idx >= 0 else "", "forca": forca}
 
 

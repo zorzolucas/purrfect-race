@@ -29,17 +29,20 @@ Toda corrida tem uma **categoria**. Ela define a força das adversárias, o prê
 | Categoria | Força das NPCs (média dos atributos) | Fama para entrar (inicial) | Quando aparece |
 |---|---|---|---|
 | **Estreia** | 209 | — | Só no turno 13 (a primeira corrida dela) |
-| **Aberta** | Ano 1: 263 · Ano 2: 345 · Ano 3: 455 | 0 | A partir do turno 14 |
-| **Prata** | Ano 2: 364 · Ano 3: 520 | 600 | A partir do turno 25 (ano 2) |
-| **Ouro** | Ano 2: 434 · Ano 3: 575 | 1500 | A partir do turno 37 (2º semestre do ano 2) |
-| **Grande Prêmio** | Ano 1: 335 · Ano 2: 480 · Ano 3: 695 | Por convite (objetivo) | Turnos 24, 48 e 72 |
+| **Aberta** | Ano 1: 267 · Ano 2: 345 · Ano 3: 475 | 0 | A partir do turno 14 |
+| **Prata** | Ano 2: 372 · Ano 3: 545 | 600 | A partir do turno 25 (ano 2) |
+| **Ouro** | Ano 2: 465 · Ano 3: 628 | 1500 | A partir do turno 37 (2º semestre do ano 2) |
+| **Grande Prêmio** | Ano 1: 340 · Ano 2: 535 · Ano 3: 715 | Por convite (objetivo) | Turnos 24, 48 e 72 |
 
 - Os valores subiram 5% a 12% em 2026-11-17, quando o olheiro e a instrução pré-corrida deixaram o bot mais esperto. Em 2026-11-18 (v0.5) subiram de novo, acompanhando a curva nova da jogadora, e o **ano 3 ficou bem mais forte** (Ouro de 487 para 575): antes, a garota do bot chegava ao ano 3 com folga e só o GP final era desafio ([campanhas](campanhas.md) §7).
+- Em 2026-11-20 (v0.7) os anos 2 e 3 subiram de 3% a 11%: com o fôlego do pelotão ([corrida.md](corrida.md) §6), a garota que treina Estamina ganhou vantagem sobre o pelotão a partir do ano 2, e o GP do ano 2 derrubava só 2% de quem chegava nele ([campanhas](campanhas.md) §7.4).
 - As **corridas do calendário fixo** (§7.2) correm com força ×1,08 no ano 2 e ×1,1 no ano 3 (`forca_fixa`): juntam as melhores do ano, e é isso que faz as séries pedirem rota planejada.
 - O pelotão **fica mais forte a cada ano**, como a jogadora. Assim a mesma categoria pede mais no ano 3 do que no ano 2.
-- **Por distância**, a força é multiplicada por: Sprint ×0,99 · Milha ×0,98 · Média ×0,99 · Longa ×1,04. Corrida curta tem mais sorte, e sem isso as garotas de Sprint completavam bem menos carreiras que as de Longa. Com a instrução Forçar (GDD §5.7) a Sprint ficou mais fácil, e o multiplicador subiu de ×0,95 para ×0,99. A Média desceu de ×1,01 para ×0,99 na v0.6: a Ouro do ano 2 derrubava 19% das garotas de Média Grama.
+- **Por distância**, a força é multiplicada por: Sprint ×0,99 · Milha ×0,98 · Média ×1,01 · Longa ×1,04. Corrida curta tem mais sorte, e sem isso as garotas de Sprint completavam bem menos carreiras que as de Longa. Com a instrução Forçar (GDD §5.7) a Sprint ficou mais fácil, e o multiplicador subiu de ×0,95 para ×0,99. A Média desceu de ×1,01 para ×0,99 na v0.6 e voltou a ×1,01 na v0.7, quando as casas de Média passaram a completar 55% a 57% com a simulação nova.
+- **Por categoria e distância** (`forca_distancia_cat`, v0.7), por cima do multiplicador de distância: Estreia na Longa ×0,92, Aberta do ano 1 na Longa ×0,95, GP do ano 1 na Sprint ×0,95 e na Milha ×0,98, Prata do ano 2 na Sprint ×0,97, Ouro do ano 3 na Longa ×0,98 e GP final na Longa ×0,97. Cada um tira um muro de uma casa: o GP do ano 1 derrubava 25% das garotas de Sprint Grama, e a Estreia, 16% das de Longa (a média é 5%).
+- **Por estilo** (`forca_estilo`, v0.7): nas corridas da carreira, a **Perseguidora** corre com ×1,015, seja a jogadora ou NPC. A grade de estilo da simulação ([corrida](corrida.md) §8.5) empata os estilos com atributos iguais, mas na carreira, contra o pelotão do elenco, as Perseguidoras completavam 4 pontos a menos ([campanhas](campanhas.md) §7.4). O circuito do endgame não usa esse multiplicador.
 - A força das NPCs varia ±10% de uma corredora para outra, para o pelotão não ser uniforme.
-- Nas corridas de objetivo com meta de rival e em todo Grande Prêmio, a **rival** (com nome ou campeã da casa) corre com +15% sobre a força da categoria, sempre com aptidão Ótima. A **Algol** corre com mais 8% (`forca_rival_extra`), porque a habilidade única dela rende menos que a da Polaris e as casas dela ficavam 9 pontos mais fáceis.
+- Nas corridas de objetivo com meta de rival e em todo Grande Prêmio, a **rival** (com nome ou campeã da casa) corre com +15% sobre a força da categoria, sempre com aptidão Ótima. A **Algol** correu com mais 8% (`forca_rival_extra`) da v0.5 à v0.6, porque a habilidade única dela rendia menos que a da Polaris e as casas dela ficavam 9 pontos mais fáceis. Com a simulação da v0.7, os +8% deixavam as casas dela 4 pontos abaixo das casas com campeã, e o extra voltou a 1,0 (o botão continua em `forca_rival_extra`).
 - Os números saíram do bot de balanceamento na carreira de 72 turnos ([campanhas](campanhas.md) §7).
 
 ### 2.1 Curva esperada da jogadora
@@ -49,7 +52,7 @@ Este é o **alvo** para calibrar os ganhos de treino em 72 turnos:
 | Turno | 13 (Estreia) | 24 | 36 | 48 | 60 | 72 |
 |---|---|---|---|---|---|---|
 | Média dos atributos (alvo) | ~200 | ~330 | ~460 | ~590 | ~700 | ~800 |
-| Média do bot (v0.5 do protótipo) | 228 | 338 | 450 | 587 | 708 | 819 |
+| Média do bot (v0.7 do protótipo) | 228 | 337 | 451 | 590 | 716 | 826 |
 
 O treino rende mais com atributos baixos e menos com atributos altos (retorno de ×1,25 − 0,45 × atributo/limite): a garota cresce mais nos anos 1 e 2 e menos no ano 3. Uma jogadora que treina bem chega acima disso, e uma que descansa demais ou se lesiona chega abaixo. Amuletos e rotas boas também empurram a curva para cima, então a força das NPCs deve ser calibrada com uma carreira "média" sem amuletos raros.
 
@@ -442,7 +445,9 @@ No começo da carreira, a **Fechadora** é forte na Sprint e a **Ponteira** é f
 - Recalibrar o ritmo também nos níveis 150–300 (o `ajustar_ritmo` hoje usa 500 e 800).
 - Aceitar como "sabor" do começo de carreira e compensar com a meta (top 5 em vez de top 3).
 
-Enquanto isso, as campanhas usam uma exceção: a Fechadora de Sprint precisa de top 3 na Estreia ([campanhas](campanhas.md) §4.2). Fica como pendência de balanceamento.
+Enquanto isso, as campanhas usam uma exceção: a Fechadora de Sprint precisa de top 3 na Estreia ([campanhas](campanhas.md) §4.2).
+
+**Resolvido na v0.7 (2026-11-20):** a simulação ganhou uma correção de estilo por nível e distância, calibrada de 200 a 1000 ([corrida.md](corrida.md) §8.5). Com ela, os 4 estilos ficam entre 21% e 29% em cada nível e distância da grade. A exceção da Fechadora de Sprint ficou, porque não pesa (campanhas §4.2).
 
 ## 12. Escopo do MVP
 

@@ -22,6 +22,33 @@
     arr: [0.9710, 0.9659, 1.0060, 1.0110],
     fec: [0.9568, 0.9669, 1.0122, 1.0525],
   };
+  // Correção de estilo por nível e distância (corrida.md §8.5), igual a CORRECAO_ESTILO de
+  // scripts/sim_corrida.gd. Fora da grade vale a borda.
+  const CORR_NIVEIS = [200, 300, 375, 450, 525, 600, 700, 800, 1000];
+  const CORR_DISTS = [1200, 1600, 2000, 2400, 3200];
+  const CORRECAO_ESTILO = {
+    pon: [[1.0132, 0.9964, 0.9834, 0.9762, 0.9688], [1.0189, 0.9989, 0.9913, 0.9793, 0.9694], [1.0465, 1.0011, 0.9879, 0.9782, 0.9615], [1.0454, 1.0043, 0.9844, 0.9784, 0.9718], [1.0229, 1.0164, 0.9816, 0.9740, 0.9700], [1.0117, 1.0189, 0.9838, 0.9767, 0.9731], [0.9980, 1.0159, 0.9910, 0.9722, 0.9723], [0.9989, 1.0038, 0.9938, 0.9755, 0.9673], [1.0111, 1.0034, 1.0001, 1.0027, 0.9660]],
+    per: [[1.0157, 1.0073, 0.9886, 0.9871, 0.9856], [1.0099, 1.0046, 1.0028, 0.9883, 0.9880], [1.0128, 1.0004, 0.9993, 0.9980, 0.9897], [1.0118, 0.9988, 0.9980, 0.9961, 0.9902], [1.0064, 1.0016, 0.9951, 0.9989, 0.9903], [0.9948, 0.9982, 0.9958, 0.9926, 0.9916], [0.9927, 0.9881, 0.9908, 0.9936, 0.9917], [0.9893, 0.9923, 0.9905, 0.9876, 0.9905], [0.9959, 0.9936, 0.9939, 0.9897, 0.9896]],
+    arr: [[1.0130, 1.0143, 1.0109, 1.0120, 1.0195], [1.0034, 1.0135, 1.0123, 1.0156, 1.0175], [0.9985, 1.0085, 1.0148, 1.0179, 1.0191], [0.9915, 1.0080, 1.0150, 1.0168, 1.0149], [0.9939, 0.9980, 1.0143, 1.0182, 1.0140], [0.9736, 0.9954, 1.0145, 1.0189, 1.0141], [0.9832, 0.9926, 1.0081, 1.0180, 1.0155], [0.9911, 0.9968, 1.0034, 1.0153, 1.0190], [0.9790, 0.9912, 0.9970, 1.0015, 1.0192]],
+    fec: [[0.9581, 0.9820, 1.0172, 1.0248, 1.0261], [0.9678, 0.9830, 0.9935, 1.0167, 1.0251], [0.9422, 0.9901, 0.9980, 1.0059, 1.0298], [0.9512, 0.9889, 1.0026, 1.0088, 1.0231], [0.9768, 0.9839, 1.0090, 1.0090, 1.0258], [1.0198, 0.9875, 1.0059, 1.0119, 1.0211], [1.0261, 1.0034, 1.0100, 1.0162, 1.0205], [1.0207, 1.0071, 1.0123, 1.0216, 1.0232], [1.0140, 1.0118, 1.0089, 1.0062, 1.0252]],
+  };
+  // Fôlego do pelotão (corrida.md §6), igual a FOLEGO_PELOTAO de scripts/sim_corrida.gd.
+  const FOLEGO_NIVEL = 350, FOLEGO_FRACAO = 1.0;
+  function naGrade(grade, x) {
+    if (x <= grade[0]) return [0, 0];
+    for (let i = 0; i < grade.length - 1; i++) {
+      if (x <= grade[i + 1]) return [i, (x - grade[i]) / (grade[i + 1] - grade[i])];
+    }
+    return [grade.length - 2, 1];
+  }
+  function correcaoEstilo(style, nivel, D) {
+    const m = CORRECAO_ESTILO[style];
+    const [i, a] = naGrade(CORR_NIVEIS, nivel);
+    const [j, b] = naGrade(CORR_DISTS, D);
+    const baixo = m[i][j] + (m[i][j + 1] - m[i][j]) * b;
+    const cima = m[i + 1][j] + (m[i + 1][j + 1] - m[i + 1][j]) * b;
+    return baixo + (cima - baixo) * a;
+  }
   // (fase, tipo, valor, duração s)
   const SKILLS = [[1, "hp", 0.06, 0], [1, "vel", 0.8, 4.0], [2, "vel", 0.8, 4.0], [2, "hp", 0.04, 0], [3, "vel", 1.0, 4.0]];
   const APT = { R: 0.90, O: 0.95, B: 1.00, X: 1.05 };
@@ -58,10 +85,15 @@
   function novaCorrida(field, D, seed) {
     const rnd = rng(seed);
     const k = cfg.ESCALA, v0 = V0 * k;
+    let nivel = 0;
+    for (const [, s] of field) for (const k of KEYS) nivel += s[k];
+    nivel /= 5 * field.length;
+    const desconto = FOLEGO_FRACAO * Math.max(0, nivel - FOLEGO_NIVEL);
     const rs = field.map(([style, s, mult], idx) => {
+      const corr = correcaoEstilo(style, nivel, D);
       const e = {};
-      for (const k of KEYS) e[k] = s[k] * W[style][k] * mult;
-      const hpmax = K_HP_D * D + K_HP * e.est;
+      for (const k of KEYS) e[k] = s[k] * W[style][k] * mult * corr;
+      const hpmax = K_HP_D * D + K_HP * Math.max(e.est - desconto, 0);
       const noise = rnd.gauss(0, SORTE * (1 - e.int / 2400));
       const chance = Math.min(0.9, SKILL_BASE + SKILL_INT * e.int / 1200);
       // teto: 60 km/h com Vel 0 até 65 km/h com Vel 1200 (linear)

@@ -37,6 +37,7 @@
      "meta": {
       "rival": "Polaris"
      },
+     "forca_rival": 1.0,
      "dist": "milha",
      "piso": "grama"
     },
@@ -247,6 +248,7 @@
      "meta": {
       "rival": "Polaris"
      },
+     "forca_rival": 1.07,
      "dist": "media",
      "piso": "grama"
     },
@@ -671,7 +673,7 @@
     }
    ],
    "virada": {
-    "fama_min": 5500
+    "fama_min": 4800
    },
    "caminhos": {
     "A": {
@@ -778,6 +780,7 @@
      "meta": {
       "rival": "Algol"
      },
+     "forca_rival": 1.0,
      "dist": "milha",
      "piso": "terra"
     },
@@ -1234,7 +1237,7 @@
     "turno": 20,
     "cat": "aberta",
     "meta": {
-     "max": 5,
+     "max": 6,
      "maratona": 2
     },
     "onde": "casa"
@@ -1614,7 +1617,7 @@
     "turno": 20,
     "cat": "aberta",
     "meta": {
-     "max": 5,
+     "max": 6,
      "maratona": 2
     },
     "onde": "casa"
@@ -1822,7 +1825,7 @@
     "turno": 20,
     "cat": "aberta",
     "meta": {
-     "max": 5,
+     "max": 6,
      "maratona": 2
     },
     "onde": "casa"
@@ -1935,7 +1938,7 @@
     "turno": 32,
     "cat": "prata",
     "meta": {
-     "max": 5
+     "max": 4
     },
     "onde": "outro_piso"
    },
@@ -2052,7 +2055,7 @@
    "virada": {
     "e": [
      {
-      "distancias_min": 4
+      "vitorias_min": 6
      },
      {
       "distancias_top3_min": 3
@@ -2258,7 +2261,7 @@
     "turno": 32,
     "cat": "prata",
     "meta": {
-     "max": 5
+     "max": 4
     },
     "onde": "outro_piso"
    },
@@ -2381,7 +2384,7 @@
      "rival": true
     },
     "onde": "casa",
-    "forca_rival": 1.07
+    "forca_rival": 1.0
    },
    "virada": {
     "e": [

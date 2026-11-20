@@ -39,9 +39,9 @@
     "aberta": {
       "nome": "Aberta",
       "forca": [
-        263,
+        267,
         345,
-        455
+        475
       ],
       "fama_entrada": 0,
       "fama": 200,
@@ -50,9 +50,9 @@
     "prata": {
       "nome": "Prata",
       "forca": [
-        364,
-        364,
-        520
+        372,
+        372,
+        545
       ],
       "fama_entrada": 600,
       "fama": 400,
@@ -61,9 +61,9 @@
     "ouro": {
       "nome": "Ouro",
       "forca": [
-        434,
-        434,
-        575
+        465,
+        465,
+        628
       ],
       "fama_entrada": 1500,
       "fama": 800,
@@ -71,21 +71,21 @@
     },
     "gp1": {
       "nome": "Grande Prêmio",
-      "forca": 335,
+      "forca": 340,
       "fama_entrada": 0,
       "fama": 1500,
       "desde": 24
     },
     "gp2": {
       "nome": "Grande Prêmio",
-      "forca": 480,
+      "forca": 535,
       "fama_entrada": 0,
       "fama": 1500,
       "desde": 48
     },
     "gp3": {
       "nome": "Grande Prêmio",
-      "forca": 695,
+      "forca": 715,
       "fama_entrada": 0,
       "fama": 1500,
       "desde": 72
@@ -103,7 +103,10 @@
   "forca_rival": 1.15,
   "aptidao_rival": 1.1025,
   "forca_rival_extra": {
-    "Algol": 1.08
+    "Algol": 1.0
+  },
+  "forca_estilo": {
+    "per": 1.015
   },
   "forca_desafio": 1.2,
   "forca_fixa": [
@@ -643,8 +646,42 @@
   "forca_distancia": {
     "sprint": 0.99,
     "milha": 0.98,
-    "media": 0.99,
+    "media": 1.01,
     "longa": 1.04
+  },
+  "forca_distancia_cat": {
+    "_doc": "Multiplicador extra por categoria e distância (campanhas.md §7.4): um número ou um valor por ano. Acerta corridas em que uma casa virava muro ou sobrava.",
+    "estreia": {
+      "longa": 0.92
+    },
+    "aberta": {
+      "longa": [
+        0.95,
+        1.0,
+        1.0
+      ]
+    },
+    "gp1": {
+      "sprint": 0.95,
+      "milha": 0.98
+    },
+    "prata": {
+      "sprint": [
+        1.0,
+        0.97,
+        1.0
+      ]
+    },
+    "ouro": {
+      "longa": [
+        1.0,
+        1.0,
+        0.98
+      ]
+    },
+    "gp3": {
+      "longa": 0.97
+    }
   },
   "olheiro": {
     "_doc": "Olheiro (calendario.md §7.3): etiqueta pela chance de vencer, estimada com 1 rodada da simulação em modo estimativa por instrução e sorteios da sorte por cima. k_sorte calibra a sorte que a estimativa não vê (bloqueio e habilidades). (inicial)",

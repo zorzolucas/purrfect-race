@@ -105,6 +105,9 @@
   "forca_rival_extra": {
     "Algol": 1.0
   },
+  "forca_estilo": {
+    "per": 1.015
+  },
   "forca_desafio": 1.2,
   "forca_fixa": [
     1.0,

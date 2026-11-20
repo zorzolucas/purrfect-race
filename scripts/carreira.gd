@@ -649,6 +649,12 @@ func _pelotao(c: Dictionary, elenco: Array) -> Dictionary:
 	var v: float = cal.variacao_npc
 	for g in pool.slice(0, vagas):
 		field.append(_adversaria(g, forca * r.randf_range(1.0 - v, 1.0 + v), "", c))
+	# força por estilo na carreira (calendario.md §2): a grade de estilo da simulação empata os
+	# estilos com atributos iguais, mas na carreira, contra o pelotão do elenco, a Perseguidora
+	# completava 4 pontos a menos (campanhas.md §7.4). Vale para a jogadora e para as NPCs.
+	var fe: Dictionary = cal.get("forca_estilo", {})
+	for x in field:
+		x.mult = float(x.mult) * float(fe.get(x.estilo, 1.0))
 	return {"field": field, "rival_idx": rival_idx, "rival": rival if rival_idx >= 0 else "", "forca": forca}
 
 

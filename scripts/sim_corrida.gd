@@ -59,13 +59,6 @@ static var CORRECAO_ESTILO := {
 }
 
 
-## Por cima da grade (corrida.md §8.5): a grade empata os estilos com atributos iguais, mas na
-## carreira, com o treino de cada estilo e o pelotão do elenco, a Perseguidora completava 4 pontos
-## a menos que os outros estilos (campanhas.md §7.4). O ajustar_estilo.gd zera isto antes de
-## calibrar, para a grade continuar sendo só a do pelotão de atributos iguais.
-static var EXTRA_ESTILO := {"per": 1.02}
-
-
 ## Fôlego do pelotão (corrida.md §6): acima de `nivel`, cada ponto que o pelotão sobe na média
 ## tira `fracao` ponto da Estamina que conta no fôlego de todas, porque um pelotão forte corre num
 ## ritmo que cansa mais. Sem isso, a partir do nível ~550 o fôlego nunca acabava, a Estamina não
@@ -102,7 +95,7 @@ static func correcao_estilo(estilo: String, nivel: float, dist: float) -> float:
 	var j: int = b[0]
 	var baixo: float = lerpf(m[i][j], m[i][j + 1], b[1])
 	var cima: float = lerpf(m[i + 1][j], m[i + 1][j + 1], b[1])
-	return lerpf(baixo, cima, a[1]) * float(EXTRA_ESTILO.get(estilo, 1.0))
+	return lerpf(baixo, cima, a[1])
 
 
 ## Habilidades genéricas de referência (corrida.md §7): [fase, tipo, valor, duração s].

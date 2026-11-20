@@ -150,6 +150,8 @@ func _initialize() -> void:
 		_checar(not cal.nomes_corrida.get(cat, []).is_empty(), "sem nomes de corrida para %s" % cat)
 	for d in DISTS:
 		_checar(cal.distancia_gp.has(d), "distancia_gp sem %s" % d)
+	for st in cal.get("forca_estilo", {}):
+		_checar(st in ESTILOS, "forca_estilo: estilo desconhecido %s" % st)
 
 	# campanhas
 	var camp: Dictionary = dd.campanhas

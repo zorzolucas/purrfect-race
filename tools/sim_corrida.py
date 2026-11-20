@@ -42,9 +42,6 @@ CORRECAO_ESTILO = {
     "fec": [[0.9581, 0.9820, 1.0172, 1.0248, 1.0261], [0.9678, 0.9830, 0.9935, 1.0167, 1.0251], [0.9422, 0.9901, 0.9980, 1.0059, 1.0298], [0.9512, 0.9889, 1.0026, 1.0088, 1.0231], [0.9768, 0.9839, 1.0090, 1.0090, 1.0258], [1.0198, 0.9875, 1.0059, 1.0119, 1.0211], [1.0261, 1.0034, 1.0100, 1.0162, 1.0205], [1.0207, 1.0071, 1.0123, 1.0216, 1.0232], [1.0140, 1.0118, 1.0089, 1.0062, 1.0252]],
 }
 
-# Por cima da grade, igual a EXTRA_ESTILO de scripts/sim_corrida.gd: na carreira a Perseguidora
-# completava 4 pontos a menos que os outros estilos (campanhas.md §7.4).
-EXTRA_ESTILO = {"per": 1.02}
 
 # Fôlego do pelotão (corrida.md §6), igual a FOLEGO_PELOTAO de scripts/sim_corrida.gd: acima do
 # nível 350, cada ponto que o pelotão sobe tira 1 ponto da Estamina que conta no fôlego.
@@ -66,7 +63,7 @@ def correcao_estilo(style, nivel, D):
     j, b = _na_grade(CORR_DISTS, D)
     baixo = m[i][j] + (m[i][j + 1] - m[i][j]) * b
     cima = m[i + 1][j] + (m[i + 1][j + 1] - m[i + 1][j]) * b
-    return (baixo + (cima - baixo) * a) * EXTRA_ESTILO.get(style, 1.0)
+    return baixo + (cima - baixo) * a
 
 
 # habilidades genéricas que toda corredora leva no teste: (fase, tipo, valor, duração s)

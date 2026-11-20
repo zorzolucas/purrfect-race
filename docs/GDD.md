@@ -132,7 +132,7 @@ Nas referências do gênero, o sistema que mais faz o jogador repetir carreiras 
 - **Férias de verão** em janeiro dos 3 anos: acampamento sem corridas, com treino reforçado.
 - **Amuletos:** cada objetivo cumprido dá 1 amuleto (escolha entre 3), um modificador que vale até o fim da carreira. Não passam para a garota salva. O raro **Sete Vidas** deixa refazer uma vez um objetivo falhado.
 - **Clima do mês** (tempo bom, chuva, calor, frio, vento, noite de estrelas), seguindo as estações. Ele mexe no treino e, na chuva e no calor, na corrida.
-- **Magnitude** (0 a 5): dificuldade por garota, liberada vencendo o GP final. Fica para depois do MVP.
+- **Magnitude** (0 a 5): dificuldade por garota, liberada vencendo o GP final. Já está no protótipo ([endgame](endgame.md) §1).
 - Uma **semente** por carreira guarda todos os sorteios: recarregar o save e repetir a ação dá o mesmo resultado.
 - Corridas têm **categorias** (Estreia, Aberta, Prata, Ouro, Grande Prêmio). As mais altas pedem **fama** para entrar.
 - O detalhe está no [calendário](calendario.md), e a campanha de exemplo (Lira) está no [elenco](elenco.md#campanha-da-lira).
@@ -306,6 +306,7 @@ Existe **uma única moeda**, sem moeda premium. Fontes:
 - As copas de distância têm as 3 corridas na mesma faixa. A **Copa Terra** varia: **1200 / 1600 / 2400 m**, para pedir especialistas de terra diferentes.
 - Vencer as 5 copas abre o **Campeonato Final**: 5 corridas variadas, que pedem **5 garotas diferentes**.
 - Tudo é PvE, sem PvP.
+- No protótipo, o circuito tem **3 níveis** (Bronze, Prata e Ouro), 3 casas rivais que disputam os pontos, 3 tentativas por evento em cada rotação e **condições da semana** (clima e traçado de cada corrida) que mudam qual estilo e atributo rende mais, para não existir uma escalação certa para sempre ([endgame](endgame.md) §2 e §5).
 
 ## 8. Início do jogo
 
@@ -327,8 +328,8 @@ Existe **uma única moeda**, sem moeda premium. Fontes:
 - Arte provisória (primitivas 3D) e **1 garota low-poly de referência** para validar o pipeline Blender → Godot (§11.4).
 
 **Fica para depois**
-- Mais garotas, mais corridas, circuito completo.
-- Magnitude (dificuldade crescente), ver [calendário](calendario.md) §10.
+- Mais garotas e mais corridas.
+- Amuletos e Mistérios exclusivos de magnitude. (A magnitude, o circuito em níveis e o desafio da semana já estão no protótipo: [endgame](endgame.md).)
 - Modelos low-poly finais das 6 garotas do MVP, rivais e NPCs (§11).
 - Cenários low-poly além da pista e do pátio da academia.
 - Legado/madrinha (§3.6).

@@ -396,6 +396,8 @@ Turnos **21–22** (ano 1), **45–46** (ano 2) e **69–70** (ano 3), em janeir
 
 Na astronomia, a **magnitude** mede o brilho de uma estrela. Aqui ela é o nível de dificuldade de uma carreira, de **0 a 5**.
 
+> No protótipo desde 2026-11-19 ([endgame](endgame.md) §1). A Má Fama virou **Bolso Furado** (prêmios em moeda das corridas −30%); os amuletos e Mistérios exclusivos ainda faltam.
+
 - A magnitude é **por garota**. No começo da carreira, o jogador escolhe qualquer magnitude até a **maior liberada** para aquela garota.
 - **Liberar:** terminar uma carreira **vencendo o GP final** na magnitude M libera a magnitude M+1 para aquela garota.
 - Os efeitos se **acumulam**: a Magnitude 3 tem tudo da 1 e da 2.

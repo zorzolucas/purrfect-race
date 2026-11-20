@@ -1,6 +1,6 @@
 # Nekomusume — Campanhas e balanceamento
 
-> Versão 0.7 — 2026-11-20. Na v0.7 a simulação mudou (fôlego do pelotão e correção de estilo por nível, [corrida](corrida.md) §6 e §8.5), o bot treina pelo estilo, a Antares foi para a casa certa e a Algol perdeu o extra. A diferença entre casas ficou em 8,3 pontos, nenhum objetivo derruba mais de 23% em casa, arquétipo ou estilo, e nenhuma garota fica abaixo da curva (§7).
+> Versão 0.7 — 2026-11-20. Na v0.7 a simulação mudou (fôlego do pelotão e correção de estilo por nível, [corrida](corrida.md) §6 e §8.5), o bot treina pelo estilo, a Antares foi para a casa certa, a Algol perdeu o extra e a Perseguidora ganhou +1,5% na carreira. Casas, arquétipos e estilos ficaram em 9,8, 10,8 e 1,8 pontos de diferença, nenhum objetivo derruba mais de 22% em grupo nenhum e as 18 viradas ficaram entre 35% e 65% (§7).
 > Versão 0.6 — 2026-11-18. Na v0.6 a diferença entre casas chegou a 9,9 pontos e a entre arquétipos a 11,2, com o objetivo 4 da Teimosa e da Sonhadora, a Misteriosa e a Média Grama acertados (§7).
 > Versão 0.5 — 2026-11-18. Na v0.5 o ano 3 ficou mais forte, a garota cresce mais cedo, as corridas do calendário fixo ficaram mais fortes (a Coroa Dupla caiu de 28% para 14% das carreiras) e o bot passou a usar uma semente por garota (§7).
 > Versão 0.4 — 2026-11-18. Na v0.4 a diferença entre casas e entre arquétipos caiu para ~11 pontos, as viradas da Durona e da Curiosa mudaram, a Coroa Dupla pede as 2 Ouros no mesmo ano e o bot rodou com 40 sementes (§7).
@@ -562,35 +562,36 @@ No jogo, a sorte não é o problema: o olheiro prevê bem o resultado. No GP do 
 | Objetivo | 1 (t13) | 2 (t20) | 3 (t24) | 4 (t32) | 5 (t40) | 6 (t48) | 7 (t60) | 8 (t72) |
 |---|---|---|---|---|---|---|---|---|
 | Passa | 96% | 85% | 74% | 65% | 54% | 49% | 42% | **36%** |
-| Queda de quem chega | 4% | 12% | 13% | 12% | 17% | 10% | 13% | 16% |
+| Queda de quem chega | 4% | 11% | 14% | 12% | 16% | 10% | 13% | 16% |
 
-- **Carreiras completas: 35,6%** (alvo ~35%, faixa de 30% a 40%). Nenhum objetivo derruba mais de 17% de quem chega nele, e nenhuma casa, arquétipo ou estilo passa de 23% em objetivo nenhum (teto 25%).
-- **Por casa:** de 31,0% (Longa Terra) a 39,4% (Sprint Grama), **diferença de 8,3 pontos** (meta: até 10). Com 480 carreiras por casa, a sorte explica uns ±2 pontos em cada uma, e só ela já abriria uns 6 pontos entre a maior e a menor de 8 casas.
-- **Por arquétipo:** de 28,1% (Estrategista) a 41,7% (Teimosa), **diferença de 13,5 pontos**. Com 240 a 320 carreiras, a sorte explica uns ±3 pontos em cada um, e só ela abriria uns 10 pontos entre 13 grupos. A Estrategista é o único arquétipo a mais de 2 desvios da média (§7.6).
-- **Por estilo:** Perseguidora 32,2%, Ponteira 35,6%, Fechadora 36,0% e Arrancadora 38,4%. Diferença de 6,2 pontos (era 6,7). A Fechadora, que liderava na v0.6, ficou no meio. O estilo de cima muda com a casa: Fechadora na Milha Grama, na Milha Terra e na Sprint Grama, Arrancadora na Longa e na Média, e Arrancadora e Ponteira empatadas na Sprint Terra.
-- **Curva de atributos:** 228 / 337 / 451 / 591 / 716 / 826 nos turnos 13, 24, 36, 48, 60 e 72 (alvo 200 / 330 / 460 / 590 / 700 / 800).
-- **16,2 corridas** por carreira. **GP final vencido** em 30% das carreiras. Depois da virada, o caminho A completa 74% e o B 72%.
-- **Títulos:** 10% das carreiras fecham uma Coroa Dupla, 3% uma Tríplice e 2% a Volta ao Céu (eram 16%, 4% e 5%). O bot não planeja rota, então quem planeja deve ir bem melhor.
+- **Carreiras completas: 35,6%** (alvo ~35%, faixa de 30% a 40%). Nenhum objetivo derruba mais de 16% de quem chega nele, e nenhuma casa, arquétipo ou estilo passa de 22% em objetivo nenhum (teto 25%).
+- **Por casa:** de 30,4% (Longa Terra) a 40,2% (Sprint Grama), **diferença de 9,8 pontos** (meta: até 10). Com 480 carreiras por casa, a sorte explica uns ±2 pontos em cada uma, e só ela já abriria uns 6 pontos entre a maior e a menor de 8 casas.
+- **Por arquétipo:** de 30,0% (Capitã) a 40,8% (Teimosa), **diferença de 10,8 pontos**. Com 240 a 320 carreiras, a sorte explica uns ±3 pontos em cada um, e só ela abriria uns 10 pontos entre 13 grupos. Nenhum arquétipo fica a mais de 2 desvios da média.
+- **Por estilo:** Ponteira 35,0%, Arrancadora 35,1%, Fechadora 35,5% e Perseguidora 36,8%. **Diferença de 1,8 ponto** (era 6,7). Cada estilo é o melhor em pelo menos uma casa: Arrancadora na Longa Terra, Fechadora na Média Terra, na Milha Grama e na Sprint Grama, Perseguidora na Longa Grama e na Milha Terra, Ponteira na Sprint Terra, e Arrancadora e Perseguidora empatadas na Média Grama.
+- **Curva de atributos:** 228 / 337 / 451 / 590 / 716 / 826 nos turnos 13, 24, 36, 48, 60 e 72 (alvo 200 / 330 / 460 / 590 / 700 / 800).
+- **16,2 corridas** por carreira. **GP final vencido** em 30% das carreiras. Depois da virada, os caminhos A e B completam 73% cada.
+- **Títulos:** 11% das carreiras fecham uma Coroa Dupla, 3% uma Tríplice e 2% a Volta ao Céu (eram 16%, 4% e 5%). O bot não planeja rota, então quem planeja deve ir bem melhor.
 
-**Maiores quedas por grupo:** Estrategista nos objetivos 7 e 8 (21% e 23%), Longa Grama no 8 (23%), Média Grama, Leal e Festeira no 5 (21%, 21% e 20%) e Perfeccionista no 8 (21%). Com 100 a 300 carreiras chegando, a sorte explica uns ±4 pontos.
+**Maiores quedas por grupo:** Longa Grama no objetivo 8 (22%), Sonhadora no 4 (22%), Média Grama e Festeira no 5 (21%), e Durona no 3 e Arrancadora no 5 (20%). Com 100 a 300 carreiras chegando, a sorte explica uns ±4 pontos.
 
-**Garotas fora da curva** (a mais de 2 desvios da sorte): só 3, todas acima: Alcione (Teimosa, Sprint Grama) com 48%, Corona (Perfeccionista, Milha Terra) com 49% e Carina (Sonhadora, Milha Grama) com 53%. Com 48 garotas, a sorte sozinha já põe ~2 fora. Nenhuma fica abaixo: a Columba e a Fênix, que tinham 16% e 19%, foram a 33% e 28% com a Algol sem o extra (§7.4).
+**Garotas fora da curva** (a mais de 2 desvios da sorte): 4 de 48, quando a sorte sozinha já põe ~2 fora. Abaixo, só a Dubhe (Sonhadora, Média Grama, Fechadora) com 22,5%. Acima, a Electra (Durona, Sprint Grama) com 48%, a Carina (Sonhadora, Milha Grama) com 49% e a Cassiopeia (Estrategista, Milha Grama) com 51%. Antes das mudanças da v0.7 em rivais, casas e estilos (§7.4), a Antares tinha 11%, a Columba 16% e a Fênix 19%.
 
 ### 7.2 Conta madura
 
 | Objetivo | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 |
 |---|---|---|---|---|---|---|---|---|
-| Passa | 100% | 94% | 87% | 82% | 74% | 69% | 63% | **59%** |
-| Queda de quem chega | 0% | 6% | 7% | 6% | 10% | 7% | 7% | 8% |
+| Passa | 100% | 95% | 87% | 82% | 73% | 69% | 63% | **58%** |
+| Queda de quem chega | 0% | 5% | 8% | 6% | 10% | 7% | 8% | 8% |
 
-- **Carreiras completas: 58,6%** (alvo ~55%, faixa de 50% a 60%), com a madrinha de nota ~700, vínculo 3 e o teto de +25 por atributo.
-- Diferença de 16,7 pontos entre casas (de 47,5% na Média Terra a 64,2% na Milha Grama e na Longa Terra), 15,4 entre arquétipos e 4,2 entre estilos. Com 120 carreiras por casa, a sorte explica uns ±4,5 pontos em cada uma, então isso pede uma rodada maior antes de mexer (§7.6).
-- Curva 254 / 363 / 477 / 617 / 747 / 874, 22,0 corridas por carreira e GP final vencido em 52%.
-- Títulos: 23% das carreiras fecham uma Coroa Dupla, 9% uma Tríplice e 8% a Volta ao Céu.
+- **Carreiras completas: 58,2%** (alvo ~55%, faixa de 50% a 60%), com a madrinha de nota ~700, vínculo 3 e o teto de +25 por atributo.
+- **Por estilo:** Fechadora 55,0%, Arrancadora 57,9%, Ponteira 58,8% e Perseguidora 61,2%. Diferença de 6,2 pontos. Com +2% na Perseguidora (em vez de +1,5%), ela ia a 64,6% aqui, 9 pontos à frente das outras (§7.4).
+- Diferença de 19,2 pontos entre casas (de 46,7% na Média Terra a 65,8% na Milha Grama) e de 17,1 entre arquétipos. Com 20 carreiras por garota, a sorte explica uns ±4,5 pontos em cada casa: na rodada com +2% na Perseguidora, as casas davam 15 pontos, com outra casa embaixo. Isso pede uma rodada maior antes de mexer (§7.6).
+- Curva 254 / 362 / 477 / 616 / 746 / 873, 21,9 corridas por carreira e GP final vencido em 51%.
+- Títulos: 24% das carreiras fecham uma Coroa Dupla, 7% uma Tríplice e 8% a Volta ao Céu.
 
 ### 7.3 Ponto de virada (conta nova)
 
-As 12 campanhas de arquétipo ficam entre 35% e 65% no caminho A: Competitiva 40%, Teimosa 42%, Perfeccionista 43%, Misteriosa 44%, Estrategista 47%, Durona 51%, Festeira 52%, Sonhadora 53%, Capitã 53%, Leal 56%, Curiosa 57% e Estrela 63%. Do MVP: Mira 40%, Nashira 41%, Capela 45% e Lira 59%. Ficam fora a Shaula (31%, com 39 carreiras chegando no turno 48) e a Antares (68%, com 31).
+**Todas as 18 campanhas ficam entre 35% e 65% no caminho A.** Arquétipos: Competitiva 36%, Estrategista 43%, Perfeccionista 45%, Teimosa 46%, Sonhadora 48%, Misteriosa 49%, Festeira 51%, Durona 53%, Leal 55%, Capitã 56%, Curiosa 61% e Estrela 63%. MVP: Shaula 38%, Mira 39%, Nashira 45%, Capela 47%, Lira 55% e Antares 64%.
 
 Na v0.7 mudaram 2 regras:
 
@@ -609,7 +610,7 @@ Na v0.5, o ano 3 novo mudou a fama e o número de vitórias no turno 48, e 5 reg
 | Festeira | 1 Festival | 1 Festival **ou 3 saídas** (o bot quase não passa por Festival: só 1 em 3 carreiras) |
 | Competitiva | Venceu o GP do ano 2 e top 2 no objetivo 5 | Venceu o GP do ano 2 **e o objetivo 5** |
 
-Na conta madura, passam de 65% a Curiosa (81%), a Perfeccionista (74%), a Estrela (73%) e a Festeira (66%), e no MVP a Capela e a Lira (com 10 a 12 carreiras chegando). A meta vale para a conta nova; quem tem a conta madura vence mais e ganha mais fama.
+Na conta madura, passam de 65% a Curiosa (84%), a Estrela (80%), a Perfeccionista (72%) e a Durona (68%), e no MVP a Capela e a Antares (com 12 a 15 carreiras chegando). A meta vale para a conta nova; quem tem a conta madura vence mais e ganha mais fama.
 
 ### 7.4 O que mudou nas últimas rodadas
 
@@ -622,11 +623,12 @@ Na conta madura, passam de 65% a Curiosa (81%), a Perfeccionista (74%), a Estrel
 5. **Força por categoria e distância** (`forca_distancia_cat`, calendário §2): 7 ajustes de 2% a 8%, cada um tirando o muro de uma casa. O GP do ano 1 derrubava 25% das garotas de Sprint Grama, e a Estreia, 16% das de Longa (a média é 5%).
 6. **Metas de arquétipo.** A Maratona do objetivo 2 (Capitã, Leal e Estrela) pede top 6 (era top 5). O objetivo 4 da Festeira e da Misteriosa pede top 4 (era top 5): numa rodada intermediária, a Festeira completava 48% e a Misteriosa 44%. O objetivo 4 da Teimosa ficou sem o bônus da rival (era +7%), porque derrubava ~30% em 4 rodadas seguidas.
 7. **Rivais do MVP** (§4.3): sem bônus no objetivo 4 da Lira e da Antares, e +7% no objetivo 5 da Nashira. A Lira foi de 26% para 34% de carreiras completas e a Nashira de 31% para 38%.
-8. **Algol sem os 8% extras** (`forca_rival_extra` 1,0, era 1,08 desde a v0.5). Com a simulação nova, as 2 casas dela (Sprint Terra e Milha Terra) completavam 31,9% e 31,7%, 4 pontos abaixo das casas com campeã, e a Columba e a Fênix, as duas de Milha Terra, eram as garotas mais abaixo da curva (16% e 19%). Sem o extra, as casas foram a 34,8% e 39,0% e as duas a 33% e 28%.
-9. **A Antares estava na casa errada** em `data/iniciais.json`: Sprint Grama, com a aptidão (Terra Ótima), a campanha (objetivos na Terra, rival Algol) e o elenco da Sprint Terra. Ela completava 11%; com os rivais e a casa certa, foi a 34%. O bot também a contava na Sprint Grama, que tinha 7 garotas (a Sprint Terra tinha 5). O `teste_dados.gd` agora confere a casa das iniciais.
-10. **Viradas** da Curiosa e da Capela (§7.3).
+8. **Algol sem os 8% extras** (`forca_rival_extra` 1,0, era 1,08 desde a v0.5). Com a simulação nova, as 2 casas dela (Sprint Terra e Milha Terra) completavam 31,9% e 31,7%, 4 pontos abaixo das casas com campeã, e a Columba e a Fênix, as duas de Milha Terra, eram as garotas mais abaixo da curva (16% e 19%). Na rodada com a mudança, as casas foram a 34,8% e 39,0% e as duas garotas a 33% e 28%.
+9. **A Antares estava na casa errada** em `data/iniciais.json`: Sprint Grama, com a aptidão (Terra Ótima), a campanha (objetivos na Terra, rival Algol) e o elenco da Sprint Terra. Ela completava 11%; com o rival sem bônus, a casa certa e a Algol sem o extra, foi a 34%. O bot também a contava na Sprint Grama, que tinha 7 garotas (a Sprint Terra tinha 5). O `teste_dados.gd` agora confere a casa das iniciais.
+10. **Perseguidora +1,5% na carreira** (`forca_estilo` no `data/calendario.json`, calendário §2). As 12 Perseguidoras completavam 32,2%, de 3 a 6 pontos abaixo dos outros estilos, e puxavam para baixo a Estrategista (28,1%, o único arquétipo a mais de 2 desvios) e a Leal. Com +2% na simulação, a conta nova acertou (Perseguidoras em 36,6%), mas na madura ela passou 9 pontos à frente das outras e no circuito virou a melhor em 38% das corridas. Ficou +1,5%, e só nas corridas da carreira (jogadora e NPCs): a simulação e o circuito não mudam. Estilos de 6,2 para 1,8 ponto na conta nova e 6,2 na madura; a Estrategista foi a 35%.
+11. **Viradas** da Curiosa e da Capela (§7.3).
 
-A taxa geral foi de 38,7% para 35,6%, mais perto do alvo de 35%.
+A taxa geral foi de 38,7% para 35,6%, no alvo de 35%.
 
 **v0.6** (a partir da v0.5: 36,2% na conta nova, 12,5 pontos entre casas, 15,6 entre arquétipos):
 
@@ -680,16 +682,17 @@ A taxa geral subiu de 36,2% para 38,7% com as três mudanças, ainda dentro da f
 | Rival no objetivo 4 da Teimosa (v0.7) | +7% | Sem bônus |
 | Rival no MVP (v0.7) | +15% | Sem bônus no objetivo 4 da Lira e da Antares, +7% no objetivo 5 da Nashira |
 | Algol (v0.7) | +15% × 1,08 | +15%, como as outras rivais (`forca_rival_extra` 1,0) |
+| Perseguidora na carreira (v0.7) | ×1,0 | ×1,015 (`forca_estilo`) |
 
 O ganho do treino caiu porque o semestre de base sozinho levava a garota a ~320 na Estreia. O bônus por nível e os atributos por corrida devolvem o crescimento nos anos 2 e 3, quando ela corre mais e treina menos.
 
 ### 7.6 Próximos passos
 
 - **Testes manuais** em 4 rodadas (primeiras impressões, dificuldade e sorte, rota e ano 3, elenco e estilos). O resumo de cada rodada entra aqui.
-- **Perseguidora e Estrategista.** A Perseguidora completa 32,2%, de 3 a 6 pontos abaixo dos outros estilos, e 11 das 12 ficam entre 25% e 38%. A Estrategista (28,1%, o único arquétipo a mais de 2 desvios) junta esse estilo com as 2 casas mais difíceis (Naos na Longa Terra e Alcor na Média Grama, as duas com 25%) e completa só 61% depois da virada (a média é 73%). O primeiro botão é a correção de estilo da Perseguidora ([corrida](corrida.md) §8.5), medida nas 12 Perseguidoras e conferida no circuito, onde ela também quase nunca é a melhor ([endgame](endgame.md) §5.6).
-- **Arquétipos:** 13,5 pontos, perto dos ~10 que a sorte sozinha abre com 240 a 320 carreiras por arquétipo. Para separar sorte de diferença real, rodar 160 carreiras por garota (~2,5 h em 4 processos) antes de mexer no resto.
-- **Viradas:** a Shaula (31%) na conta nova. Na madura, a Curiosa, a Perfeccionista, a Estrela e a Festeira passam de 65%.
-- **Conta madura:** 16,7 pontos entre casas, com 20 carreiras por garota. Rodar 40 por garota para confirmar antes de mexer.
+- **Casas e arquétipos:** 9,8 e 10,8 pontos, perto do que a sorte sozinha abre com 80 carreiras por garota (~6 e ~10). Para separar sorte de diferença real, rodar 160 carreiras por garota (~2,5 h em 4 processos) antes de mexer de novo. A Longa Terra (30%), a Capitã e a Misteriosa (30% e 31%) são as de baixo, e a Dubhe (22,5%) é a única garota abaixo da curva.
+- **Viradas na conta madura:** a Curiosa (84%) e a Estrela (80%) são as mais longe da faixa.
+- **Conta madura:** rodar 40 carreiras por garota para separar sorte de diferença real entre casas (19,2 pontos com 20 por garota).
+- **Garotas reais no circuito:** a Electra na Copa Sprint ([endgame](endgame.md) §5.6).
 - Mostrar o encontro de inspiração da madrinha (hoje o bônus dos turnos 25 e 49 acontece em silêncio).
 
 ## 8. Decisões pequenas tomadas aqui

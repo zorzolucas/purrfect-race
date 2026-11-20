@@ -17,6 +17,7 @@ var calendario: Dictionary = {}
 var habilidades: Dictionary = {}
 var amuletos: Dictionary = {}
 var campanhas: Dictionary = {}
+var endgame: Dictionary = {}
 var patio: Dictionary = {}
 
 
@@ -29,6 +30,7 @@ func _ready() -> void:
 	habilidades = _ler_json("res://data/habilidades.json")
 	amuletos = _ler_json("res://data/amuletos.json")
 	campanhas = _ler_json("res://data/campanhas.json")
+	endgame = _ler_json("res://data/endgame.json")
 	patio = _ler_json("res://data/patio.json")
 
 
@@ -41,6 +43,10 @@ func habilidade(id: String) -> Dictionary:
 
 func amuleto(id: String) -> Dictionary:
 	for a in amuletos.get("lista", []):
+		if a.id == id:
+			return a
+	# as maldições da Magnitude (data/endgame.json) funcionam como amuletos negativos
+	for a in endgame.get("maldicoes", []):
 		if a.id == id:
 			return a
 	return {}

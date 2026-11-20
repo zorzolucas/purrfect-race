@@ -90,7 +90,13 @@ visíveis. Cada tiragem custa 100 moedas. Marque uma garota e ela vem garantida 
 recebe moeda (prêmios das corridas e bônus por objetivo) e decide se a nova versão substitui
 a salva. O perfil fica em `user://perfil.json`.
 
-**Fica para depois:** magnitude, liberar amuletos entre carreiras e o circuito de copas.
+**Endgame ([endgame.md](docs/endgame.md)):** vencer o GP final libera a próxima
+**Magnitude** daquela garota (0 a 5: NPCs mais fortes, maldições, metas mais altas, +20% de
+moeda por nível). O **Circuito** tem 5 copas e o Campeonato Final em Bronze, Prata e Ouro,
+corridos com as versões salvas contra 3 casas rivais; clima e traçado de cada corrida mudam a
+cada rotação. O **Desafio da semana** é uma carreira com semente, garota e regra fixas por rotação.
+
+**Fica para depois:** liberar amuletos entre carreiras e os amuletos exclusivos de magnitude.
 Fora a Lira na pista e os sprites das fichas, a arte é placeholder (formas coloridas).
 
 | Arquivo | O que faz |
@@ -99,7 +105,8 @@ Fora a Lira na pista e os sprites das fichas, a arte é placeholder (formas colo
 | `scripts/calendario.gd` | Datas, trechos, mapa de rotas, clima, calendário fixo e corridas geradas, tudo pela semente. |
 | `scripts/campanha.gd` | Monta a campanha de cada garota (`data/campanhas.json`) e avalia o ponto de virada. |
 | `scripts/carreira.gd` | Regras da carreira. Os números de balanceamento ficam em `BAL`. |
-| `scripts/perfil.gd` | Moeda, elenco, vínculo, versão salva de cada garota e a pool. |
+| `scripts/perfil.gd` | Moeda, elenco, vínculo, versão salva de cada garota, a pool e o progresso do endgame. |
+| `scripts/endgame.gd`, `scripts/tela_circuito.gd` | Magnitude, Circuito (pelotão, casas rivais, traçados, pontos) e Desafio da semana, com os números em `data/endgame.json`; tela do circuito com escalação e resultado. |
 | `scripts/dados.gd` | Autoload que carrega os arquivos de `data/` (elenco, iniciais, rivais, encontros). |
 | `scripts/corrida_3d.gd`, `scripts/pista_geo.gd` | Vista 3D da corrida (pista, corredoras, câmeras) e a geometria da pista em metros. |
 | `scripts/patio_3d.gd`, `scripts/tela_patio.gd` | Pátio da academia: cenário de primitivas, colegas passeando com hábitos, clima e evento do turno, e a tela com as conversas. |
@@ -117,6 +124,9 @@ Fora a Lira na pista e os sprites das fichas, a arte é placeholder (formas colo
 | `testes/teste_dados.gd` | Confere os JSON de `data/`: campos, ids únicos e referências entre arquivos (colegas, rivais, habilidades, efeitos). |
 | `testes/teste_carreira.gd` | Joga carreiras inteiras com um bot aleatório, confere o estado a cada passo e que salvar e carregar no meio não muda nada. |
 | `testes/teste_telas.gd` | Abre o jogo e aperta botões ao acaso por 1200 passos. Falha em qualquer erro de script. |
+| `testes/teste_endgame.gd` | Testa a magnitude (metas, maldições, força, mapa, moeda, save), as regras do desafio, a liberação de magnitude, as tentativas e os prêmios do circuito. |
+| `testes/meta_circuito.gd` | Procura meta no circuito: pontos por estilo, por garota e por +10% em cada atributo em cada corrida e traçado, e a chance de vencer cada nível ([endgame](docs/endgame.md) §5). |
+| `testes/capturas_endgame.gd` | Capturas da academia com o desafio e a magnitude, do circuito, da escalação, do resultado e do fim de um desafio. |
 | `testes/rodar_testes.gd` | Roda todos os `teste_*.gd` e mostra o resumo. O GitHub roda o mesmo a cada PR (`.github/workflows/testes.yml`). |
 | `testes/instrucao.gd` | Compara as 3 instruções em corridas equilibradas e mede o erro do olheiro contra corridas reais. |
 | `testes/teste_patio.gd` | Testa aniversários, eventos do pátio, conversas (uma por turno, afinidade 30+), reações, save e monta a cena 3D em todos os eventos. |

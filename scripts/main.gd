@@ -28,6 +28,12 @@ func _trocar(nova: Control) -> void:
 	tela = nova
 	tela.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(tela)
+	# transição curta: a tela nova entra com fade e desliza um pouco para cima
+	tela.modulate.a = 0.0
+	tela.position.y = 10.0
+	var tw := tela.create_tween().set_parallel()
+	tw.tween_property(tela, "modulate:a", 1.0, 0.18)
+	tw.tween_property(tela, "position:y", 0.0, 0.22).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 
 
 func mostrar_escolha() -> void:

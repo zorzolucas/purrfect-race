@@ -11,6 +11,7 @@ var tela: Control
 
 func _ready() -> void:
 	var fundo := ColorRect.new()
+	theme = UI.tema()
 	fundo.color = UI.FUNDO
 	fundo.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(fundo)
@@ -121,6 +122,7 @@ func mostrar_carreira(msg: String = "") -> void:
 	var t := TelaCarreira.new(carreira, msg)
 	t.ir_correr.connect(mostrar_corrida)
 	t.ir_patio.connect(mostrar_patio)
+	t.ir_academia.connect(func(): mostrar_academia("Carreira de %s salva no turno %d. Continue quando quiser." % [carreira.nome, carreira.turno]))
 	t.atualizou.connect(func(m): mostrar_carreira(m))
 	_trocar(t)
 

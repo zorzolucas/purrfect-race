@@ -46,7 +46,7 @@ func _ready() -> void:
 			txt = "A carreira de %s terminou. Falta decidir se a nova versão fica salva." % salvo.nome
 		var l := UI.label(txt, 18, UI.TEXTO, true)
 		h.add_child(l)
-		h.add_child(UI.botao("Continuar carreira", func(): continuar.emit(), 18))
+		h.add_child(UI.botao_principal("Continuar carreira", func(): continuar.emit(), 18))
 		pc.add_child(h)
 		v.add_child(pc)
 
@@ -99,7 +99,13 @@ func _cartao(nome: String) -> Control:
 			mag_escolhida[nome] = i
 			op.tooltip_text = Endgame.resumo_magnitude(i))
 		linha.add_child(op)
-	linha.add_child(UI.botao("Treinar %s" % nome.split(" ")[0], func(): treinar.emit(nome, int(mag_escolhida.get(nome, 0))), 16))
+	var acao := func(): treinar.emit(nome, int(mag_escolhida.get(nome, 0)))
+	if Carreira.tem_save():
+		# começar outra carreira apaga a que está em andamento
+		linha.add_child(UI.botao_confirmar("Treinar %s" % nome.split(" ")[0], acao, 16,
+			"Apagar a carreira atual? Clique de novo"))
+	else:
+		linha.add_child(UI.botao("Treinar %s" % nome.split(" ")[0], acao, 16))
 	v.add_child(linha)
 	return p
 

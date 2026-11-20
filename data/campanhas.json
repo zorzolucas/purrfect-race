@@ -37,6 +37,7 @@
      "meta": {
       "rival": "Polaris"
      },
+     "forca_rival": 1.0,
      "dist": "milha",
      "piso": "grama"
     },
@@ -247,6 +248,7 @@
      "meta": {
       "rival": "Polaris"
      },
+     "forca_rival": 1.07,
      "dist": "media",
      "piso": "grama"
     },
@@ -778,6 +780,7 @@
      "meta": {
       "rival": "Algol"
      },
+     "forca_rival": 1.0,
      "dist": "milha",
      "piso": "terra"
     },
@@ -2052,7 +2055,7 @@
    "virada": {
     "e": [
      {
-      "distancias_min": 4
+      "vitorias_min": 6
      },
      {
       "distancias_top3_min": 3

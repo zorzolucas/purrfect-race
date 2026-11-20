@@ -261,7 +261,7 @@ O ritmo foi recalibrado no nível baixo na v0.7 (correção de estilo, corrida.m
 - Se a casa tem rival com nome (calendário §3.1), é ela: **Polaris** em Média e Longa Grama, **Algol** em Sprint e Milha Terra.
 - Senão, é a **campeã da casa**: a garota do elenco da mesma casa com a maior soma de atributos que não seja a jogadora. Ela corre com +15% sobre a força da categoria nas corridas de objetivo e no GP, como as rivais com nome, mas sem encontros no MVP.
 - A rival da campanha **corre sempre com aptidão Ótima** na distância e no piso da corrida (`aptidao_rival` no `data/calendario.json`). Antes da v0.4, Polaris na Longa e Algol na Milha tinham aptidão Boa e eram mais fracas que as campeãs da casa, o que deixava as casas com campeã até 7 pontos mais difíceis.
-- Na **primeira Prata** (objetivo 4, turno 32) dos arquétipos Competitiva, Estrategista e Leal, a rival corre **sem os +15%** (`forca_rival: 1.0` no objetivo): ela ainda está pegando ritmo. Esse objetivo derrubava de 33% a 42% das carreiras desses arquétipos. Na **Teimosa** e na **Sonhadora** (só Fechadoras), a rival corre com **+7%** (`forca_rival: 1.07`): sem bônus elas iam a 53%, e com +15% o objetivo derrubava de 29% a 36%.
+- Na **primeira Prata** (objetivo 4, turno 32) dos arquétipos Competitiva, Estrategista e Leal, a rival corre **sem os +15%** (`forca_rival: 1.0` no objetivo): ela ainda está pegando ritmo. Esse objetivo derrubava de 33% a 42% das carreiras desses arquétipos. Na **Sonhadora** (só Fechadoras), a rival corre com **+7%** (`forca_rival: 1.07`): sem bônus ela ia a 53%, e com +15% o objetivo derrubava 29%. A **Teimosa** também tinha +7% até a v0.6, mas o objetivo seguia derrubando ~30% delas em 4 rodadas seguidas, e na v0.7 ficou sem bônus, como as outras.
 
 Isso **muda o calendário §3.1**: a "campeã da casa" deixa de ser uma NPC gerada e passa a ser uma garota do elenco. Assim ela tem nome e cara, e o jogador vai conhecendo as 48 aos poucos.
 
@@ -297,7 +297,7 @@ São **84 textos** no total (12 × 7). As campanhas do MVP têm mais capítulos 
 - Finais: A *"Paciência de campeã"*: ela vira a referência das novatas. B *"Rival de respeito"*: as duas combinam correr juntas no ano seguinte.
 
 **Capitã**. *Cuida de todo mundo e precisa aprender a correr por si.*
-- Objetivo 2: Maratona (2 corridas com top 5). Objetivo 4: Prata **fora de casa**, top 5 ("cobrir a vaga de uma colega").
+- Objetivo 2: Maratona (2 corridas com top 6; era top 5 até a v0.6). Objetivo 4: Prata **fora de casa**, top 5 ("cobrir a vaga de uma colega").
 - Virada: escolheu "cuidar do grupo" no capítulo 3 **e** ficou top 3 no GP do ano 2 → **Capitã da academia**. Senão → **Voo solo**.
 - Capitã da academia: Ouro na casa, top 3; GP final top 3 e à frente de {rival}. Voo solo: vencer Ouro na casa (Difícil); GP final top 3.
 - Capítulos: 1 *"Monitora"*: {nome} vira responsável pelas novatas no primeiro dia. 2 *"Todas juntas"*: ela leva as novatas para correr nas Abertas. 3 *"Escolha"*: uma novata pede ajuda na véspera de uma corrida dela (escolha: cuidar do grupo ou focar em si). 4A *"Faixa de capitã"*. 4B *"Só eu e a pista"*.
@@ -320,7 +320,7 @@ São **84 textos** no total (12 × 7). As campanhas do MVP têm mais capítulos 
 - Finais: A *"Tudo como previsto"*. B *"Fora do roteiro"*: a melhor corrida dela foi a que ela não planejou.
 
 **Leal**. *Corre por uma promessa e descobre o que quer para si.*
-- Objetivo 2: Maratona (2 corridas com top 5). Objetivo 4: Prata na casa, **à frente de {rival}** ("a amiga de infância virou rival").
+- Objetivo 2: Maratona (2 corridas com top 6; era top 5 até a v0.6). Objetivo 4: Prata na casa, **à frente de {rival}** ("a amiga de infância virou rival").
 - Virada: **saiu com ela 2 vezes ou mais** até o turno 48 → **Promessa**. Senão → **Por mim**.
 - Promessa: Ouro na casa, top 3; GP final top 3 e à frente de {rival}. Por mim: vencer Ouro na casa (Difícil); GP final top 3.
 - Capítulos: 1 *"A promessa"*: {nome} prometeu a alguém de casa que correria o GP. 2 *"Carta"*: a resposta chega depois da estreia. 3 *"Do outro lado"*: {rival} é alguém que ela conhece desde pequena. 4A *"Cumprir"*. 4B *"Minha corrida"*.
@@ -336,14 +336,14 @@ São **84 textos** no total (12 × 7). As campanhas do MVP têm mais capítulos 
 ### 5.3 Arrancadoras
 
 **Estrela** (referência: Capela). *Brilha com plateia e descobre se corre pelos aplausos ou pela pista.*
-- Objetivo 2: Maratona (2 corridas com top 5). Objetivo 4: Prata **fora de casa**, top 5.
+- Objetivo 2: Maratona (2 corridas com top 6; era top 5 até a v0.6). Objetivo 4: Prata **fora de casa**, top 5.
 - Virada: fama de **4800 ou mais** no turno 48 → **Holofote**. Senão → **Pista vazia**.
 - Holofote: Maratona, 2 corridas com top 3 desde o GP do ano 2 (1 Ouro); GP final top 3 e à frente de {rival}. Pista vazia: vencer Ouro na casa (Difícil); GP final top 3.
 - Capítulos: 1 *"Primeira foto"*: {nome} quer ser famosa antes de correr. 2 *"Fã"*: a primeira fã aparece. 3 *"Turnê"*: ela quer correr em todo lugar. 4A *"Palco"*. 4B *"Madrugada"*.
 - Finais: A *"Palco e pista"*. B *"Sem plateia"*.
 
 **Festeira**. *Faz amizade com todas, atrapalha o treino e aprende a hora de focar.*
-- Objetivo 2: top 3. Objetivo 4: Prata no **outro piso**, top 5.
+- Objetivo 2: top 3. Objetivo 4: Prata no **outro piso**, top 4 (era top 5 até a v0.6).
 - Virada: passou por **pelo menos 1 nó de Festival** ou **saiu 3 vezes ou mais** até o turno 48 → **Rainha da festa**. Senão → **Hora de focar**.
 - Rainha da festa: Ouro na casa, top 3; GP final top 3 e à frente de {rival}. Hora de focar: vencer Ouro na casa (Difícil); GP final top 3.
 - Capítulos: 1 *"Boas-vindas"*: {nome} organiza uma festa no primeiro dia. 2 *"Depois da festa"*: ela chega cansada num treino importante. 3 *"Todo mundo convidado"*: até {rival} vai à festa dela. 4A *"A festa continua"*. 4B *"Luzes apagadas"*.
@@ -366,7 +366,7 @@ São **84 textos** no total (12 × 7). As campanhas do MVP têm mais capítulos 
 - Finais: A *"Do fundo"*: ela larga em último e cruza em primeiro. B *"Corre porque gosta"*.
 
 **Misteriosa** (referência: Shaula). *Esconde um passado e decide se mostra quem é.*
-- Objetivo 2: top 3. Objetivo 4: Prata no **outro piso**, top 5 ("a pista de onde ela veio").
+- Objetivo 2: top 3. Objetivo 4: Prata no **outro piso**, top 4 (era top 5 até a v0.6) ("a pista de onde ela veio").
 - Virada: escolheu "perguntar" no capítulo 3 → **Raízes**. Senão → **Sombra**.
 - Raízes: Ouro na distância vizinha, top 3; GP final top 3 e à frente de {rival}. Sombra: vencer Ouro na casa (Difícil); GP final top 3.
 - Capítulos: 1 *"Ninguém sabe"*: {nome} não fala de onde veio. 2 *"Foto antiga"*: cai uma foto da mochila dela. 3 *"Pergunta"*: escolha entre perguntar e respeitar o silêncio. 4A *"De onde eu vim"*. 4B *"Sombra"*.

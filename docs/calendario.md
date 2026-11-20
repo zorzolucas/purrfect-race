@@ -29,15 +29,17 @@ Toda corrida tem uma **categoria**. Ela define a força das adversárias, o prê
 | Categoria | Força das NPCs (média dos atributos) | Fama para entrar (inicial) | Quando aparece |
 |---|---|---|---|
 | **Estreia** | 209 | — | Só no turno 13 (a primeira corrida dela) |
-| **Aberta** | Ano 1: 263 · Ano 2: 345 · Ano 3: 455 | 0 | A partir do turno 14 |
-| **Prata** | Ano 2: 364 · Ano 3: 520 | 600 | A partir do turno 25 (ano 2) |
-| **Ouro** | Ano 2: 434 · Ano 3: 575 | 1500 | A partir do turno 37 (2º semestre do ano 2) |
-| **Grande Prêmio** | Ano 1: 335 · Ano 2: 480 · Ano 3: 695 | Por convite (objetivo) | Turnos 24, 48 e 72 |
+| **Aberta** | Ano 1: 267 · Ano 2: 345 · Ano 3: 475 | 0 | A partir do turno 14 |
+| **Prata** | Ano 2: 372 · Ano 3: 545 | 600 | A partir do turno 25 (ano 2) |
+| **Ouro** | Ano 2: 465 · Ano 3: 628 | 1500 | A partir do turno 37 (2º semestre do ano 2) |
+| **Grande Prêmio** | Ano 1: 340 · Ano 2: 535 · Ano 3: 715 | Por convite (objetivo) | Turnos 24, 48 e 72 |
 
 - Os valores subiram 5% a 12% em 2026-11-17, quando o olheiro e a instrução pré-corrida deixaram o bot mais esperto. Em 2026-11-18 (v0.5) subiram de novo, acompanhando a curva nova da jogadora, e o **ano 3 ficou bem mais forte** (Ouro de 487 para 575): antes, a garota do bot chegava ao ano 3 com folga e só o GP final era desafio ([campanhas](campanhas.md) §7).
+- Em 2026-11-20 (v0.7) os anos 2 e 3 subiram de 3% a 11%: com o fôlego do pelotão ([corrida.md](corrida.md) §6), a garota que treina Estamina ganhou vantagem sobre o pelotão a partir do ano 2, e o GP do ano 2 derrubava só 2% de quem chegava nele ([campanhas](campanhas.md) §7.4).
 - As **corridas do calendário fixo** (§7.2) correm com força ×1,08 no ano 2 e ×1,1 no ano 3 (`forca_fixa`): juntam as melhores do ano, e é isso que faz as séries pedirem rota planejada.
 - O pelotão **fica mais forte a cada ano**, como a jogadora. Assim a mesma categoria pede mais no ano 3 do que no ano 2.
-- **Por distância**, a força é multiplicada por: Sprint ×0,99 · Milha ×0,98 · Média ×0,99 · Longa ×1,04. Corrida curta tem mais sorte, e sem isso as garotas de Sprint completavam bem menos carreiras que as de Longa. Com a instrução Forçar (GDD §5.7) a Sprint ficou mais fácil, e o multiplicador subiu de ×0,95 para ×0,99. A Média desceu de ×1,01 para ×0,99 na v0.6: a Ouro do ano 2 derrubava 19% das garotas de Média Grama.
+- **Por distância**, a força é multiplicada por: Sprint ×0,99 · Milha ×0,98 · Média ×1,01 · Longa ×1,04. Corrida curta tem mais sorte, e sem isso as garotas de Sprint completavam bem menos carreiras que as de Longa. Com a instrução Forçar (GDD §5.7) a Sprint ficou mais fácil, e o multiplicador subiu de ×0,95 para ×0,99. A Média desceu de ×1,01 para ×0,99 na v0.6 e voltou a ×1,01 na v0.7, quando as casas de Média passaram a completar 55% a 57% com a simulação nova.
+- **Por categoria e distância** (`forca_distancia_cat`, v0.7), por cima do multiplicador de distância: Estreia na Longa ×0,92, Aberta do ano 1 na Longa ×0,95, GP do ano 1 na Sprint ×0,95 e na Milha ×0,98, Prata do ano 2 na Sprint ×0,97, Ouro do ano 3 na Longa ×0,98 e GP final na Longa ×0,97. Cada um tira um muro de uma casa: o GP do ano 1 derrubava 25% das garotas de Sprint Grama, e a Estreia, 16% das de Longa (a média é 5%).
 - A força das NPCs varia ±10% de uma corredora para outra, para o pelotão não ser uniforme.
 - Nas corridas de objetivo com meta de rival e em todo Grande Prêmio, a **rival** (com nome ou campeã da casa) corre com +15% sobre a força da categoria, sempre com aptidão Ótima. A **Algol** corre com mais 8% (`forca_rival_extra`), porque a habilidade única dela rende menos que a da Polaris e as casas dela ficavam 9 pontos mais fáceis.
 - Os números saíram do bot de balanceamento na carreira de 72 turnos ([campanhas](campanhas.md) §7).

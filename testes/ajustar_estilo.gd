@@ -39,6 +39,8 @@ func _rodada(lv: float, d: float, n: int, corr: Dictionary, semente0: int) -> Di
 
 
 func _initialize() -> void:
+	# a grade é a do pelotão de atributos iguais; o extra da carreira fica de fora (sim_corrida.gd)
+	SimCorrida.EXTRA_ESTILO = {}
 	var iters := 8
 	var n := 300
 	var parte := [0, 1]

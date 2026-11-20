@@ -258,6 +258,8 @@ A correção é um multiplicador nos atributos de cada estilo, numa grade de **9
 
 Com o treino igual para todos, a Fechadora sobra, porque o sprint dela converte melhor a Estamina que sobra e ela usa pouco a Inteligência que fica para trás. Treinando o que o estilo usa (a Ponteira puxa Inteligência), os 4 empatam. O bot de balanceamento passou a treinar assim ([campanhas](campanhas.md) §6.3).
 
+**Extra da carreira (`SimCorrida.EXTRA_ESTILO`):** por cima da grade, a Perseguidora corre com **×1,02**. A grade empata os estilos num pelotão de atributos iguais, mas na carreira, contra o pelotão do elenco, as 12 Perseguidoras completavam 32,2% das carreiras, de 3 a 6 pontos abaixo dos outros estilos, e puxavam para baixo a Estrategista e a Leal. Com o extra, foram a 36,6% ([campanhas](campanhas.md) §7.4). Numa corrida com atributos iguais, isso dá à Perseguidora uns 3 pontos a mais de vitória. O `ajustar_estilo.gd` zera o extra antes de calibrar, para a grade continuar sendo só a do pelotão de atributos iguais.
+
 ### 8.6 Quanto vale +10% em cada atributo (v0.6)
 
 `testes/valor_atributo.gd`: 12 corredoras com atributos iguais (3 de cada estilo), uma delas com +10% num atributo, mesma semente nas variantes. Posições ganhas na média (40 corridas × 4 estilos por célula):
@@ -310,7 +312,7 @@ Godot --headless --path . --script res://testes/valor_atributo.gd -- 40 550,800 
 Godot --headless --path . --script res://testes/estilo_jogadora.gd -- 200 estilo   # estilos na carreira
 ```
 
-O `ajustar_estilo` imprime uma linha por célula; os valores vão para `CORRECAO_ESTILO` em `scripts/sim_corrida.gd`, `tools/sim_corrida.py` e `visualizador/sim.js`.
+O `ajustar_estilo` imprime uma linha por célula; os valores vão para `CORRECAO_ESTILO` em `scripts/sim_corrida.gd`, `tools/sim_corrida.py` e `visualizador/sim.js`. O `EXTRA_ESTILO` fica de fora da calibração e só muda com o bot da carreira.
 
 A versão em Godot deve usar **as mesmas fórmulas**. Este documento é a referência.
 

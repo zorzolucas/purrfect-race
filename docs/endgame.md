@@ -213,6 +213,45 @@ Chance de vencer cada evento com um elenco de aptidão Ótima em todas as corrid
 - Fim de carreira típico: média ~820 na conta nova e ~870 na madura ([campanhas](campanhas.md) §7). O **Bronze** cai com as primeiras garotas salvas, o **Prata** fica perto de 50% para a conta madura (com 3 tentativas, ~80% de vencer na semana) e o **Ouro** pede média ~1000, que só o vínculo alto alcança (limite 1000 + 40 por nível de vínculo). É o que campanhas §2.3 pedia: o lugar onde a garota forte e o vínculo 5 fazem diferença.
 - A Copa Terra e o Campeonato Final são os mais difíceis de cada nível, porque misturam distâncias.
 
+### 5.6 Com a simulação nova (2026-11-20)
+
+O fôlego do pelotão ([corrida](corrida.md) §6) e a correção de estilo por nível ([corrida](corrida.md) §8.5) mudaram a física que os traçados compensavam. Tudo medido de novo com `meta_circuito.gd`, nível 800.
+
+**Atributos** (+10% num atributo, 40 rodadas por variante):
+
+| Corrida | Traçado | Vel | Est | Pod | Det | Int |
+|---|---|---|---|---|---|---|
+| Sprint 1200 m | Padrão | **+0,58** | +0,01 | +0,35 | +0,01 | +0,04 |
+| Longa 3200 m | Padrão | +0,41 | +0,43 | −0,08 | +0,30 | **+0,45** |
+| Sprint 1200 m | Pesada (×0,8) | **+0,58** | +0,01 | +0,47 | +0,01 | −0,02 |
+| Longa 3200 m | Pesada (×0,8) | +0,62 | **+1,48** | +0,24 | +0,55 | +1,02 |
+
+- A Velocidade deixou de valer mais que tudo. Nos 3200 m da pista padrão, Velocidade, Estamina e Inteligência valem o mesmo, e na média das 5 distâncias Vel +0,79, Est +0,77 e Int +0,73 ([corrida](corrida.md) §8.6).
+- **Pista pesada:** com o fôlego da distância ×0,35, a Sprint virava outra corrida. As velocistas do pelotão (Estamina baixa) ficavam sem fôlego, o perfil equilibrado vencia 80% das corridas (2,5% na pista padrão) e nenhum atributo mudava nada. Com ×0,8, a Sprint pesada fica como a padrão e, de 2400 m para cima, a Estamina vale mais que o dobro da Velocidade.
+
+**Estilos** (perfil neutro, as 20 corridas, média ponderada pelo peso dos traçados, 30 rodadas por variante):
+
+| Medição | Ponteira | Perseguidora | Arrancadora | Fechadora | Diferença | Melhor estilo em (% das corridas × traçados) |
+|---|---|---|---|---|---|---|
+| Simulação antiga, traçados da v0.1 (§5.4) | 4,99 | 5,03 | 5,07 | 4,92 | 3% | 28 / 10 / 44 / 18 |
+| Simulação nova, traçados da v0.1 | 6,03 | 5,97 | 6,20 | 6,29 | 5,4% | 23 / 7 / 26 / **44** |
+| **Simulação nova, traçados de hoje** | **5,69** | **5,70** | **5,84** | **5,80** | **2,7%** | 30 / 7 / 31 / 32 |
+
+*Os pontos só se comparam dentro da mesma linha.*
+
+- A correção de estilo deixou a pista padrão quase empatada (2,5%, era 10%), e os bônus das Fechadoras, pensados para tirá-las do último lugar, passaram a sobrar. Ficaram: pista pesada com Fechadoras +1,5% (era +3%, e o +1,5% das Arrancadoras saiu), vento +2% e +1% (era +4% e +2%), reta +3% e +1% (era +5% e +2%) e curvas com Ponteiras +3% e Perseguidoras +2% (era +2% e +1%).
+- Por traçado, cada um ainda tem o seu: subidas com as Arrancadoras (a maior diferença, 14,6%), curvas com as Ponteiras, reta com as Fechadoras. A pista pesada (1,8%) e o vento (1,5%) mudam o atributo que vale, não o estilo.
+- Por copa, a diferença fica entre 2,9% (Final e Terra) e 5,2% (Longa).
+
+**Garotas reais** (perfil da ficha, todas com média 800, 20 rodadas por traçado):
+
+- A melhor garota de cada corrida é a melhor em **53%** dos traçados, em média (era 46%).
+- Estilo da melhor, ponderado pelos traçados: Fechadora 45%, Ponteira 36%, Perseguidora 10% e Arrancadora 9% (era 35 / 38 / 14 / 12).
+- O caso mais forte segue sendo a **Electra na Copa Sprint**: a melhor em 83% dos traçados nos 1200 m (era 75%). Fora dela, a Bellatrix na Copa Terra e a Shaula nos 3000 m do Final chegam a 69%.
+- Como na §5.4, a versão salva tem os atributos que o jogador treinou, não o perfil da ficha, então isso pesa menos do que parece.
+
+**Níveis** (como na §5.5, 30 tentativas por célula): quase igual ao de antes. Com média 800, Bronze 93–100%, Prata 7–37% e Ouro 0–3%. Com 950, Prata 80–90% e Ouro 7–30%. Com 1000, Ouro 50–67%.
+
 ## 6. Como rodar
 
 ```
@@ -231,6 +270,7 @@ MAGNITUDE=3 Godot --headless --path . --script res://testes/balanco.gd -- 20 mvp
 ## 7. Pendências
 
 - ~~**Simulação:** a Estamina não pesa e a Velocidade domina (§5.2).~~ Resolvido em 2026-11-20 com o fôlego do pelotão ([corrida](corrida.md) §6), e os traçados foram recalibrados (§5.6). Quando a simulação mudar de novo, rode `meta_circuito.gd` (estilo, attr e nivel) e confira a §5.6.
+- **Garotas reais:** a Electra na Copa Sprint (a melhor em 83% dos traçados) e as Fechadoras como as melhores garotas reais (45%), medidas com o perfil da ficha (§5.6). Vale medir com versões salvas de verdade, saídas do bot, antes de mexer no elenco.
 - Medir a carreira em cada magnitude com o bot (`MAGNITUDE=n`) e ajustar a tabela do §1.
 - Amuletos e Mistérios exclusivos de magnitude (calendário §10).
 - O circuito ainda não mostra a corrida em 3D: o resultado sai direto. Dá para reaproveitar a `TelaCorrida`.

@@ -86,8 +86,8 @@ func _process(_delta: float) -> bool:
 		return false
 	sem_botao = 0
 	var b: BaseButton = bs[rng.randi() % bs.size()]
-	# "Voltar" e "Desistir" fazem o macaco andar em círculos: aperta menos
-	if b is Button and (b.text.begins_with("Voltar") or b.text.begins_with("Desistir")) and rng.randf() < 0.8:
+	# "Voltar", "Desistir" e "Academia" fazem o macaco andar em círculos: aperta menos
+	if b is Button and (b.text.begins_with("Voltar") or b.text.begins_with("Desistir") or b.text.begins_with("Academia")) and rng.randf() < 0.8:
 		b = bs[rng.randi() % bs.size()]
 	b.pressed.emit()
 	return false

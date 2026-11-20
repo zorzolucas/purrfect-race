@@ -55,8 +55,7 @@ func _initialize() -> void:
 		so_niveis = Array(args[3].split(",")).map(func(x): return float(x))
 	var t: Dictionary = SimCorrida.CORRECAO_ESTILO
 	var celula := 0
-	# o último nível (800) fica em 1,0: ali o RITMO já foi calibrado (corrida.md §8.1)
-	for lv in t.niveis.slice(0, t.niveis.size() - 1):
+	for lv in t.niveis:
 		if not so_niveis.is_empty() and not lv in so_niveis:
 			continue
 		for d in t.dists:

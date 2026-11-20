@@ -151,7 +151,7 @@ As corridas do ano 1 são na **Média**: no nível baixo a Fechadora sofre na Lo
 | — | 41–47 | *Capítulo 5: "Sem plateia"*. O evento de mesmo nome acontece aqui. | — | — |
 | 6 | 48 | GP do ano 2, Milha Grama | Top 3 | Normal |
 
-**Ponto de virada:** se ela tem **fama de 5500 ou mais** no turno 48, segue o caminho **Ídolo**. Senão, segue **Corredora**. Liberar o evento no capítulo *Fã-clube* dá fama extra.
+**Ponto de virada:** se ela tem **fama de 4800 ou mais** no turno 48 (era 5500 até a v0.6), segue o caminho **Ídolo**. Senão, segue **Corredora**. Liberar o evento no capítulo *Fã-clube* dá fama extra.
 
 | Caminho | Objetivo 7 (turno 60) | GP final (turno 72) | Final |
 |---|---|---|---|
@@ -264,6 +264,7 @@ O ritmo foi recalibrado no nível baixo na v0.7 (correção de estilo, corrida.m
 - Senão, é a **campeã da casa**: a garota do elenco da mesma casa com a maior soma de atributos que não seja a jogadora. Ela corre com +15% sobre a força da categoria nas corridas de objetivo e no GP, como as rivais com nome, mas sem encontros no MVP.
 - A rival da campanha **corre sempre com aptidão Ótima** na distância e no piso da corrida (`aptidao_rival` no `data/calendario.json`). Antes da v0.4, Polaris na Longa e Algol na Milha tinham aptidão Boa e eram mais fracas que as campeãs da casa, o que deixava as casas com campeã até 7 pontos mais difíceis.
 - Na **primeira Prata** (objetivo 4, turno 32) dos arquétipos Competitiva, Estrategista e Leal, a rival corre **sem os +15%** (`forca_rival: 1.0` no objetivo): ela ainda está pegando ritmo. Esse objetivo derrubava de 33% a 42% das carreiras desses arquétipos. Na **Sonhadora** (só Fechadoras), a rival corre com **+7%** (`forca_rival: 1.07`): sem bônus ela ia a 53%, e com +15% o objetivo derrubava 29%. A **Teimosa** também tinha +7% até a v0.6, mas o objetivo seguia derrubando ~30% delas em 4 rodadas seguidas, e na v0.7 ficou sem bônus, como as outras.
+- No **MVP** (v0.7), a rival corre sem os +15% no objetivo 4 da **Lira** (Polaris na Milha) e da **Antares** (Algol na Milha), e com +7% no objetivo 5 da **Nashira** (Polaris). Com +15% eles derrubavam 36%, 65% e 37% de quem chegava.
 
 Isso **muda o calendário §3.1**: a "campeã da casa" deixa de ser uma NPC gerada e passa a ser uma garota do elenco. Assim ela tem nome e cara, e o jogador vai conhecendo as 48 aos poucos.
 
@@ -353,7 +354,7 @@ São **84 textos** no total (12 × 7). As campanhas do MVP têm mais capítulos 
 
 **Curiosa**. *Quer testar tudo e descobre onde é a casa dela.*
 - Objetivo 2: Aberta **fora de casa**, top 5. Objetivo 4: Prata no **outro piso**, top 5.
-- Virada: **correu nas 4 distâncias** e ficou **top 3 em pelo menos 3** delas até o turno 48 → **Exploradora**. Senão → **Volta para casa**.
+- Virada: **venceu 6 corridas** e ficou **top 3 em pelo menos 3 distâncias** até o turno 48 → **Exploradora**. Senão → **Volta para casa**. (Até a v0.6 pedia correr nas 4 distâncias, o que só 1 em 4 carreiras fazia.)
 - Exploradora: Ouro na distância vizinha, top 3; GP final, versão da distância vizinha, top 3. Volta para casa: vencer Ouro na casa (Difícil); GP final top 3.
 - Capítulos: 1 *"E se?"*: {nome} pergunta tudo sobre todas as pistas. 2 *"Outra distância"*: ela quer correr fora de casa logo depois da estreia. 3 *"Chão novo"*. 4A *"Mapa completo"*. 4B *"O caminho de volta"*.
 - Finais: A *"Exploradora"*: ela coleciona as 4 distâncias no caderno. B *"Volta para casa"*.
@@ -601,6 +602,20 @@ Na conta madura, a Perfeccionista (75%) e a Estrela (67%) passam do limite. A me
 
 ### 7.4 O que mudou nas últimas rodadas
 
+**v0.7** (a partir da v0.6: 38,7% na conta nova, 9,9 pontos entre casas, 11,2 entre arquétipos e a Fechadora 6,7 pontos acima da Ponteira):
+
+1. **Fôlego do pelotão** ([corrida](corrida.md) §6). Até a v0.6, a partir do nível ~550 o fôlego nunca acabava: a Estamina não mudava nenhuma colocação e a Velocidade valia mais que tudo ([endgame](endgame.md) §5.2), um meta de "treinar Velocidade". Agora a Estamina acima da média do pelotão conta no fôlego em todo nível, e no nível 800 +10% de Estamina vale quase o mesmo que +10% de Velocidade ([corrida](corrida.md) §8.6).
+2. **Correção de estilo por nível e distância** ([corrida](corrida.md) §8.5). O ritmo dos estilos foi calibrado nos níveis 500 a 1000, e nos anos 1 e 2 a Fechadora sobrava na Sprint e a Ponteira na Longa (até 42% de vitórias, com 25% de ideal). Uma grade de 9 níveis × 5 distâncias deixa cada estilo perto de 25% em todo nível.
+3. **O bot treina pelo estilo** (§6.3): o perfil da casa × os pesos do estilo. Com o mesmo treino para todas, a Fechadora sobrava (47% de top 3 contra 40% da Ponteira em `estilo_jogadora.gd`), e com a correção de estilo a Ponteira ficava 14 pontos atrás. É uma mudança só do bot, mas é assim que uma jogadora treina.
+4. **Força das NPCs dos anos 2 e 3** subiu de 3% a 11% (calendário §2). Com a simulação nova a garota que treina Estamina passou a sobrar no ano 2: a taxa geral foi a 47% e o GP do ano 2 derrubava só 2% de quem chegava. A Média voltou a ×1,01.
+5. **Força por categoria e distância** (`forca_distancia_cat`, calendário §2): 7 ajustes de 2% a 8%, cada um tirando o muro de uma casa. O GP do ano 1 derrubava 25% das garotas de Sprint Grama, e a Estreia, 16% das de Longa (a média é 5%).
+6. **Metas de arquétipo.** A Maratona do objetivo 2 (Capitã, Leal e Estrela) pede top 6 (era top 5). O objetivo 4 da Festeira e da Misteriosa pede top 4 (era top 5): numa rodada intermediária, a Festeira completava 48% e a Misteriosa 44%. O objetivo 4 da Teimosa ficou sem o bônus da rival (era +7%), porque derrubava ~30% em 4 rodadas seguidas.
+7. **Rivais do MVP** (§4.3): sem bônus no objetivo 4 da Lira e da Antares, e +7% no objetivo 5 da Nashira. A Lira foi de 26% para 34% de carreiras completas e a Nashira de 31% para 38%.
+8. **A Antares estava na casa errada** em `data/iniciais.json`: Sprint Grama, com a aptidão (Terra Ótima), a campanha (objetivos na Terra, rival Algol) e o elenco da Sprint Terra. Ela completava 11%; com os rivais e a casa certa, ANTARES_FINAL. O bot também a contava na Sprint Grama, que tinha 7 garotas (a Sprint Terra tinha 5). O `teste_dados.gd` agora confere a casa das iniciais.
+9. **Viradas** da Curiosa e da Capela (§7.3).
+
+A taxa geral foi de 38,7% para TAXA_FINAL, mais perto do alvo de 35%.
+
 **v0.6** (a partir da v0.5: 36,2% na conta nova, 12,5 pontos entre casas, 15,6 entre arquétipos):
 
 1. **Objetivo 4 da Teimosa e da Sonhadora** com a rival a +7% (`forca_rival: 1.07`). Com +15% ele derrubava 36% e 29%; com +0%, as duas iam a 53% de carreiras completas.
@@ -642,6 +657,16 @@ A taxa geral subiu de 36,2% para 38,7% com as três mudanças, ainda dentro da f
 | Rival no objetivo 4 da Teimosa e da Sonhadora (v0.6) | +15% | +7% (`forca_rival: 1.07`) |
 | Ano 1 da Fechadora de Longa do modelo (v0.6) | Na Média | Na Longa |
 | Multiplicador da Média (v0.6) | ×1,01 | ×0,99 |
+| Fôlego máximo (v0.7) | 0,6 × D + 1,5 × Est | 0,6 × D + 1,5 × max(Est − desconto, 0), com desconto = max(0, nível do pelotão − 350) |
+| Estilo na corrida (v0.7) | Pesos do estilo | Pesos × correção por nível e distância ([corrida](corrida.md) §8.5) |
+| Treino do bot (v0.7) | Perfil da casa | Perfil da casa × pesos do estilo |
+| Força das NPCs (v0.7) | Aberta 263/345/455, Prata 364/520, Ouro 434/575, GP 335/480/695 | Aberta 267/345/475, Prata 372/545, Ouro 465/628, GP 340/535/715 |
+| Multiplicador da Média (v0.7) | ×0,99 | ×1,01 |
+| Força por categoria e distância (v0.7) | — | 7 ajustes de ×0,92 a ×0,98 (calendário §2) |
+| Maratona do objetivo 2 (v0.7) | 2 corridas com top 5 | 2 corridas com top 6 |
+| Objetivo 4 da Festeira e da Misteriosa (v0.7) | Top 5 | Top 4 |
+| Rival no objetivo 4 da Teimosa (v0.7) | +7% | Sem bônus |
+| Rival no MVP (v0.7) | +15% | Sem bônus no objetivo 4 da Lira e da Antares, +7% no objetivo 5 da Nashira |
 
 O ganho do treino caiu porque o semestre de base sozinho levava a garota a ~320 na Estreia. O bônus por nível e os atributos por corrida devolvem o crescimento nos anos 2 e 3, quando ela corre mais e treina menos.
 

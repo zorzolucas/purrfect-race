@@ -1,5 +1,6 @@
 # Nekomusume — Endgame
 
+> Versão 0.2 — 2026-11-20. Na v0.2 os traçados foram recalibrados para a simulação nova (fôlego do pelotão e correção de estilo por nível, [corrida](corrida.md) §6 e §8.5), que tirou o domínio da Velocidade (§5.2 e §5.6).
 > Versão 0.1 — 2026-11-19. Detalha o endgame previsto em [campanhas](campanhas.md) §2.3: **Magnitude** ([calendário](calendario.md) §10), **Circuito em níveis** ([GDD](GDD.md) §7) e **Desafio da semana**, como estão no protótipo, e o balanceamento feito para não existir um meta (§5).
 > Valores marcados com **(inicial)** são pontos de partida para balanceamento. Todos os números ficam em `data/endgame.json`.
 
@@ -78,12 +79,12 @@ Cada corrida tem um **clima** (tempo bom 60%, chuva 25%, calor 15%) e um **traç
 
 | Traçado | Peso | Efeito | Quem ganha |
 |---|---|---|---|
-| Pista padrão | 1 | Nenhum | Ponteiras e Perseguidoras (o natural da simulação) |
-| Pista pesada | 2 | Fôlego da distância ×0,35; Fechadoras +3%, Arrancadoras +1,5% | De 2400 m para cima, Estamina e Inteligência valem mais que Velocidade |
+| Pista padrão | 1 | Nenhum | Empate entre os estilos (desde a correção de estilo, [corrida](corrida.md) §8.5) |
+| Pista pesada | 2 | Fôlego da distância ×0,8; Fechadoras +1,5% | De 2400 m para cima, Estamina e Inteligência valem mais que Velocidade |
 | Subidas | 2 | Aceleração ×0,4 e Velocidade ×0,8 | Poder vale mais que Velocidade; Arrancadoras |
-| Vento contra | 1 | Velocidade ×0,7; Fechadoras +4%, Arrancadoras +2% | Quem vem de trás; Poder, Determinação e Inteligência pesam mais |
-| Reta final longa | 1 | Fechadoras +5%, Arrancadoras +2% | Fechadoras |
-| Curvas fechadas | 1 | Ponteiras +2%, Perseguidoras +1% | Quem corre na frente |
+| Vento contra | 1 | Velocidade ×0,7; Fechadoras +2%, Arrancadoras +1% | Poder, Determinação e Inteligência pesam mais |
+| Reta final longa | 1 | Fechadoras +3%, Arrancadoras +1% | Fechadoras |
+| Curvas fechadas | 1 | Ponteiras +3%, Perseguidoras +2% | Quem corre na frente |
 
 A tela de escalação mostra o traçado e o clima de cada corrida e a aptidão de cada garota. A escalação já vem sugerida (maior média de atributos × aptidão), só como ponto de partida.
 
@@ -128,6 +129,8 @@ Lucas pediu que o endgame não tenha um meta definido: nenhum estilo, garota, at
 Todas as variantes de uma mesma rodada usam a **mesma semente** (números aleatórios comuns): a diferença entre elas é efeito do estilo ou atributo, não da sorte. Sem isso, com 60 corridas por variante, o ruído era maior que os efeitos.
 
 ### 5.2 O que a simulação faz sozinha
+
+> As §5.2 a §5.4 foram medidas com a simulação até a v0.6. A §5.6 tem as medições com a simulação nova e os traçados de hoje.
 
 Com atributos em 800 (o fim de carreira típico) e o traçado padrão:
 
@@ -227,7 +230,7 @@ MAGNITUDE=3 Godot --headless --path . --script res://testes/balanco.gd -- 20 mvp
 
 ## 7. Pendências
 
-- **Simulação:** a Estamina não pesa e a Velocidade domina (§5.2). Vale um ajuste na fórmula do fôlego ou no peso da Velocidade, medido com o bot das campanhas. Quando mudar, rode `meta_circuito.gd` de novo: os traçados foram calibrados para a simulação de hoje.
+- ~~**Simulação:** a Estamina não pesa e a Velocidade domina (§5.2).~~ Resolvido em 2026-11-20 com o fôlego do pelotão ([corrida](corrida.md) §6), e os traçados foram recalibrados (§5.6). Quando a simulação mudar de novo, rode `meta_circuito.gd` (estilo, attr e nivel) e confira a §5.6.
 - Medir a carreira em cada magnitude com o bot (`MAGNITUDE=n`) e ajustar a tabela do §1.
 - Amuletos e Mistérios exclusivos de magnitude (calendário §10).
 - O circuito ainda não mostra a corrida em 3D: o resultado sai direto. Dá para reaproveitar a `TelaCorrida`.

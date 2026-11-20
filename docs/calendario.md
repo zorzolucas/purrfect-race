@@ -51,7 +51,7 @@ Este é o **alvo** para calibrar os ganhos de treino em 72 turnos:
 | Turno | 13 (Estreia) | 24 | 36 | 48 | 60 | 72 |
 |---|---|---|---|---|---|---|
 | Média dos atributos (alvo) | ~200 | ~330 | ~460 | ~590 | ~700 | ~800 |
-| Média do bot (v0.5 do protótipo) | 228 | 338 | 450 | 587 | 708 | 819 |
+| Média do bot (v0.7 do protótipo) | 228 | 337 | 451 | 590 | 716 | 826 |
 
 O treino rende mais com atributos baixos e menos com atributos altos (retorno de ×1,25 − 0,45 × atributo/limite): a garota cresce mais nos anos 1 e 2 e menos no ano 3. Uma jogadora que treina bem chega acima disso, e uma que descansa demais ou se lesiona chega abaixo. Amuletos e rotas boas também empurram a curva para cima, então a força das NPCs deve ser calibrada com uma carreira "média" sem amuletos raros.
 

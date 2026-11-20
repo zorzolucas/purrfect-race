@@ -46,6 +46,7 @@ func mostrar_academia(msg: String = "") -> void:
 	t.treinar.connect(_comecar_carreira)
 	t.continuar.connect(_continuar_carreira)
 	t.abrir_pool.connect(mostrar_pool)
+	t.abrir_patio.connect(mostrar_patio_academia)
 	_trocar(t)
 
 
@@ -95,7 +96,21 @@ func mostrar_carreira(msg: String = "") -> void:
 		return
 	var t := TelaCarreira.new(carreira, msg)
 	t.ir_correr.connect(mostrar_corrida)
+	t.ir_patio.connect(mostrar_patio)
 	t.atualizou.connect(func(m): mostrar_carreira(m))
+	_trocar(t)
+
+
+func mostrar_patio() -> void:
+	var t := TelaPatio.new(carreira)
+	t.voltar.connect(func(m): mostrar_carreira(m))
+	_trocar(t)
+
+
+## Pátio fora da carreira: as garotas do elenco passeando, só com falas soltas.
+func mostrar_patio_academia() -> void:
+	var t := TelaPatio.new(null, perfil.elenco.keys())
+	t.voltar.connect(func(_m): mostrar_academia())
 	_trocar(t)
 
 

@@ -1,0 +1,1157 @@
+{
+ "_doc": "Pátio da academia (GDD §11.3): onde cada colega fica, o que ela faz, falas soltas ao clicar, conversas curtas (1 por turno na carreira) e os eventos do pátio. Conversas: 'garota' null = qualquer colega ({outra}); 'quando' aceita clima, evento, afinidade_min, afinidade_max e turno_min. Efeitos como nos encontros (humor, energia, afinidade, vel/est/pod/det/int, afinidade_todas). 'expressao' e 'gesto' são do retrato (RetratoGarota) e 'reacao' é como ela reage à escolha. Textos: {nome} = a garota treinada, {outra} = a colega.",
+ "lugares": {
+  "fonte": [
+   0.0,
+   -1.6
+  ],
+  "banco_esq": [
+   -4.6,
+   -0.8
+  ],
+  "banco_dir": [
+   4.6,
+   -1.2
+  ],
+  "sol": [
+   -6.6,
+   2.0
+  ],
+  "arvore": [
+   8.2,
+   -4.6
+  ],
+  "pista": [
+   7.7,
+   0.4
+  ],
+  "escada": [
+   0.0,
+   -6.0
+  ],
+  "marquise_esq": [
+   -3.0,
+   -6.4
+  ],
+  "marquise_dir": [
+   3.0,
+   -6.4
+  ],
+  "centro": [
+   0.0,
+   2.2
+  ]
+ },
+ "garotas": {
+  "Lira": {
+   "lugar": "sol",
+   "habito": "cochila numa faixa de sol",
+   "gesto": "cochilo",
+   "emote": "zz",
+   "falas": [
+    "Corrida até o refeitório? Valendo o almoço!",
+    "Hmm... cinco minutinhos de sol e eu volto.",
+    "Hoje eu largo na frente. Amanhã também.",
+    "Peixe frito no almoço! Ouvi da cozinheira!"
+   ]
+  },
+  "Nashira": {
+   "lugar": "banco_dir",
+   "habito": "anota tempos no caderno azul",
+   "gesto": "inclinar",
+   "emote": "reticencias",
+   "falas": [
+    "Você está 0,4 segundo mais rápida que mês passado. Anotei.",
+    "Silêncio, por favor. Estou na parte boa do caderno.",
+    "Deixei um bilhete no seu armário. Não precisa agradecer.",
+    "Chá? Tenho uma garrafa térmica a mais. Por acaso."
+   ]
+  },
+  "Mira": {
+   "lugar": "fonte",
+   "habito": "olha o peixe-dourado da fonte",
+   "gesto": "inclinar",
+   "emote": "estrela",
+   "falas": [
+    "Aquela nuvem parece um gato dormindo... né?",
+    "O peixe-dourado me olhou. Acho que gostou de mim.",
+    "Desculpa, eu tava... onde a gente tava mesmo?",
+    "Shhh. O vento tá fazendo barulho de mar."
+   ]
+  },
+  "Capela": {
+   "lugar": "escada",
+   "habito": "ensaia uma dança na escada",
+   "gesto": "danca",
+   "emote": "nota",
+   "falas": [
+    "Você viu esse passo? Viu? Faço de novo!",
+    "Uma foto! Rápido, a luz tá perfeita!",
+    "Sem plateia é só ensaio. Com plateia é show.",
+    "Esse laço tá torto? Fala a verdade."
+   ]
+  },
+  "Antares": {
+   "lugar": "pista",
+   "habito": "dá tiros curtos na beira da pista",
+   "gesto": "pulinho",
+   "emote": "exclamacao",
+   "falas": [
+    "Fala menos. Corre mais.",
+    "Acordei às 5h. Você?",
+    "...Valeu.",
+    "Mais uma. Só mais uma."
+   ]
+  },
+  "Shaula": {
+   "lugar": "arvore",
+   "habito": "fica encostada na árvore, de capuz",
+   "gesto": "",
+   "emote": "reticencias",
+   "falas": [
+    "Não tô esperando ninguém. Só tô... aqui.",
+    "Hm.",
+    "Se a Lira perguntar, você não me viu.",
+    "A pista fica bonita à noite. Não conta pra ninguém."
+   ]
+  }
+ },
+ "amizades": [
+  [
+   "Lira",
+   "Antares"
+  ],
+  [
+   "Nashira",
+   "Capela"
+  ],
+  [
+   "Nashira",
+   "Mira"
+  ],
+  [
+   "Mira",
+   "Shaula"
+  ]
+ ],
+ "atritos": [
+  [
+   "Lira",
+   "Shaula"
+  ]
+ ],
+ "eventos": {
+  "aniversario_dela": {
+   "titulo": "Festa surpresa",
+   "banner": "É aniversário de {nome}! As colegas prepararam uma festa surpresa no pátio.",
+   "cena": "roda",
+   "conversa": "pat_festa_dela"
+  },
+  "aniversario": {
+   "titulo": "Aniversário",
+   "banner": "Hoje é aniversário de {outra}. Ela está perto da fonte com um bolo.",
+   "cena": "bolo",
+   "conversa": "pat_aniversario"
+  },
+  "vitoria": {
+   "titulo": "Comemoração",
+   "banner": "As colegas souberam da vitória e querem comemorar.",
+   "cena": "roda",
+   "conversa": "pat_vitoria"
+  },
+  "derrota": {
+   "titulo": "Depois da corrida",
+   "banner": "{outra} está esperando {nome} no pátio depois da corrida.",
+   "cena": "consolo",
+   "conversa": "pat_consolo"
+  },
+  "festival": {
+   "titulo": "Festival",
+   "banner": "O pátio está cheio de barracas para o festival.",
+   "cena": "festival",
+   "conversa": "pat_festival"
+  },
+  "chuva": {
+   "titulo": "Chuva",
+   "banner": "Chuva: todo mundo se escondeu embaixo da marquise.",
+   "cena": "marquise",
+   "conversa": "pat_chuva"
+  },
+  "estrelas": {
+   "titulo": "Noite de estrelas",
+   "banner": "Noite de estrelas: as colegas ficaram no pátio até tarde olhando o céu.",
+   "cena": "noite",
+   "conversa": "pat_estrelas"
+  },
+  "calor": {
+   "titulo": "Calor",
+   "banner": "Calor: a fonte virou o lugar mais disputado da academia.",
+   "cena": "fonte",
+   "conversa": "pat_calor"
+  },
+  "frio": {
+   "titulo": "Frio",
+   "banner": "Frio: alguém trouxe uma garrafa de chocolate quente.",
+   "cena": "normal",
+   "conversa": "pat_frio"
+  },
+  "habitos": {
+   "titulo": "Pátio",
+   "banner": "Um dia comum no pátio. Cada uma no seu canto.",
+   "cena": "normal",
+   "conversa": ""
+  }
+ },
+ "conversas": [
+  {
+   "id": "pat_festa_dela",
+   "garota": null,
+   "quando": {
+    "evento": "aniversario_dela"
+   },
+   "titulo": "Parabéns, {nome}!",
+   "texto": "{outra} aparece com um chapéu de festa torto e um bolo com uma vela em forma de estrela. — Surpresa! A Nashira anotou a data, a gente só fez o bolo.",
+   "expressao": "feliz",
+   "gesto": "pulinho",
+   "escolhas": [
+    {
+     "texto": "Soprar a vela e fazer um pedido",
+     "efeitos": {
+      "humor": 1,
+      "afinidade_todas": 3
+     },
+     "resultado": "Todas batem palmas. {nome} não conta o pedido, mas fica sorrindo o resto do dia.",
+     "reacao": {
+      "expressao": "feliz",
+      "gesto": "pulinho",
+      "emote": "coracao"
+     }
+    },
+    {
+     "texto": "Dividir o bolo com todo mundo",
+     "efeitos": {
+      "afinidade_todas": 5
+     },
+     "resultado": "Sobra só um pedacinho, e {outra} guarda para {nome}. Ninguém esquece essa festa.",
+     "reacao": {
+      "expressao": "piscadinha",
+      "gesto": "aceno",
+      "emote": "estrela"
+     }
+    }
+   ]
+  },
+  {
+   "id": "pat_aniversario",
+   "garota": null,
+   "quando": {
+    "evento": "aniversario"
+   },
+   "titulo": "Aniversário de {outra}",
+   "texto": "{outra} está sentada na beira da fonte com um bolinho e uma vela apagada. Parece que ninguém lembrou.",
+   "expressao": "fechados",
+   "gesto": "encolher",
+   "escolhas": [
+    {
+     "texto": "Acender a vela e cantar parabéns",
+     "efeitos": {
+      "afinidade": 12
+     },
+     "resultado": "{outra} cobre o rosto, mas não consegue esconder o sorriso.",
+     "reacao": {
+      "expressao": "feliz",
+      "gesto": "pulinho",
+      "emote": "coracao"
+     }
+    },
+    {
+     "texto": "Chamar as outras para uma festinha",
+     "efeitos": {
+      "afinidade": 16,
+      "energia": -8
+     },
+     "resultado": "Em dez minutos o pátio vira festa. {outra} diz que foi o melhor aniversário dela.",
+     "reacao": {
+      "expressao": "feliz",
+      "gesto": "danca",
+      "emote": "nota"
+     }
+    }
+   ]
+  },
+  {
+   "id": "pat_vitoria",
+   "garota": null,
+   "quando": {
+    "evento": "vitoria"
+   },
+   "titulo": "Comemoração",
+   "texto": "— Eu vi a reta final! — grita {outra}, correndo até {nome}. — Conta tudo, desde a largada!",
+   "expressao": "feliz",
+   "gesto": "pulinho",
+   "escolhas": [
+    {
+     "texto": "Contar a corrida inteira",
+     "efeitos": {
+      "afinidade": 8
+     },
+     "resultado": "{nome} conta tudo, e cada vez a ultrapassagem fica um pouco maior.",
+     "reacao": {
+      "expressao": "feliz",
+      "gesto": "pulinho",
+      "emote": "estrela"
+     }
+    },
+    {
+     "texto": "Agradecer a torcida",
+     "efeitos": {
+      "afinidade": 5,
+      "humor": 1
+     },
+     "resultado": "{outra} fica sem graça e diz que vai torcer mais alto da próxima vez.",
+     "reacao": {
+      "expressao": "piscadinha",
+      "gesto": "aceno",
+      "emote": "coracao"
+     }
+    }
+   ]
+  },
+  {
+   "id": "pat_consolo",
+   "garota": null,
+   "quando": {
+    "evento": "derrota"
+   },
+   "titulo": "Depois da corrida",
+   "texto": "{outra} estende uma garrafinha de água para {nome}. — Não foi hoje. Quer conversar ou quer só ficar quieta?",
+   "expressao": "fechados",
+   "gesto": "inclinar",
+   "escolhas": [
+    {
+     "texto": "Conversar sobre a corrida",
+     "efeitos": {
+      "afinidade": 6,
+      "int": 8
+     },
+     "resultado": "As duas repassam a corrida curva por curva. Dá para ver onde errou.",
+     "reacao": {
+      "expressao": "normal",
+      "gesto": "concordar",
+      "emote": "reticencias"
+     }
+    },
+    {
+     "texto": "Ficar quieta do lado dela",
+     "efeitos": {
+      "afinidade": 8,
+      "humor": 1
+     },
+     "resultado": "O sol baixa devagar. Quando {nome} levanta, já está mais leve.",
+     "reacao": {
+      "expressao": "fechados",
+      "gesto": "concordar",
+      "emote": "coracao"
+     }
+    }
+   ]
+  },
+  {
+   "id": "pat_festival",
+   "garota": null,
+   "quando": {
+    "evento": "festival"
+   },
+   "titulo": "Barraca de pescaria",
+   "texto": "{outra} puxa {nome} pela manga até a barraca de pescaria. — Aposto que eu pego mais peixinhos que você!",
+   "expressao": "piscadinha",
+   "gesto": "pulinho",
+   "escolhas": [
+    {
+     "texto": "Aceitar a aposta",
+     "chance": 0.5,
+     "efeitos": {
+      "afinidade": 8,
+      "humor": 1
+     },
+     "resultado": "{nome} ganha por um peixinho e {outra} pede revanche na hora.",
+     "efeitos_falha": {
+      "afinidade": 8
+     },
+     "resultado_falha": "{outra} ganha e não para de se gabar. As duas riem muito.",
+     "reacao": {
+      "expressao": "feliz",
+      "gesto": "pulinho",
+      "emote": "estrela"
+     }
+    },
+    {
+     "texto": "Só assistir",
+     "efeitos": {
+      "afinidade": 5
+     },
+     "resultado": "{outra} pesca um peixinho dourado e dá para {nome} cuidar.",
+     "reacao": {
+      "expressao": "feliz",
+      "gesto": "aceno",
+      "emote": "coracao"
+     }
+    }
+   ]
+  },
+  {
+   "id": "pat_chuva",
+   "garota": null,
+   "quando": {
+    "evento": "chuva"
+   },
+   "titulo": "Embaixo da marquise",
+   "texto": "{outra} olha a chuva escorrendo da marquise. — Dizem que gato odeia água. Eu só odeio meia molhada.",
+   "expressao": "normal",
+   "gesto": "inclinar",
+   "escolhas": [
+    {
+     "texto": "Esperar a chuva passar conversando",
+     "efeitos": {
+      "afinidade": 7
+     },
+     "resultado": "A chuva não passa, mas a conversa também não acaba.",
+     "reacao": {
+      "expressao": "feliz",
+      "gesto": "concordar",
+      "emote": "nota"
+     }
+    },
+    {
+     "texto": "Correr até o vestiário",
+     "efeitos": {
+      "afinidade": 4,
+      "pod": 6
+     },
+     "resultado": "As duas chegam encharcadas e rindo. Correr na lama até que é treino.",
+     "reacao": {
+      "expressao": "surpresa",
+      "gesto": "tremer",
+      "emote": "gota"
+     }
+    }
+   ]
+  },
+  {
+   "id": "pat_estrelas",
+   "garota": null,
+   "quando": {
+    "evento": "estrelas"
+   },
+   "titulo": "Noite de estrelas",
+   "texto": "{outra} está deitada na grama, apontando para o céu. — Aquela ali é a estrela de quem vence o Grande Prêmio. Ou eu inventei agora.",
+   "expressao": "fechados",
+   "gesto": "",
+   "escolhas": [
+    {
+     "texto": "Deitar do lado e procurar a sua estrela",
+     "efeitos": {
+      "afinidade": 8
+     },
+     "resultado": "{nome} escolhe uma estrela pequena e teimosa. {outra} diz que combina.",
+     "reacao": {
+      "expressao": "feliz",
+      "gesto": "",
+      "emote": "estrela"
+     }
+    },
+    {
+     "texto": "Falar dos sonhos de cada uma",
+     "efeitos": {
+      "afinidade": 6,
+      "det": 8
+     },
+     "resultado": "Falar em voz alta deixa o sonho mais perto.",
+     "reacao": {
+      "expressao": "normal",
+      "gesto": "concordar",
+      "emote": "coracao"
+     }
+    }
+   ]
+  },
+  {
+   "id": "pat_calor",
+   "garota": null,
+   "quando": {
+    "evento": "calor"
+   },
+   "titulo": "Guerra de água",
+   "texto": "{outra} mergulha a mão na fonte e olha para {nome} com cara de quem vai aprontar.",
+   "expressao": "piscadinha",
+   "gesto": "",
+   "escolhas": [
+    {
+     "texto": "Atacar primeiro",
+     "efeitos": {
+      "afinidade": 7,
+      "energia": -5
+     },
+     "resultado": "Em um minuto, metade do pátio está molhada e ninguém está com calor.",
+     "reacao": {
+      "expressao": "feliz",
+      "gesto": "pulinho",
+      "emote": "gota"
+     }
+    },
+    {
+     "texto": "Dividir um picolé na sombra",
+     "efeitos": {
+      "afinidade": 5,
+      "energia": 5
+     },
+     "resultado": "O picolé derrete mais rápido do que as duas conseguem comer.",
+     "reacao": {
+      "expressao": "feliz",
+      "gesto": "concordar",
+      "emote": "coracao"
+     }
+    }
+   ]
+  },
+  {
+   "id": "pat_frio",
+   "garota": null,
+   "quando": {
+    "evento": "frio"
+   },
+   "titulo": "Chocolate quente",
+   "texto": "{outra} sopra o vapor de uma caneca. — Sobrou um pouco. Mas só se você contar uma história.",
+   "expressao": "normal",
+   "gesto": "",
+   "escolhas": [
+    {
+     "texto": "Contar uma história da infância",
+     "efeitos": {
+      "afinidade": 7
+     },
+     "resultado": "{outra} ri na hora certa e pede outra.",
+     "reacao": {
+      "expressao": "feliz",
+      "gesto": "concordar",
+      "emote": "coracao"
+     }
+    },
+    {
+     "texto": "Pegar a caneca e sair correndo",
+     "efeitos": {
+      "afinidade": 3,
+      "vel": 6
+     },
+     "resultado": "{outra} corre atrás. Ninguém derrama uma gota, e isso já é um treino.",
+     "reacao": {
+      "expressao": "surpresa",
+      "gesto": "tremer",
+      "emote": "exclamacao"
+     }
+    }
+   ]
+  },
+  {
+   "id": "pat_lira",
+   "garota": "Lira",
+   "quando": {},
+   "titulo": "Faixa de sol",
+   "texto": "{outra} está deitada numa faixa de sol, de barriga para cima, com o rabo balançando devagar. — Shhh... tô carregando a bateria.",
+   "expressao": "fechados",
+   "gesto": "cochilo",
+   "escolhas": [
+    {
+     "texto": "Deitar do lado",
+     "efeitos": {
+      "afinidade": 6,
+      "energia": 4
+     },
+     "resultado": "As duas acordam meia hora depois, com a marca do sol no rosto.",
+     "reacao": {
+      "expressao": "feliz",
+      "gesto": "",
+      "emote": "zz"
+     }
+    },
+    {
+     "texto": "Desafiar para uma corrida até a fonte",
+     "efeitos": {
+      "afinidade": 4,
+      "vel": 6
+     },
+     "resultado": "{outra} pula de pé e sai correndo antes do \"já\". Óbvio.",
+     "reacao": {
+      "expressao": "piscadinha",
+      "gesto": "pulinho",
+      "emote": "exclamacao"
+     }
+    }
+   ]
+  },
+  {
+   "id": "pat_lira2",
+   "garota": "Lira",
+   "quando": {
+    "afinidade_min": 30
+   },
+   "titulo": "O entalhe na orelha",
+   "texto": "{outra} mexe na ponta da orelha esquerda. — Sabe esse corte? Caí na cerca numa corrida quando era pequena. Perdi. Mas foi a corrida mais divertida da minha vida.",
+   "expressao": "normal",
+   "gesto": "inclinar",
+   "escolhas": [
+    {
+     "texto": "Contar a sua primeira derrota",
+     "efeitos": {
+      "afinidade": 8
+     },
+     "resultado": "{outra} ouve sem interromper, o que é raro. No fim, oferece meio pastel.",
+     "reacao": {
+      "expressao": "feliz",
+      "gesto": "concordar",
+      "emote": "coracao"
+     }
+    },
+    {
+     "texto": "\"Então você sempre foi teimosa\"",
+     "efeitos": {
+      "afinidade": 5,
+      "det": 6
+     },
+     "resultado": "— Sempre! — e ela ri alto o bastante para a Nashira reclamar do banco.",
+     "reacao": {
+      "expressao": "feliz",
+      "gesto": "pulinho",
+      "emote": "nota"
+     }
+    }
+   ]
+  },
+  {
+   "id": "pat_nashira",
+   "garota": "Nashira",
+   "quando": {},
+   "titulo": "O caderno azul",
+   "texto": "{outra} levanta os olhos do caderno. As orelhas viram na direção de {nome} antes do rosto. — Precisa de alguma coisa? Estou calculando o vento da reta oposta.",
+   "expressao": "normal",
+   "gesto": "inclinar",
+   "escolhas": [
+    {
+     "texto": "Pedir para ver os cálculos",
+     "efeitos": {
+      "afinidade": 5,
+      "int": 7
+     },
+     "resultado": "{outra} explica com a caneta, empolgada. São três páginas só sobre o vento.",
+     "reacao": {
+      "expressao": "piscadinha",
+      "gesto": "concordar",
+      "emote": "estrela"
+     }
+    },
+    {
+     "texto": "Trazer um chá para ela",
+     "efeitos": {
+      "afinidade": 7
+     },
+     "resultado": "Ela agradece baixinho. No dia seguinte, aparece um bilhete com uma dica no seu armário.",
+     "reacao": {
+      "expressao": "fechados",
+      "gesto": "concordar",
+      "emote": "coracao"
+     }
+    }
+   ]
+  },
+  {
+   "id": "pat_nashira2",
+   "garota": "Nashira",
+   "quando": {
+    "afinidade_min": 30
+   },
+   "titulo": "Plano B",
+   "texto": "O rabo de {outra} fica eriçado por um segundo. — Mudaram o horário da pista. Meu plano da semana inteira... — Ela encara o caderno como se ele tivesse culpa.",
+   "expressao": "surpresa",
+   "gesto": "tremer",
+   "escolhas": [
+    {
+     "texto": "Refazer o plano junto com ela",
+     "efeitos": {
+      "afinidade": 7,
+      "int": 5
+     },
+     "resultado": "Em dez minutos existe um plano B. Ela pinta a aba de verde: \"aprovado\".",
+     "reacao": {
+      "expressao": "feliz",
+      "gesto": "concordar",
+      "emote": "estrela"
+     }
+    },
+    {
+     "texto": "Arrastar ela para improvisar",
+     "efeitos": {
+      "afinidade": 5,
+      "humor": 1
+     },
+     "resultado": "Ela resiste, depois admite que treinar sem plano foi... interessante. Vai anotar isso.",
+     "reacao": {
+      "expressao": "tonta",
+      "gesto": "negar",
+      "emote": "reticencias"
+     }
+    }
+   ]
+  },
+  {
+   "id": "pat_mira",
+   "garota": "Mira",
+   "quando": {},
+   "titulo": "O peixe-dourado",
+   "texto": "{outra} está debruçada na fonte, com a manga do casaco molhada. — Ele tem nome. É Seu Cometa. Ele que escolheu.",
+   "expressao": "normal",
+   "gesto": "inclinar",
+   "escolhas": [
+    {
+     "texto": "Perguntar como ele escolheu",
+     "efeitos": {
+      "afinidade": 6
+     },
+     "resultado": "A explicação envolve bolhas, uma nuvem e um sonho. Faz todo o sentido para ela.",
+     "reacao": {
+      "expressao": "feliz",
+      "gesto": "",
+      "emote": "estrela"
+     }
+    },
+    {
+     "texto": "Lembrar que o treino começou há 10 minutos",
+     "efeitos": {
+      "afinidade": 3,
+      "det": 6
+     },
+     "resultado": "— Ah! — As orelhas dela levantam de uma vez e ela sai correndo pelo lado errado.",
+     "reacao": {
+      "expressao": "surpresa",
+      "gesto": "susto",
+      "emote": "exclamacao"
+     }
+    }
+   ]
+  },
+  {
+   "id": "pat_mira2",
+   "garota": "Mira",
+   "quando": {
+    "afinidade_min": 30
+   },
+   "titulo": "A outra Mira",
+   "texto": "— Às vezes, na reta final, eu paro de pensar — diz {outra}, olhando para as mãos escondidas nas mangas. — Aí tudo fica quieto e eu só corro. Isso é estranho?",
+   "expressao": "normal",
+   "gesto": "",
+   "escolhas": [
+    {
+     "texto": "\"É o seu superpoder\"",
+     "efeitos": {
+      "afinidade": 8
+     },
+     "resultado": "Ela pensa um tempão e depois sorri. — Superpoder de frajola.",
+     "reacao": {
+      "expressao": "feliz",
+      "gesto": "pulinho",
+      "emote": "coracao"
+     }
+    },
+    {
+     "texto": "Pedir para ela te ensinar",
+     "efeitos": {
+      "afinidade": 5,
+      "int": 6
+     },
+     "resultado": "Ela tenta explicar e desiste no meio. — É tipo nuvem. Você só olha.",
+     "reacao": {
+      "expressao": "fechados",
+      "gesto": "inclinar",
+      "emote": "reticencias"
+     }
+    }
+   ]
+  },
+  {
+   "id": "pat_capela",
+   "garota": "Capela",
+   "quando": {},
+   "titulo": "Ensaio na escada",
+   "texto": "{outra} termina um giro na escada e para com a mão no ar, esperando. As orelhas sobem quando ela vê {nome}. — Plateia! Finalmente!",
+   "expressao": "piscadinha",
+   "gesto": "danca",
+   "escolhas": [
+    {
+     "texto": "Aplaudir de pé",
+     "efeitos": {
+      "afinidade": 7
+     },
+     "resultado": "Ela faz mais três reverências. E depois o número inteiro de novo.",
+     "reacao": {
+      "expressao": "feliz",
+      "gesto": "pulinho",
+      "emote": "estrela"
+     }
+    },
+    {
+     "texto": "Entrar na coreografia",
+     "efeitos": {
+      "afinidade": 5,
+      "pod": 6
+     },
+     "resultado": "{nome} erra todos os passos, e {outra} diz que foi a melhor parte.",
+     "reacao": {
+      "expressao": "feliz",
+      "gesto": "danca",
+      "emote": "nota"
+     }
+    }
+   ]
+  },
+  {
+   "id": "pat_capela2",
+   "garota": "Capela",
+   "quando": {
+    "afinidade_min": 30
+   },
+   "titulo": "Sem plateia",
+   "texto": "Pela primeira vez, {outra} está sentada quieta na escada, sem ensaiar. — Se ninguém viu, valeu? Ontem eu corri bem e ninguém tava olhando.",
+   "expressao": "fechados",
+   "gesto": "encolher",
+   "escolhas": [
+    {
+     "texto": "\"Eu vi. E valeu.\"",
+     "efeitos": {
+      "afinidade": 9
+     },
+     "resultado": "Ela pisca rápido algumas vezes e depois ri. — Tá, mas agora eu quero foto.",
+     "reacao": {
+      "expressao": "feliz",
+      "gesto": "pulinho",
+      "emote": "coracao"
+     }
+    },
+    {
+     "texto": "\"Você viu. Isso basta.\"",
+     "efeitos": {
+      "afinidade": 5,
+      "det": 7
+     },
+     "resultado": "Ela fica pensando nisso o resto da tarde. Treina sozinha, pela primeira vez.",
+     "reacao": {
+      "expressao": "normal",
+      "gesto": "concordar",
+      "emote": "estrela"
+     }
+    }
+   ]
+  },
+  {
+   "id": "pat_antares",
+   "garota": "Antares",
+   "quando": {},
+   "titulo": "Mais uma",
+   "texto": "{outra} termina mais um tiro e se apoia nos joelhos, ofegante. — ...Que foi? Tô bem.",
+   "expressao": "normal",
+   "gesto": "",
+   "escolhas": [
+    {
+     "texto": "Cronometrar o próximo tiro",
+     "efeitos": {
+      "afinidade": 5,
+      "vel": 6
+     },
+     "resultado": "Ela bate o próprio tempo e solta um \"hm\" que, vindo dela, é uma festa.",
+     "reacao": {
+      "expressao": "piscadinha",
+      "gesto": "pulinho",
+      "emote": "exclamacao"
+     }
+    },
+    {
+     "texto": "Oferecer água e mandar ela parar",
+     "efeitos": {
+      "afinidade": 7
+     },
+     "resultado": "Ela resmunga, mas aceita. E para. Por hoje.",
+     "reacao": {
+      "expressao": "fechados",
+      "gesto": "concordar",
+      "emote": "gota"
+     }
+    }
+   ]
+  },
+  {
+   "id": "pat_antares2",
+   "garota": "Antares",
+   "quando": {
+    "afinidade_min": 30
+   },
+   "titulo": "5h da manhã",
+   "texto": "— Amanhã. 5h. Pista. — {outra} diz isso sem olhar para {nome}, e já vai embora. Parece um convite.",
+   "expressao": "normal",
+   "gesto": "",
+   "escolhas": [
+    {
+     "texto": "Aparecer às 4h50",
+     "efeitos": {
+      "afinidade": 9,
+      "energia": -6,
+      "est": 6
+     },
+     "resultado": "Ela chega e encontra {nome} esperando. Pela primeira vez, ela sorri primeiro.",
+     "reacao": {
+      "expressao": "feliz",
+      "gesto": "pulinho",
+      "emote": "estrela"
+     }
+    },
+    {
+     "texto": "\"Às 7h, e eu levo o café\"",
+     "efeitos": {
+      "afinidade": 6,
+      "humor": 1
+     },
+     "resultado": "Ela pensa, negocia para 6h e aceita o café.",
+     "reacao": {
+      "expressao": "piscadinha",
+      "gesto": "concordar",
+      "emote": "coracao"
+     }
+    }
+   ]
+  },
+  {
+   "id": "pat_shaula",
+   "garota": "Shaula",
+   "quando": {},
+   "titulo": "Embaixo da árvore",
+   "texto": "{outra} puxa o capuz quando vê {nome} chegando. As orelhas abrem para os lados. — Tá perdida?",
+   "expressao": "normal",
+   "gesto": "",
+   "escolhas": [
+    {
+     "texto": "Sentar do lado sem falar nada",
+     "efeitos": {
+      "afinidade": 7
+     },
+     "resultado": "Depois de muito tempo, ela empresta um lado do fone do rádio velho.",
+     "reacao": {
+      "expressao": "fechados",
+      "gesto": "",
+      "emote": "nota"
+     }
+    },
+    {
+     "texto": "Perguntar da equipe da cidade natal",
+     "efeitos": {
+      "afinidade": 4,
+      "det": 6
+     },
+     "resultado": "Ela não responde. Mas também não vai embora, e isso já diz muito.",
+     "reacao": {
+      "expressao": "normal",
+      "gesto": "negar",
+      "emote": "reticencias"
+     }
+    }
+   ]
+  },
+  {
+   "id": "pat_shaula2",
+   "garota": "Shaula",
+   "quando": {
+    "afinidade_min": 30
+   },
+   "titulo": "O tufo branco",
+   "texto": "Um vento forte derruba o capuz de {outra}, e aparece um tufo branco na nuca dela. Ela congela.",
+   "expressao": "surpresa",
+   "gesto": "susto",
+   "escolhas": [
+    {
+     "texto": "Fingir que não viu",
+     "efeitos": {
+      "afinidade": 8
+     },
+     "resultado": "Ela arruma o capuz e, baixinho, diz obrigada. Você ganhou uma aliada.",
+     "reacao": {
+      "expressao": "fechados",
+      "gesto": "concordar",
+      "emote": "coracao"
+     }
+    },
+    {
+     "texto": "\"Combina com você\"",
+     "chance": 0.6,
+     "efeitos": {
+      "afinidade": 11
+     },
+     "resultado": "Ela fica vermelha até a ponta das orelhas e deixa o capuz abaixado o resto do dia.",
+     "efeitos_falha": {
+      "afinidade": -3
+     },
+     "resultado_falha": "— Não comenta. — Ela some na direção da pista.",
+     "reacao": {
+      "expressao": "piscadinha",
+      "gesto": "encolher",
+      "emote": "coracao"
+     }
+    }
+   ]
+  },
+  {
+   "id": "pat_gen_lanche",
+   "garota": null,
+   "quando": {},
+   "titulo": "Lanche dividido",
+   "texto": "{outra} está sentada no banco com dois bolinhos e cara de quem não vai conseguir comer os dois.",
+   "expressao": "normal",
+   "gesto": "",
+   "escolhas": [
+    {
+     "texto": "Aceitar um bolinho",
+     "efeitos": {
+      "afinidade": 5,
+      "energia": 4
+     },
+     "resultado": "Bolinho de banana, ainda morno. A conversa vai longe.",
+     "reacao": {
+      "expressao": "feliz",
+      "gesto": "concordar",
+      "emote": "coracao"
+     }
+    },
+    {
+     "texto": "Trocar por uma dica de treino",
+     "efeitos": {
+      "afinidade": 3,
+      "int": 5
+     },
+     "resultado": "{outra} topa a troca e ainda dá a dica de graça.",
+     "reacao": {
+      "expressao": "piscadinha",
+      "gesto": "concordar",
+      "emote": "estrela"
+     }
+    }
+   ]
+  },
+  {
+   "id": "pat_gen_gato",
+   "garota": null,
+   "quando": {},
+   "titulo": "Visita",
+   "texto": "Um gato de verdade, gordo e laranja, se esfrega na perna de {outra}. Ela fica imóvel, encantada.",
+   "expressao": "surpresa",
+   "gesto": "",
+   "escolhas": [
+    {
+     "texto": "Fazer carinho junto",
+     "efeitos": {
+      "afinidade": 6
+     },
+     "resultado": "O gato decide que as duas são aceitáveis e dorme no meio delas.",
+     "reacao": {
+      "expressao": "feliz",
+      "gesto": "",
+      "emote": "coracao"
+     }
+    },
+    {
+     "texto": "Ver quem o gato segue",
+     "efeitos": {
+      "afinidade": 4,
+      "vel": 4
+     },
+     "resultado": "O gato escolhe {outra}. {nome} finge que não ligou.",
+     "reacao": {
+      "expressao": "piscadinha",
+      "gesto": "pulinho",
+      "emote": "nota"
+     }
+    }
+   ]
+  },
+  {
+   "id": "pat_gen_rival",
+   "garota": null,
+   "quando": {
+    "afinidade_max": 10
+   },
+   "titulo": "Clima estranho",
+   "texto": "{outra} cruza com {nome} no pátio e as duas desviam para o mesmo lado. Duas vezes.",
+   "expressao": "surpresa",
+   "gesto": "tremer",
+   "escolhas": [
+    {
+     "texto": "Rir da situação",
+     "efeitos": {
+      "afinidade": 7
+     },
+     "resultado": "{outra} tenta segurar, mas acaba rindo também. O clima melhora.",
+     "reacao": {
+      "expressao": "feliz",
+      "gesto": "pulinho",
+      "emote": "nota"
+     }
+    },
+    {
+     "texto": "Passar direto, de queixo erguido",
+     "efeitos": {
+      "afinidade": -2,
+      "det": 8
+     },
+     "resultado": "As orelhas de {outra} vão para trás. Vai ter troco na pista.",
+     "reacao": {
+      "expressao": "normal",
+      "gesto": "negar",
+      "emote": "raiva"
+     }
+    }
+   ]
+  },
+  {
+   "id": "pat_gen_conselho",
+   "garota": null,
+   "quando": {
+    "turno_min": 13
+   },
+   "titulo": "Pergunta sincera",
+   "texto": "— Posso perguntar uma coisa? — diz {outra}. — Como você fica calma antes da largada?",
+   "expressao": "normal",
+   "gesto": "inclinar",
+   "escolhas": [
+    {
+     "texto": "Ensinar a respirar contando",
+     "efeitos": {
+      "afinidade": 6
+     },
+     "resultado": "As duas respiram juntas, contando até quatro. Funciona melhor em dupla.",
+     "reacao": {
+      "expressao": "fechados",
+      "gesto": "concordar",
+      "emote": "coracao"
+     }
+    },
+    {
+     "texto": "Confessar que não fica",
+     "efeitos": {
+      "afinidade": 7,
+      "humor": -1
+     },
+     "resultado": "{outra} fica aliviada. {nome} fica pensando nisso até de noite.",
+     "reacao": {
+      "expressao": "surpresa",
+      "gesto": "inclinar",
+      "emote": "reticencias"
+     }
+    }
+   ]
+  }
+ ]
+}

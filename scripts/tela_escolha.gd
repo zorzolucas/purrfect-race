@@ -24,7 +24,7 @@ func _cartao(ini: Dictionary) -> Control:
 	p.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var v := UI.vbox(10)
 	var topo := UI.hbox(12)
-	topo.add_child(UI.retrato(ini.nome, Color(ini.cor), 80))
+	topo.add_child(RetratoGarota.new(ini.nome, 96))
 	var nomes := UI.vbox(2)
 	nomes.add_child(UI.label(ini.nome, 24))
 	nomes.add_child(UI.label("“%s”" % ini.apelido, 15, UI.SUAVE, true))

@@ -125,6 +125,11 @@ var oferta_amuleto: Array = []  # amuletos oferecidos, esperando a escolha
 var estrela_usada := false
 var instrucao := "normal"    # instrução da próxima corrida (GDD §5.7)
 var titulos: Array = []      # séries completadas: [{id, nome, turno}] (calendario.md §7.4)
+var conversa_turno := 0     # último turno em que ela conversou no pátio (1 por turno)
+var patio_vistos: Array = [] # conversas próprias de cada colega já vistas no pátio
+## Reação de quem falou na última escolha (encontro ou pátio), para o retrato mostrar.
+## Não vai para o save: a tela consome e limpa.
+var ultima_reacao := {}
 var _cache_olheiro := {}
 
 
@@ -399,9 +404,10 @@ func treinar(t: String) -> String:
 	var var_ := r.randf_range(0.85, 1.15)
 	var partes := []
 	for k in g:
-		var v: float = round(g[k] * var_)
-		attrs[k] += v
-		partes.append("+%d %s" % [v, Dados.ATTR_CURTO[k]])
+		# mostra o que ela ganhou de fato: perto do limite, o texto dizia +40 e nada subia
+		var antes: float = attrs[k]
+		attrs[k] = minf(limite, attrs[k] + round(g[k] * var_))
+		partes.append("+%d %s" % [roundi(attrs[k] - antes), Dados.ATTR_CURTO[k]])
 	usos_treino[t] += 1
 	var txt := "Treino de %s: %s." % [Dados.ATTR_NOME[t], ", ".join(partes)]
 	if salvou_estrela:
@@ -601,8 +607,10 @@ func _pelotao(c: Dictionary, elenco: Array) -> Dictionary:
 ## A chance sai de 1 rodada da simulação em modo estimativa por instrução (tempo esperado de
 ## cada uma) e de sorteios da sorte por cima. É determinística: o mesmo estado dá a mesma etiqueta.
 func olheiro(c: Dictionary) -> Dictionary:
-	var chave := "%d|%s|%s|%d|%d|%d|%s" % [turno, c.get("id", "x"), c.get("nome", ""), humor,
-		habilidades.size(), amuletos.size(), str(attrs.values())]
+	# a chave leva as listas inteiras, não só o tamanho: trocar um amuleto no limite (mesma
+	# quantidade) ou subir uma aptidão (Coroa) muda a estimativa
+	var chave := "%d|%s|%s|%d|%s|%s|%s|%s" % [turno, c.get("id", "x"), c.get("nome", ""), humor,
+		str(habilidades), str(amuletos), str(aptidao), str(attrs.values())]
 	if _cache_olheiro.has(chave):
 		return _cache_olheiro[chave]
 	var ol: Dictionary = Dados.calendario.olheiro
@@ -946,6 +954,7 @@ func _inspiracao() -> void:
 
 func _fim_turno(chance_encontro: float = BAL.chance_encontro) -> void:
 	turno += 1
+	_cache_olheiro.clear()  # a chave tem o turno: as estimativas antigas não servem mais
 	if turno > BAL.turnos:
 		terminou = true
 		return
@@ -1034,7 +1043,8 @@ func _abrir_misterio() -> void:
 	var lista: Array = Dados.calendario.misterios
 	var e: Dictionary = lista[r.randi() % lista.size()]
 	var colegas := afinidade.keys()
-	encontro_pendente = {"id": e.id, "tipo": "misterio", "outra": colegas[r.randi() % colegas.size()]}
+	var outra: String = colegas[r.randi() % colegas.size()] if not colegas.is_empty() else ""
+	encontro_pendente = {"id": e.id, "tipo": "misterio", "outra": outra}
 
 
 func _abrir_vespera() -> void:
@@ -1092,6 +1102,48 @@ func escolher(i: int) -> String:
 	var ef: Dictionary = esc.efeitos if deu_certo else esc.get("efeitos_falha", esc.efeitos)
 	var resultado := texto(esc.resultado if deu_certo else esc.get("resultado_falha", esc.resultado))
 	var outra: String = encontro_pendente.get("outra", "")
+	ultima_reacao = reacao_da_escolha(esc, ef, deu_certo)
+	ultima_reacao.quem = quem_do_encontro()
+	var partes := _aplicar_efeitos(ef, outra)
+	_limitar()
+	encontro_pendente = {}
+	if ef.get("perde_turno", false):
+		_fim_turno(0.0)
+		partes.append("o turno passou")
+	if not partes.is_empty():
+		resultado += " (%s)" % ", ".join(partes)
+	return resultado
+
+
+## Quem aparece no retrato do encontro pendente: a colega nos genéricos e no Mistério,
+## a rival na véspera, a própria garota nos eventos únicos e capítulos.
+func quem_do_encontro() -> String:
+	var tipo: String = encontro_pendente.get("tipo", "encontro")
+	if tipo == "vespera":
+		return encontro_pendente.get("rival", nome)
+	if tipo == "encontro" and encontro_atual().get("garota") == null:
+		return encontro_pendente.get("outra", nome)
+	return nome
+
+
+## Reação de quem fala: a 'reacao' da escolha ou, sem ela, uma tirada dos efeitos.
+static func reacao_da_escolha(esc: Dictionary, ef: Dictionary, deu_certo: bool) -> Dictionary:
+	if esc.has("reacao") and deu_certo:
+		return esc.reacao.duplicate()
+	if not deu_certo:
+		return {"expressao": "tonta", "gesto": "tremer", "emote": "reticencias"}
+	if int(ef.get("afinidade", 0)) < 0 or int(ef.get("humor", 0)) < 0:
+		return {"expressao": "fechados", "gesto": "encolher", "emote": "gota"}
+	if int(ef.get("humor", 0)) > 0 or int(ef.get("afinidade", 0)) >= 10 or ef.has("afinidade_todas"):
+		return {"expressao": "feliz", "gesto": "pulinho", "emote": "coracao"}
+	for k in SimCorrida.KEYS:
+		if ef.has(k):
+			return {"expressao": "piscadinha", "gesto": "concordar", "emote": "estrela"}
+	return {"expressao": "normal", "gesto": "concordar", "emote": ""}
+
+
+## Aplica os efeitos de um encontro ou conversa e devolve as partes do texto.
+func _aplicar_efeitos(ef: Dictionary, outra: String) -> Array:
 	var partes := []
 	var faltou_pontos := false
 	for k in ef:
@@ -1108,6 +1160,11 @@ func escolher(i: int) -> String:
 					var d := roundi(int(v) * _mult_afinidade())
 					_mudar_afinidade(outra, d)
 					partes.append("afinidade com %s %+d" % [_curto(outra), d])
+			"afinidade_todas":
+				var d := roundi(int(v) * _mult_afinidade())
+				for colega in afinidade:
+					_mudar_afinidade(colega, d)
+				partes.append("afinidade com todas %+d" % d)
 			"nivel_treino":
 				var mais := "vel"
 				for t in usos_treino:
@@ -1145,19 +1202,116 @@ func escolher(i: int) -> String:
 				if attrs.has(k):
 					attrs[k] += float(v)
 					partes.append("%+d %s" % [v, Dados.ATTR_CURTO[k]])
-	_limitar()
-	encontro_pendente = {}
-	if ef.get("perde_turno", false):
-		_fim_turno(0.0)
-		partes.append("o turno passou")
-	if not partes.is_empty():
-		resultado += " (%s)" % ", ".join(partes)
-	return resultado
+	return partes
 
 
 func _mudar_afinidade(colega: String, d: int) -> void:
 	if afinidade.has(colega):
 		afinidade[colega] = clampi(afinidade[colega] + d, -20, 100)
+
+
+# ---------- pátio da academia (GDD §11.3) ----------
+
+## Turno do aniversário [dia, mês] no ano (0, 1 ou 2) da carreira. A carreira começa em
+## março; dia 1-15 é o turno de Início do mês, 16-31 o de Fim (visual-elenco.md §3.2).
+static func turno_do_aniversario(aniv: Array, ano: int) -> int:
+	var idx := posmod(int(aniv[1]) - 3, 12)
+	return ano * 24 + idx * 2 + (0 if int(aniv[0]) <= 15 else 1) + 1
+
+
+func faz_aniversario(quem: String) -> bool:
+	var g: Dictionary = Dados.garota(quem)
+	if not g.has("aniversario"):
+		return false
+	return turno_do_aniversario(g.aniversario, (turno - 1) / 24) == turno
+
+
+## Evento do pátio neste turno: {id, outra}. Sai só do estado da carreira (aniversários,
+## corrida do turno anterior, nó do mapa e clima), então não precisa ir para o save.
+func evento_patio() -> Dictionary:
+	if faz_aniversario(nome):
+		return {"id": "aniversario_dela", "outra": ""}
+	for colega in afinidade:
+		if faz_aniversario(colega):
+			return {"id": "aniversario", "outra": colega}
+	var ult := resultados.filter(func(r): return int(r.turno) == turno - 1)
+	if not ult.is_empty():
+		if int(ult[-1].posicao) == 1:
+			return {"id": "vitoria", "outra": ""}
+		if int(ult[-1].posicao) >= 4 and not afinidade.is_empty():
+			var amiga: String = afinidade.keys()[0]
+			for colega in afinidade:
+				if afinidade[colega] > afinidade[amiga]:
+					amiga = colega
+			return {"id": "derrota", "outra": amiga}
+	if tipo_no() == "festival":
+		return {"id": "festival", "outra": ""}
+	if clima() in ["chuva", "estrelas", "calor", "frio"]:
+		return {"id": clima(), "outra": ""}
+	return {"id": "habitos", "outra": ""}
+
+
+func pode_conversar_no_patio() -> bool:
+	return conversa_turno != turno and pendencia() == ""
+
+
+func _condicoes_patio(cv: Dictionary, colega: String) -> bool:
+	var q: Dictionary = cv.get("quando", {})
+	var af: int = afinidade.get(colega, 0)
+	return turno >= int(q.get("turno_min", 0)) and af >= int(q.get("afinidade_min", -100)) \
+		and af <= int(q.get("afinidade_max", 100))
+
+
+## Conversa curta com uma colega clicada no pátio, ou {} se ela já conversou neste turno.
+## Prioridade: a conversa do evento (no aniversário e no consolo, só com a colega do
+## evento), depois as conversas próprias dela ainda não vistas, depois as genéricas.
+func conversa_patio(colega: String) -> Dictionary:
+	if not pode_conversar_no_patio() or not afinidade.has(colega):
+		return {}
+	var dados_p: Dictionary = Dados.patio
+	var ev := evento_patio()
+	var id_ev: String = dados_p.eventos[ev.id].get("conversa", "")
+	if id_ev != "" and (ev.outra == "" or ev.outra == colega):
+		for cv in dados_p.conversas:
+			if cv.id == id_ev:
+				return cv
+	var r := _rng("patio:" + colega)
+	var proprias: Array = dados_p.conversas.filter(func(cv): return cv.garota == colega \
+		and not cv.id in patio_vistos and _condicoes_patio(cv, colega))
+	if not proprias.is_empty() and r.randf() < 0.7:
+		return proprias[0]
+	var gen: Array = dados_p.conversas.filter(func(cv): return cv.garota == null \
+		and not cv.get("quando", {}).has("evento") and _condicoes_patio(cv, colega))
+	if gen.is_empty():
+		return proprias[0] if not proprias.is_empty() else {}
+	return gen[r.randi() % gen.size()]
+
+
+## Troca {nome} e {outra} num texto do pátio.
+func texto_patio(t: String, colega: String) -> String:
+	return t.replace("{nome}", _primeiro_nome()).replace("{outra}", _curto(colega))
+
+
+## Aplica a escolha i da conversa do pátio com a colega e devolve o texto do resultado.
+func escolher_conversa(colega: String, i: int) -> String:
+	var cv := conversa_patio(colega)
+	if cv.is_empty():
+		return ""
+	var esc: Dictionary = cv.escolhas[i]
+	var r := _rng("conversa:" + cv.id)
+	var deu_certo := not esc.has("chance") or r.randf() < float(esc.chance)
+	var ef: Dictionary = esc.efeitos if deu_certo else esc.get("efeitos_falha", esc.efeitos)
+	var resultado := texto_patio(esc.resultado if deu_certo else esc.get("resultado_falha", esc.resultado), colega)
+	ultima_reacao = reacao_da_escolha(esc, ef, deu_certo)
+	ultima_reacao.quem = colega
+	var partes := _aplicar_efeitos(ef, colega)
+	_limitar()
+	conversa_turno = turno
+	if cv.garota != null and not cv.id in patio_vistos:
+		patio_vistos.append(cv.id)
+	if not partes.is_empty():
+		resultado += " (%s)" % ", ".join(partes)
+	return resultado
 
 
 # ---------- save (GDD §10: automático a cada turno, um slot) ----------
@@ -1167,7 +1321,8 @@ const CAMPOS_SAVE := ["attrs", "energia", "humor", "lesionada", "turno", "usos_t
 	"serra", "unico_garantido", "terminou", "falhou_objetivo", "afinidade", "vistos",
 	"ultimo_encontro", "ultima_corrida", "duplas", "encontro_pendente", "moeda_corridas",
 	"pontos", "habilidades", "amuletos", "oferta_amuleto", "estrela_usada",
-	"caminho", "flags", "ultima_lesao", "saidas", "viradas", "madrinha", "aptidao", "instrucao", "titulos"]
+	"caminho", "flags", "ultima_lesao", "saidas", "viradas", "madrinha", "aptidao", "instrucao", "titulos",
+	"conversa_turno", "patio_vistos"]
 
 
 ## Salva também a carreira terminada: ela só é apagada depois que o jogador decide
@@ -1222,7 +1377,7 @@ static func carregar() -> Carreira:
 		if d.has(campo):
 			c.set(campo, d[campo])
 	# o JSON devolve todos os números como float
-	for campo in ["energia", "humor", "turno", "fama", "moeda_corridas", "pontos", "ultima_lesao", "saidas", "viradas"]:
+	for campo in ["energia", "humor", "turno", "fama", "moeda_corridas", "pontos", "ultima_lesao", "saidas", "viradas", "conversa_turno"]:
 		c.set(campo, int(c.get(campo)))
 	for t in c.usos_treino:
 		c.usos_treino[t] = int(c.usos_treino[t])

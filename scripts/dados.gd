@@ -17,6 +17,7 @@ var calendario: Dictionary = {}
 var habilidades: Dictionary = {}
 var amuletos: Dictionary = {}
 var campanhas: Dictionary = {}
+var patio: Dictionary = {}
 
 
 func _ready() -> void:
@@ -28,6 +29,7 @@ func _ready() -> void:
 	habilidades = _ler_json("res://data/habilidades.json")
 	amuletos = _ler_json("res://data/amuletos.json")
 	campanhas = _ler_json("res://data/campanhas.json")
+	patio = _ler_json("res://data/patio.json")
 
 
 func habilidade(id: String) -> Dictionary:

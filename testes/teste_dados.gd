@@ -72,6 +72,13 @@ func _initialize() -> void:
 		_checar(nomes.has(n), "inicial fora do elenco: %s" % n)
 		_checar(n in mvp, "inicial sem mvp: true no elenco: %s" % n)
 		_checar(ini.get("distancia", "") in DISTS and ini.get("piso", "") in PISOS, "%s: casa inválida" % n)
+		# a casa das iniciais tem que ser a do elenco (a Antares estava na Grama com aptidão e
+		# campanha da Terra, e o bot a contava na casa errada)
+		var g_ini: Array = dd.garotas.filter(func(g): return g.nome == n)
+		if not g_ini.is_empty():
+			var casa: Array = g_ini[0].casa
+			_checar(ini.get("distancia", "") == DISTS[int(casa[0])] and ini.get("piso", "") == PISOS[int(casa[1])],
+				"%s: casa em iniciais.json diferente da de garotas.json" % n)
 		for k in ini.get("naturais", []):
 			_checar(k in SimCorrida.KEYS, "%s: treino natural inválido %s" % [n, k])
 		var u: String = ini.get("unica", "")

@@ -39,7 +39,7 @@
     "aberta": {
       "nome": "Aberta",
       "forca": [
-        263,
+        267,
         345,
         475
       ],
@@ -50,8 +50,8 @@
     "prata": {
       "nome": "Prata",
       "forca": [
-        364,
-        364,
+        372,
+        372,
         545
       ],
       "fama_entrada": 600,
@@ -61,8 +61,8 @@
     "ouro": {
       "nome": "Ouro",
       "forca": [
-        450,
-        450,
+        458,
+        458,
         615
       ],
       "fama_entrada": 1500,
@@ -71,14 +71,14 @@
     },
     "gp1": {
       "nome": "Grande Prêmio",
-      "forca": 335,
+      "forca": 340,
       "fama_entrada": 0,
       "fama": 1500,
       "desde": 24
     },
     "gp2": {
       "nome": "Grande Prêmio",
-      "forca": 515,
+      "forca": 522,
       "fama_entrada": 0,
       "fama": 1500,
       "desde": 48
@@ -649,11 +649,11 @@
   "forca_distancia_cat": {
     "_doc": "Multiplicador extra por categoria e distância (campanhas.md §7.4): um número ou um valor por ano. Acerta corridas em que uma casa virava muro ou sobrava.",
     "estreia": {
-      "longa": 0.94
+      "longa": 0.92
     },
     "aberta": {
       "longa": [
-        0.97,
+        0.95,
         1.0,
         1.0
       ]
@@ -668,6 +668,16 @@
         0.97,
         1.0
       ]
+    },
+    "ouro": {
+      "longa": [
+        1.0,
+        1.0,
+        0.98
+      ]
+    },
+    "gp3": {
+      "longa": 0.97
     }
   },
   "olheiro": {

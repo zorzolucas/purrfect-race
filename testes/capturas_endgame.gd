@@ -98,7 +98,7 @@ func _salvar(nome: String) -> void:
 
 func _process(_delta: float) -> bool:
 	espera += 1
-	if espera < 20:
+	if espera < 75:
 		return false
 	espera = 0
 	if passo >= passos.size():

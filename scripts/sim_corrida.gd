@@ -58,6 +58,20 @@ static var CORRECAO_ESTILO := {
 }
 
 
+## Fôlego do pelotão (corrida.md §6): acima de `nivel`, cada ponto que o pelotão sobe na média
+## tira `fracao` ponto da Estamina que conta no fôlego de todas, porque um pelotão forte corre num
+## ritmo que cansa mais. Sem isso, a partir do nível ~550 o fôlego nunca acabava, a Estamina não
+## mudava nenhuma colocação e a Velocidade valia mais que tudo (endgame.md §5.2). Com fracao 1,0,
+## uma garota com a Estamina igual à média do pelotão tem o mesmo fôlego em qualquer nível acima
+## de `nivel`, e quem tem Estamina acima do pelotão continua com a vantagem de antes.
+static var FOLEGO_PELOTAO := {"nivel": 350.0, "fracao": 0.0}
+
+
+## Quanto da Estamina não conta no fôlego num pelotão de nível médio `nivel`.
+static func desconto_folego(nivel: float) -> float:
+	return float(FOLEGO_PELOTAO.fracao) * maxf(0.0, nivel - float(FOLEGO_PELOTAO.nivel))
+
+
 ## Interpola linearmente numa grade crescente: [índice de baixo, peso do de cima].
 static func _na_grade(grade: Array, x: float) -> Array:
 	if x <= grade[0]:
@@ -144,6 +158,7 @@ func _init(field: Array, distancia: float, seed: int = 0, clima: String = "", es
 		for key in KEYS:
 			nivel += float(g.attrs[key])
 	nivel /= maxf(1.0, 5.0 * field.size())
+	var desconto := desconto_folego(nivel)
 	for idx in field.size():
 		var g: Dictionary = field[idx]
 		var st: String = g.estilo
@@ -151,7 +166,7 @@ func _init(field: Array, distancia: float, seed: int = 0, clima: String = "", es
 		var e := {}
 		for key in KEYS:
 			e[key] = float(g.attrs[key]) * PESOS[st][key] * float(g.get("mult", 1.0)) * corr
-		var hpmax: float = (K_HP_D * D + K_HP * e.est) * (0.98 if clima == "calor" else 1.0)
+		var hpmax: float = (K_HP_D * D + K_HP * maxf(e.est - desconto, 0.0)) * (0.98 if clima == "calor" else 1.0)
 		var noise := 0.0 if estimativa else rng.randfn(0.0, SORTE * (1.0 - e.int / 2400.0))
 		var chance := minf(0.9, e.int / 1000.0)
 		var vmax: float = (TETO[0] + (TETO[1] - TETO[0]) * clampf(e.vel, 0.0, 1200.0) / 1200.0) / 3.6

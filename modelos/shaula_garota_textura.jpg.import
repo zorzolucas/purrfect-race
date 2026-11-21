@@ -2,19 +2,19 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b7xvxu7gqf47d"
-path="res://.godot/imported/lira_lira_iris.png-5318251e7460680d8759f45bbeb45ea4.ctex"
+uid="uid://nfvuna4s3erw"
+path="res://.godot/imported/shaula_garota_textura.jpg-ad1138d837ac33ebf49d36b8410be201.ctex"
 metadata={
 "vram_texture": false
 }
 generator_parameters={
-"md5": "94bf59a50394de2c7c84eeffae21f91e"
+"md5": "78ff031ac828deb87ce91e1af92ed689"
 }
 
 [deps]
 
-source_file="res://modelos/lira_lira_iris.png"
-dest_files=["res://.godot/imported/lira_lira_iris.png-5318251e7460680d8759f45bbeb45ea4.ctex"]
+source_file="res://modelos/shaula_garota_textura.jpg"
+dest_files=["res://.godot/imported/shaula_garota_textura.jpg-ad1138d837ac33ebf49d36b8410be201.ctex"]
 
 [params]
 
@@ -26,7 +26,7 @@ compress/rdo_quality_loss=0.0
 compress/hdr_compression=1
 compress/normal_map=0
 compress/channel_pack=0
-mipmaps/generate=false
+mipmaps/generate=true
 mipmaps/limit=-1
 roughness/mode=0
 roughness/src_normal=""
@@ -40,4 +40,4 @@ process/normal_map_invert_y=false
 process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
-detect_3d/compress_to=0
+detect_3d/compress_to=1

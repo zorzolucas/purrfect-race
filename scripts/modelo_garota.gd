@@ -1,12 +1,19 @@
 class_name ModeloGarota
 extends Node3D
-## Modelo 3D low-poly de uma garota (GDD §11), importado do Blender em glTF.
-## Sombra pintada na textura (material sem luz), contorno por casco invertido, rosto 2D
-## trocável pelo atlas (3 × 2 expressões), íris separadas que somem ou aparecem conforme
-## a expressão e se mexem com o olhar, e as animações do Mixamo passadas para o rig dela.
-## Por enquanto só a Lira tem modelo; as outras continuam de cápsula na corrida.
+## Modelo 3D low-poly de uma garota (GDD §11). As 8 do elenco principal vêm dos modelos que o
+## Lucas gerou no Tripo (arte/3d/*.glb), reduzidos e com o mesmo esqueleto e as mesmas
+## animações do Mixamo em todas (tools/blender/tripo_preparar.py e tripo_rig.py).
+## Sombra pintada na textura (material sem luz) e contorno por casco invertido. Rosto e íris
+## estão pintados na textura do Tripo: expressão e olhar só funcionam em modelo que tem o atlas
+## do rosto e os ossos dos olhos (o da Lira feito à mão tinha); nos outros não fazem nada.
+## Garotas fora da lista continuam de cápsula na corrida.
 
-const MODELOS := {"Lira": "res://modelos/lira.glb"}
+const MODELOS := {
+	"Lira": "res://modelos/lira.glb", "Nashira": "res://modelos/nashira.glb",
+	"Mira": "res://modelos/mira.glb", "Capela": "res://modelos/capela.glb",
+	"Antares": "res://modelos/antares.glb", "Shaula": "res://modelos/shaula.glb",
+	"Polaris": "res://modelos/polaris.glb", "Algol": "res://modelos/algol.glb",
+}
 ## Mesma ordem do atlas (tools/blender/lira.py) e das fichas conceituais.
 const EXPRESSOES := ["normal", "fechados", "feliz", "surpresa", "tonta", "piscadinha"]
 ## Quais íris aparecem em cada expressão: [direita, esquerda] (lado dela).
@@ -24,6 +31,8 @@ const ALTURA_ORIGINAL := 1.6
 ## Multiplica a textura (1 = cores do Blender). A sombra já vem pintada.
 const BRILHO := Color(1, 1, 1)
 const COR_CONTORNO := Color("#2a1a16")
+## Espessura do contorno (m, na altura original de 1,6 m).
+const CONTORNO := 0.006
 ## Quanto a íris gira (graus) com olhar(±1, ±1).
 const OLHAR_MAX := Vector2(9.0, 6.0)
 
@@ -69,7 +78,7 @@ func _materiais(no: Node) -> void:
 			var m := StandardMaterial3D.new()
 			m.albedo_texture = orig.albedo_texture if orig else null
 			m.albedo_color = BRILHO
-			m.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
+			m.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST_WITH_MIPMAPS
 			# sombra já vem pintada na textura (PDF de pipeline §3): sem luz do Godot
 			m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 			# a saia da jaqueta e a calota do cabelo são abertas: desenha os dois lados
@@ -89,6 +98,16 @@ func _materiais(no: Node) -> void:
 					_iris[0] = m
 				else:
 					_iris[1] = m
+			elif mi.mesh.get_surface_count() == 1:
+				# modelo do Tripo: uma malha só, sem casco de contorno; o contorno é uma
+				# segunda passada que cresce pela normal e só mostra o lado de trás
+				var c := StandardMaterial3D.new()
+				c.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+				c.albedo_color = COR_CONTORNO
+				c.cull_mode = BaseMaterial3D.CULL_FRONT
+				c.grow = true
+				c.grow_amount = CONTORNO
+				m.next_pass = c
 			mi.set_surface_override_material(s, m)
 
 

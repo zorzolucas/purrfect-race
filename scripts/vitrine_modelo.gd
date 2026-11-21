@@ -1,7 +1,7 @@
 extends Node3D
 ## Vitrine do modelo low-poly: a garota num disco de grama, girando devagar.
 ## Teclas: 1–6 trocam a expressão, Espaço/Backspace passam pelas animações, setas giram,
-## G pausa o giro, O liga o olhar passeando.
+## G pausa o giro, O liga o olhar passeando, Tab troca de garota.
 ## Abra cenas/vitrine_modelo.tscn no editor e aperte F6.
 
 @export var garota := "Lira"
@@ -94,9 +94,22 @@ func _unhandled_input(ev: InputEvent) -> void:
 		modelo.rotation.y -= 0.4
 	elif k.keycode == KEY_RIGHT:
 		modelo.rotation.y += 0.4
+	elif k.keycode == KEY_TAB:
+		var nomes := ModeloGarota.MODELOS.keys()
+		trocar_garota(nomes[(nomes.find(garota) + 1) % nomes.size()])
 	elif k.keycode == KEY_G:
 		girar = not girar
 	_atualizar_info()
+
+
+func trocar_garota(nome: String) -> void:
+	var rot := modelo.rotation.y
+	modelo.queue_free()
+	garota = nome
+	modelo = ModeloGarota.new(garota)
+	modelo.rotation.y = rot
+	add_child(modelo)
+	_anim_i = 0
 
 
 ## Posição fixa da câmera e do modelo, usada pelas capturas.
@@ -118,5 +131,5 @@ func _atualizar_info() -> void:
 	if info == null:
 		return
 	var anim: String = modelo.animacao.current_animation if modelo.animacao else "-"
-	info.text = "%s · %s · %s\n1–6 expressão · Espaço/Backspace animação · setas giram · G pausa · O olhar" % [
+	info.text = "%s · %s · %s\n1–6 expressão · Espaço/Backspace animação · Tab garota · setas giram · G pausa · O olhar" % [
 		garota, anim, modelo.expressao_atual()]

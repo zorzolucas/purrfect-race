@@ -2,19 +2,19 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bqrbk43dt0tt1"
-path="res://.godot/imported/lira_lira_textura.png-3404ee642231e5b72a69bff7e768a026.ctex"
+uid="uid://sl8ph6y3ddma"
+path="res://.godot/imported/polaris_garota_textura.jpg-66f71498e72918a307d4f3dd99554583.ctex"
 metadata={
 "vram_texture": false
 }
 generator_parameters={
-"md5": "0394891dc377559f7dbe1cf4b385c80e"
+"md5": "2cc41ca18b677df377d5e29edbcf585c"
 }
 
 [deps]
 
-source_file="res://modelos/lira_lira_textura.png"
-dest_files=["res://.godot/imported/lira_lira_textura.png-3404ee642231e5b72a69bff7e768a026.ctex"]
+source_file="res://modelos/polaris_garota_textura.jpg"
+dest_files=["res://.godot/imported/polaris_garota_textura.jpg-66f71498e72918a307d4f3dd99554583.ctex"]
 
 [params]
 
@@ -26,7 +26,7 @@ compress/rdo_quality_loss=0.0
 compress/hdr_compression=1
 compress/normal_map=0
 compress/channel_pack=0
-mipmaps/generate=false
+mipmaps/generate=true
 mipmaps/limit=-1
 roughness/mode=0
 roughness/src_normal=""
@@ -40,4 +40,4 @@ process/normal_map_invert_y=false
 process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
-detect_3d/compress_to=0
+detect_3d/compress_to=1

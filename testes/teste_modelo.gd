@@ -22,56 +22,62 @@ func _relativo(no: Node3D, ate: Node) -> Transform3D:
 
 func _initialize() -> void:
 	var ModeloS: GDScript = load("res://scripts/modelo_garota.gd")
-	_checar(ModeloS.tem_modelo("Lira") and not ModeloS.tem_modelo("Nashira"), "só a Lira tem modelo")
-	var m = ModeloS.new("Lira", 1.6)
+	var elenco := ["Lira", "Nashira", "Mira", "Capela", "Antares", "Shaula", "Polaris", "Algol"]
+	_checar(not ModeloS.tem_modelo("Altair"), "fora do elenco principal continua de cápsula")
+	var resumo := []
+	for nome in elenco:
+		_checar(ModeloS.tem_modelo(nome), nome + " tem modelo")
+		if ModeloS.tem_modelo(nome):
+			resumo.append(_conferir(ModeloS, nome))
+	print("\n".join(resumo))
+	print("MODELO OK" if falhas.is_empty() else "MODELO FALHOU: " + "; ".join(falhas))
+	quit(0 if falhas.is_empty() else 1)
+
+
+func _conferir(ModeloS: GDScript, nome: String) -> String:
+	var m = ModeloS.new(nome, 1.6)
 	root.add_child(m)
 
-	var skel: Skeleton3D = m.find_children("*", "Skeleton3D", true, false)[0] if m.find_children("*", "Skeleton3D", true, false).size() > 0 else null
-	_checar(skel != null, "tem Skeleton3D")
+	# o mesmo esqueleto (o da Lira) em todas
+	var skel: Skeleton3D = m.esqueleto
+	_checar(skel != null, nome + ": tem Skeleton3D")
 	if skel:
 		for osso in ["hips", "spine", "chest", "neck", "head", "thigh.L", "shin.R", "foot.L",
-				"upper_arm.R", "forearm.L", "hand.R", "ear.L", "ear.R", "tail.001", "tail.006", "eye.L", "eye.R"]:
-			_checar(skel.find_bone(osso) >= 0, "osso " + osso)
+				"upper_arm.R", "forearm.L", "hand.R", "ear.L", "ear.R", "tail.001", "tail.006"]:
+			_checar(skel.find_bone(osso) >= 0, nome + ": osso " + osso)
 
-	_checar(m.animacao != null, "tem AnimationPlayer")
+	# e as mesmas animações
+	_checar(m.animacao != null, nome + ": tem AnimationPlayer")
 	if m.animacao:
+		_checar(m.animacao.get_animation_list().size() >= 31, nome + ": 31 animações")
 		for a in ["parada", "andar", "trote", "correr", "sprint", "comemorar", "perder", "treino_vel",
 				"treino_est", "treino_pod", "treino_det", "treino_int"]:
-			_checar(m.animacao.has_animation(a), "animação " + a)
+			_checar(m.animacao.has_animation(a), nome + ": animação " + a)
 			if m.animacao.has_animation(a):
-				_checar(m.animacao.get_animation(a).loop_mode == Animation.LOOP_LINEAR, "loop " + a)
-		_checar(m.animacao.has_animation("sim") and m.animacao.get_animation("sim").loop_mode == Animation.LOOP_NONE, "gesto toca uma vez")
+				_checar(m.animacao.get_animation(a).loop_mode == Animation.LOOP_LINEAR, nome + ": loop " + a)
+		_checar(m.animacao.has_animation("sim") and m.animacao.get_animation("sim").loop_mode == Animation.LOOP_NONE,
+			nome + ": gesto toca uma vez")
 
 	var tris := 0
-	var superficies := 0
 	for mi in m.find_children("*", "MeshInstance3D", true, false):
 		for s in mi.mesh.get_surface_count():
-			superficies += 1
 			var arr: Array = mi.mesh.surface_get_arrays(s)
 			var idx: PackedInt32Array = arr[Mesh.ARRAY_INDEX]
 			tris += idx.size() / 3 if idx.size() > 0 else arr[Mesh.ARRAY_VERTEX].size() / 3
 			var mat := mi.get_surface_override_material(s) as StandardMaterial3D
-			_checar(mat != null and mat.shading_mode == BaseMaterial3D.SHADING_MODE_UNSHADED, "material sem luz (sombra pintada)")
-			if mat and mat.cull_mode != BaseMaterial3D.CULL_BACK or (mat and mat.albedo_texture != null):
-				_checar(mat.albedo_texture != null, "textura de paleta/rosto")
-	_checar(superficies == 5, "5 superfícies: textura, rosto, 2 íris e contorno (veio %d)" % superficies)
-	_checar(tris > 1500 and tris < 5000, "triângulos low-poly (veio %d)" % tris)
+			_checar(mat != null and mat.shading_mode == BaseMaterial3D.SHADING_MODE_UNSHADED, nome + ": material sem luz")
+			_checar(mat != null and mat.albedo_texture != null, nome + ": textura")
+			_checar(mat != null and mat.next_pass != null, nome + ": contorno")
+	_checar(tris > 8000 and tris < 20000, nome + ": triângulos low-poly (veio %d)" % tris)
 
-	# altura: o topo das orelhas fica perto de 1,6 m
 	var aabb := AABB()
 	for mi in m.find_children("*", "MeshInstance3D", true, false):
 		aabb = aabb.merge(_relativo(mi, m) * mi.get_aabb())
-	_checar(aabb.size.y > 1.45 and aabb.size.y < 1.85, "altura (veio %.2f)" % aabb.size.y)
+	_checar(aabb.size.y > 1.45 and aabb.size.y < 1.85, nome + ": altura (veio %.2f)" % aabb.size.y)
 
+	# sem atlas de rosto nem ossos de olho: expressão e olhar não quebram
 	m.expressao("tonta")
-	_checar(m.expressao_atual() == "tonta", "troca de expressão")
-	_checar(m._rosto != null and m._rosto.uv1_offset.is_equal_approx(Vector3(1.0 / 3.0, 0.5, 0)), "UV da expressão no atlas")
-	_checar(m._iris[0] != null and m._iris[0].albedo_color.a == 0.0, "íris some na tonta")
-	m.expressao("piscadinha")
-	_checar(m._iris[0].albedo_color.a == 1.0 and m._iris[1].albedo_color.a == 0.0, "piscadinha: só a íris direita")
 	m.olhar(Vector2(1, 0))
-	_checar(m.olhar_atual() == Vector2(1, 0), "olhar")
-
-	print("tris=%d altura=%.2f" % [tris, aabb.size.y])
-	print("MODELO OK" if falhas.is_empty() else "MODELO FALHOU: " + "; ".join(falhas))
-	quit(0 if falhas.is_empty() else 1)
+	m.tocar("correr")
+	m.queue_free()
+	return "%s: tris=%d altura=%.2f anims=%d" % [nome, tris, aabb.size.y, m.animacoes().size()]

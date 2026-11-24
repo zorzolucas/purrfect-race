@@ -152,7 +152,7 @@ As corridas do ano 1 são na **Média**: no nível baixo a Fechadora sofre na Lo
 | — | 41–47 | *Capítulo 5: "Sem plateia"*. O evento de mesmo nome acontece aqui. | — | — |
 | 6 | 48 | GP do ano 2, Milha Grama | Top 3 | Normal |
 
-**Ponto de virada:** se ela tem **fama de 4800 ou mais** no turno 48 (era 5500 até a v0.6), segue o caminho **Ídolo**. Senão, segue **Corredora**. Liberar o evento no capítulo *Fã-clube* dá fama extra.
+**Ponto de virada:** se ela tem **fama de 5200 ou mais** no turno 48 (5500 até a v0.6, 4800 até o Prestígio de 2026-11-24), segue o caminho **Ídolo**. Senão, segue **Corredora**. Liberar o evento no capítulo *Fã-clube* dá fama extra.
 
 | Caminho | Objetivo 7 (turno 60) | GP final (turno 72) | Final |
 |---|---|---|---|
@@ -341,7 +341,7 @@ São **84 textos** no total (12 × 7). As campanhas do MVP têm mais capítulos 
 
 **Estrela** (referência: Capela). *Brilha com plateia e descobre se corre pelos aplausos ou pela pista.*
 - Objetivo 2: Maratona (2 corridas com top 6; era top 5 até a v0.6). Objetivo 4: Prata **fora de casa**, top 5.
-- Virada: fama de **4800 ou mais** no turno 48 → **Holofote**. Senão → **Pista vazia**.
+- Virada: fama de **5200 ou mais** no turno 48 (era 4800 até 2026-11-24, antes do Prestígio) → **Holofote**. Senão → **Pista vazia**.
 - Holofote: Maratona, 2 corridas com top 3 desde o GP do ano 2 (1 Ouro); GP final top 3 e à frente de {rival}. Pista vazia: vencer Ouro na casa (Difícil); GP final top 3.
 - Capítulos: 1 *"Primeira foto"*: {nome} quer ser famosa antes de correr. 2 *"Fã"*: a primeira fã aparece. 3 *"Turnê"*: ela quer correr em todo lugar. 4A *"Palco"*. 4B *"Madrugada"*.
 - Finais: A *"Palco e pista"*. B *"Sem plateia"*.

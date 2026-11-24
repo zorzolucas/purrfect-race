@@ -107,7 +107,7 @@ A fama vira um medidor com **níveis de Prestígio**. Cada nível dá um multipl
 | 1 · Conhecida | 600 | ×1,04 | Prata nas opcionais |
 | 2 · Promessa | 1500 | ×1,08 | Ouro nas opcionais |
 | 3 · Destaque | 3000 | ×1,12 | 1ª melhoria fixa de treino (§4.2) |
-| 4 · Estrela | 4800 | ×1,15 | caminho Ídolo das viradas que pedem fama |
+| 4 · Estrela | 4800 | ×1,15 | Torcida no treino (§4.3) |
 | 5 · Ídolo | 7000 | ×1,18 | 2ª melhoria fixa |
 | 6 · Lenda | 10000 | ×1,20 | título "Lenda" na ficha |
 
@@ -253,3 +253,36 @@ Em aberto:
 3. **Equipamento** com pontos de habilidade também, ou só pelo Prestígio e pela Tríplice?
 4. Quais **campanhas** trocam um objetivo de corrida por um de fama (proposta: 2 das 8, começando pela Capela).
 5. A **Treinadora convidada** sai por enquanto só do encontro genérico "Treinadora visitante" (`gen_treinadora`). Dá para pôr `"boost": "treinadora"` em mais encontros.
+
+## 8. Resultado do bot (2026-11-24)
+
+Bot de balanceamento (`testes/balanco.gd`), 48 garotas. O bot agora escolhe o equipamento pelo treino que o estilo mais usa e, quando está atrás do ritmo da próxima meta de fama, aceita correr de Azarão.
+
+**Calibração** (sementes da v0.7, 8 a 10 carreiras por garota):
+
+| Rodada | Oponentes por ano | Metas de fama | Completas |
+|---|---|---|---|
+| main (v0.7) | — | — | 33% |
+| novo, sem ajuste | 1,00 · 1,00 · 1,00 | — | 61% |
+| novo | 1,04 · 1,12 · 1,12 | — | 35% |
+| novo | 1,03 · 1,10 · 1,10 | 800 · 4000 · 8500 | 17% (a meta do ano 1 derrubava 23%) |
+| novo | 1,00 · 1,05 · 1,08 | 500 · 3500 · 8000 | 37% |
+| **final** | **1,00 · 1,09 · 1,10** | **500 · 3500 · 8000** | 34% |
+
+**Validação com sementes novas** (`SEMENTE0=1000`, 24 carreiras por garota, 1152 carreiras, conta nova):
+
+| Medida | v0.7 | Agora | Alvo |
+|---|---|---|---|
+| Completas | 35,6% | **31,8%** | ~35% |
+| Maior queda num objetivo | 18% (main, sementes da calibração) | 21,8% (turno 72, com a meta de fama) | ≤ 25% |
+| Diferença entre casas | 9,8 | 11,8 | ≤ 10 (com 24 por garota a sorte sozinha abre ~11) |
+| Diferença entre estilos | 1,8 | 6,2 (Perseguidora 35,4%, Arrancadora 29,2%) | pequena |
+| Curva média (turnos 13 a 72) | 227 / 338 / 449 / 575 / 697 / 807 | 229 / 355 / 490 / 651 / 803 / 892 | — |
+| Corridas por carreira | 16,1 | 16,2 | 14 a 20 |
+| Completas na **conta madura** (10 por garota) | 58,2% | 62,5% | ~55% |
+
+- **Metas de fama**: derrubam ~3% das que chegam no turno 24, ~6% no 48 e ~5% no 72. Quem quase não corre opcional falha a do ano 2 (fama do bot no turno 48: 10% abaixo de 3786, mediana 5343).
+- **Viradas**: as que dependem de vencer o GP do turno 48 (Durona 77%, Lira e Antares ~80%, com poucas carreiras nas do MVP) e a Sonhadora (71%) passaram de 65%. As viradas por fama foram para 5200 (Estrela 49%; a Capela teve só 6 carreiras no turno 48).
+- **A garota termina ~10% mais forte** (892 contra 807 no turno 72). As garotas salvas que vão para o **circuito do endgame** ficam mais fortes, e a força das NPCs do circuito (`data/endgame.json`) ainda não acompanhou.
+
+**Próximos ajustes:** rodar 80 carreiras por garota para separar sorte de diferença real (casas, estilos e arquétipos), recalibrar as viradas que pedem vencer o turno 48, revisar a Perseguidora +1,5% (`forca_estilo`), que pode ter ficado sobrando, e escalar o circuito do endgame.

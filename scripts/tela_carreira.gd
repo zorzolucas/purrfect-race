@@ -540,7 +540,7 @@ func _descricao_no(no: Dictionary) -> String:
 
 
 func _botao_grande(texto: String, acao: Callable) -> Button:
-	var b := UI.botao(texto, acao, 22)
+	var b := UI.quebrar(UI.botao(texto, acao, 22))
 	b.custom_minimum_size.y = 64
 	return b
 
@@ -666,7 +666,7 @@ func _loja_habilidades() -> Control:
 	for h in Dados.habilidades.lista:
 		var tem: bool = h.id in c.habilidades
 		var txt := "%s\n%s" % [h.nome, "✓ aprendida" if tem else "%d pts" % c.custo_habilidade(h.id)]
-		var b := UI.botao(txt, func(): atualizou.emit(c.comprar_habilidade(h.id)), 13)
+		var b := UI.quebrar(UI.botao(txt, func(): atualizou.emit(c.comprar_habilidade(h.id)), 13), 70)
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		b.custom_minimum_size.y = 46
 		b.tooltip_text = h.descricao
@@ -690,7 +690,7 @@ func _painel_amuleto() -> Control:
 			var id: String = c.oferta_amuleto[n_of]
 			var a := Dados.amuleto(id)
 			var tipo: String = {"simples": "Simples", "troca": "Troca", "estilo": "Estilo", "raro": "Raro"}[a.tipo]
-			var b := UI.botao("%s  (%s)\n%s" % [a.nome, tipo, a.descricao], func(): _escolher_amuleto(id), 16)
+			var b := UI.quebrar(UI.botao("%s  (%s)\n%s" % [a.nome, tipo, a.descricao], func(): _escolher_amuleto(id), 16))
 			UI.tecla(b, str(n_of + 1))
 			b.custom_minimum_size.y = 62
 			_atalho(KEY_1 + n_of, b)
@@ -704,7 +704,7 @@ func _painel_amuleto() -> Control:
 			c.limite_amuletos(), Dados.amuleto(amuleto_escolhido).nome], 18, UI.DESTAQUE, true))
 		for id in c.amuletos:
 			var a := Dados.amuleto(id)
-			v.add_child(UI.botao("Tirar %s: %s" % [a.nome, a.descricao], func(): atualizou.emit(c.escolher_amuleto(amuleto_escolhido, id)), 14))
+			v.add_child(UI.quebrar(UI.botao("Tirar %s: %s" % [a.nome, a.descricao], func(): atualizou.emit(c.escolher_amuleto(amuleto_escolhido, id)), 14)))
 		v.add_child(UI.botao("Deixar o novo de lado", func(): atualizou.emit(c.escolher_amuleto(amuleto_escolhido, "")), 14))
 	return p
 
@@ -731,7 +731,7 @@ func _cartao_corrida(cr: Dictionary) -> Control:
 	var pode := c.pode_entrar(cr)
 	if not pode:
 		linhas.append("Precisa de %d de fama" % cat.fama_entrada)
-	var b := UI.botao("\n".join(linhas), func(): _correr(cr), 14)
+	var b := UI.quebrar(UI.botao("\n".join(linhas), func(): _correr(cr), 14))
 	b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	b.custom_minimum_size.y = 124 if cr.get("fixa", false) else 108
 	b.disabled = not pode
@@ -790,7 +790,7 @@ func _painel_olheiro(cr: Dictionary, e_objetivo: bool) -> Control:
 		if cr.has("maratona"):
 			rv.add_child(UI.label("Conta só esta corrida; a maratona soma as boas colocações desde o último objetivo.", 13, UI.SUAVE, true))
 	var etq := UI.label("%s · chance de vencer ~%d%% · fama ×%s" % [Carreira.nome_etiqueta(ol.etiqueta),
-		roundi(ol.chance * 100), _mult_txt(ol.mult)], 17 if e_objetivo else 20, _cor_etiqueta(ol.etiqueta))
+		roundi(ol.chance * 100), _mult_txt(ol.mult)], 17 if e_objetivo else 20, _cor_etiqueta(ol.etiqueta), true)
 	rv.add_child(etq)
 	rv.add_child(UI.label("Favorita rende menos fama (×0,75); Azarão rende mais (×1,5).", 13, UI.SUAVE, true))
 	if cr.get("fixa", false):
@@ -813,7 +813,7 @@ func _painel_olheiro(cr: Dictionary, e_objetivo: bool) -> Control:
 		var ins: String = ordem_ins[n_ins]
 		var txt := "%s%s\n%s\nvitória ~%d%%" % [SimCorrida.INSTRUCAO_NOME[ins], " ★" if ins == ol.sugestao else "",
 			desc[ins], roundi(ol.chances[ins] * 100)]
-		var b := UI.botao(txt, func(): _largar(ins), 15)
+		var b := UI.quebrar(UI.botao(txt, func(): _largar(ins), 15))
 		UI.tecla(b, str(n_ins + 1))
 		_atalho(KEY_1 + n_ins, b)
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -881,7 +881,7 @@ func _painel_mapa() -> Control:
 			var txt := "%s %s" % [info.icone, info.nome]
 			if no.tipo == "foco":
 				txt += "\n%s" % Dados.ATTR_NOME[no.foco]
-			var b := UI.botao(txt, func(): atualizou.emit(c.escolher_no(col)), 14)
+			var b := UI.quebrar(UI.botao(txt, func(): atualizou.emit(c.escolher_no(col)), 14))
 			b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			b.custom_minimum_size.y = 50
 			b.tooltip_text = _descricao_no(no)
@@ -982,7 +982,7 @@ func _painel_encontro(e: Dictionary) -> Control:
 	v.add_child(topo)
 	for i in e.escolhas.size():
 		var idx: int = i
-		var b := UI.botao(c.texto(e.escolhas[i].texto), func(): atualizou.emit(c.escolher(idx)), 17)
+		var b := UI.quebrar(UI.botao(c.texto(e.escolhas[i].texto), func(): atualizou.emit(c.escolher(idx)), 17))
 		UI.tecla(b, str(i + 1))
 		b.custom_minimum_size.y = 50
 		_atalho(KEY_1 + i, b)
@@ -1031,8 +1031,8 @@ func _botao_acao(texto: String, acao: Callable) -> Button:
 		b = UI.botao(texto, func(): atualizou.emit(acao.call()), 14)
 	else:
 		b = UI.botao(texto, func(): pass, 14)
-	b.custom_minimum_size = Vector2(130, 112)
-	return b
+	b.custom_minimum_size = Vector2(110, 112)
+	return UI.quebrar(b)
 
 
 ## Liga uma tecla a um botão: a tecla aperta o botão (respeitando se está desabilitado).

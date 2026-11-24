@@ -153,6 +153,15 @@ static func label_contorno(texto: String, tamanho: int, cor: Color, contorno: Co
 	return l
 
 
+## Deixa o texto do botão quebrar linha em vez de alargar o botão (e a tela junto). Para
+## botões que ocupam a largura disponível (EXPAND_FILL ou dentro de VBox): a largura mínima
+## vira `largura_min`, e a altura cresce com as linhas.
+static func quebrar(b: Button, largura_min: float = 90.0) -> Button:
+	b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	b.custom_minimum_size.x = maxf(b.custom_minimum_size.x, largura_min)
+	return b
+
+
 static func botao(texto: String, acao: Callable, tamanho: int = 16) -> Button:
 	var b := Button.new()
 	b.text = texto

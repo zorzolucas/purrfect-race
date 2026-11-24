@@ -186,7 +186,7 @@ func abrir(nome: String) -> void:
 		ret.call_deferred("gesto", cv.get("gesto", ""))
 		for i in cv.escolhas.size():
 			var idx: int = i
-			var b := UI.botao(_texto(cv.escolhas[i].texto, nome), func(): _escolher(nome, idx), 17)
+			var b := UI.quebrar(UI.botao(_texto(cv.escolhas[i].texto, nome), func(): _escolher(nome, idx), 17))
 			b.custom_minimum_size.y = 46
 			v.add_child(b)
 	_painel.add_child(v)

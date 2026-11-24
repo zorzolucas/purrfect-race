@@ -79,6 +79,8 @@ encontro com uma expressão e um gesto simples (pulinho, concordar, negar, encol
 reage à escolha com outra expressão e um balão (coração, nota, "!", "..."). As 40 garotas
 sem ficha usam o círculo com a inicial e a gata de primitivas com as cores da pelagem.
 
+**Guia do jogo:** aperte **F1** em qualquer tela (ou o botão Guia da academia e da carreira, ou "Como jogar" na primeira tela) para abrir o guia: 10 capítulos com o loop do jogo, atributos, turno e treino, energia e humor, objetivos e rotas, corridas, fama e prêmios, clima e encontros, academia e endgame. Ele abre sozinho quando o jogador escolhe a primeira garota. O texto fica em `data/tutorial.json`, e os números entre chaves (`{bal:descanso}`, `{d:calendario.categorias.prata.fama_entrada}`) são lidos dos dados do jogo, então mudar o balanceamento atualiza o guia sozinho.
+
 **Save:** a carreira é salva sozinha a cada turno (`user://carreira.json`). Na tela inicial
 aparece o botão para continuar.
 
@@ -131,6 +133,9 @@ Fora a Lira na pista e os sprites das fichas, a arte é placeholder (formas colo
 | `testes/instrucao.gd` | Compara as 3 instruções em corridas equilibradas e mede o erro do olheiro contra corridas reais. |
 | `testes/teste_patio.gd` | Testa aniversários, eventos do pátio, conversas (uma por turno, afinidade 30+), reações, save e monta a cena 3D em todos os eventos. |
 | `testes/capturas_patio.gd` | Capturas do pátio, das conversas e dos encontros com expressões. |
+| `scripts/tela_guia.gd`, `data/tutorial.json` | Guia do jogo (F1): capítulos e páginas com texto, cartões, tabelas e dicas; os números vêm dos dados. |
+| `testes/teste_guia.gd` | Confere o guia: tipos de bloco, chaves com valor nos dados e todas as páginas montando sem erro. |
+| `testes/capturas_guia.gd` | Capturas de todas as páginas do guia e dele aberto por cima da carreira. |
 | `testes/capturas.gd` | Passa pelas telas sozinho e salva capturas em `testes/capturas/`. |
 | `testes/capturas_novas.gd` | Capturas da madrinha, do olheiro, dos cartões de corrida e dos títulos. |
 | `tools/importar_visual.py` | Lê as fichas de [visual-elenco.md](docs/visual-elenco.md) e grava signo, aniversário e visual em `data/garotas.json` e `data/rivais.json`. |

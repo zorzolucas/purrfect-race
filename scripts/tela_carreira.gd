@@ -96,6 +96,11 @@ func _barra_topo() -> Control:
 	clima.tooltip_text = cl.get("descricao", cl.nome)
 	clima.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	h.add_child(clima)
+	var b_guia := UI.botao("Guia", func(): TelaGuia.abrir(self, "turno"), 14)
+	b_guia.tooltip_text = "Como funcionam treino, energia, humor, corridas e objetivos (F1)"
+	UI.tecla(b_guia, "F1")
+	b_guia.custom_minimum_size.x = 100
+	h.add_child(b_guia)
 	var b_menu := UI.botao("Academia", func(): ir_academia.emit(), 14)
 	b_menu.tooltip_text = "Volta à academia (Esc). A carreira fica salva e continua de onde parou."
 	UI.tecla(b_menu, "Esc")

@@ -95,6 +95,8 @@ func _rodar(nome: String, n: int, conta: String) -> Dictionary:
 	var detalhe := []  # cada corrida de objetivo: semente, turno, clima, posição, média, chance do olheiro
 	var parar_em := int(OS.get_environment("PARAR_EM")) if OS.has_environment("PARAR_EM") else 999
 	var com_titulo := {}  # carreiras com pelo menos 1 título de cada tipo
+	var fama_metas := {}  # turno da meta -> fama de cada carreira que chegou nela (antes da conferência)
+	var caiu_meta := {}   # turno da meta -> carreiras que acabaram por falta de fama
 	for i in n:
 		var madrinha := {}
 		var vinculo := 0
@@ -143,6 +145,12 @@ func _rodar(nome: String, n: int, conta: String) -> Dictionary:
 						c.escolher_amuleto(c.oferta_amuleto[0])
 					else:
 						c.escolher_amuleto(c.oferta_amuleto[0], c.amuletos[0])
+				"equipamento":
+					var melhor_t: String = c.opcoes_equipamento()[0]
+					for t in c.opcoes_equipamento():
+						if peso[t] > peso[melhor_t]:
+							melhor_t = t
+					c.escolher_equipamento(melhor_t)
 				"mapa":
 					c.escolher_no(_melhor_no(c))
 				"ferias":
@@ -170,6 +178,10 @@ func _rodar(nome: String, n: int, conta: String) -> Dictionary:
 							"npc_mult": npc_mult / (corrida.field.size() - 1), "humor": c.humor, "energia": c.energia})
 					c.registrar_corrida(pos, CarreiraS.extra_da_corrida(corrida, ordem, sim.ordem_meio))
 					corridas += 1
+					if p == "objetivo" and not c.meta_fama_do_turno(t0).is_empty() and c.resultados[-1].ok:
+						fama_metas[t0] = fama_metas.get(t0, []) + [c.fama]
+						if c.falhou_objetivo:
+							caiu_meta[t0] = caiu_meta.get(t0, 0) + 1
 					if c.falhou_objetivo and OS.has_environment("CURVA"):
 						# modo curva: segue a carreira depois da falha, só para medir os atributos
 						c.falhou_objetivo = false
@@ -215,7 +227,8 @@ func _rodar(nome: String, n: int, conta: String) -> Dictionary:
 		"n": n, "conta": conta, "passou": passou, "caminho": caminho, "completou": completou,
 		"curva": cv, "fama32": fama32 / maxi(1, passou[2]), "fama40": fama40 / maxi(1, passou[3]),
 		"corridas": float(corridas) / n, "gp_final": gp_final, "gp2_venceu": gp2_venceu, "na_virada": na_virada,
-		"instrucoes": instrucoes, "etiquetas": etiquetas, "titulos": titulos, "com_titulo": com_titulo, "detalhe": detalhe}
+		"instrucoes": instrucoes, "etiquetas": etiquetas, "titulos": titulos, "com_titulo": com_titulo, "detalhe": detalhe,
+		"fama_metas": fama_metas, "caiu_meta": caiu_meta}
 
 
 func _imprimir(r: Dictionary) -> void:
@@ -228,6 +241,21 @@ func _imprimir(r: Dictionary) -> void:
 		"/".join(r.curva.map(func(x): return str(x))), r.fama32, r.fama40, r.corridas, r.gp_final,
 		"/".join([r.instrucoes.poupar, r.instrucoes.normal, r.instrucoes.forcar].map(func(x): return str(x))),
 		"/".join([r.etiquetas.favorita, r.etiquetas.disputada, r.etiquetas.azarao].map(func(x): return str(x))), r.titulos])
+
+
+## Fama abaixo do ritmo da próxima meta (linha reta desde a anterior), com 10% de folga.
+func _atrasada(c) -> bool:
+	var m: Dictionary = c.proxima_meta_fama()
+	if m.is_empty():
+		return false
+	var t0 := 0
+	var f0 := 0
+	for x in c.CRESC().metas_fama:
+		if int(x.turno) < int(m.turno):
+			t0 = int(x.turno)
+			f0 = int(x.fama)
+	var ritmo: float = f0 + (float(m.fama) - f0) * float(c.turno - t0) / float(int(m.turno) - t0)
+	return c.fama < ritmo * 1.1
 
 
 func _melhor_no(c) -> int:
@@ -274,7 +302,8 @@ func _acao(c, peso: Dictionary) -> void:
 			if not c.pode_entrar(cr) or media * apt < forca * 0.85:
 				continue
 			var ol: Dictionary = c.olheiro(cr)
-			if ol.etiqueta == "azarao":
+			# atrás do ritmo da meta de fama, aceita correr de Azarão
+			if ol.etiqueta == "azarao" and not _atrasada(c):
 				continue
 			var valor: float = c.fama_prevista(cr, 1, ol.mult) * (0.5 + ol.chance)
 			if melhor.is_empty() or valor > melhor_valor:

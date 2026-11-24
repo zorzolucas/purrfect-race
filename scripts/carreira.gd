@@ -38,10 +38,9 @@ const BAL := {
 	"inspiracao_valor": 15.0,
 	"inspiracao_apt": 0.2,     # chance de subir 1 nível a aptidão de distância e a de piso da madrinha
 	# corridas (calendario.md §7)
-	"energia_corrida": 15,
+	"energia_corrida": 20,     # era 15: a corrida passou a dar atributo como um treino
 	"energia_seguidas": 10,    # extra na 3ª corrida em 3 turnos seguidos
-	# atributos por corrida, em cada atributo (vence = x1, top 3 = x0,8, resto = x0,5)
-	"atributos_corrida": {"estreia": 5, "aberta": 6, "prata": 9, "ouro": 12, "gp1": 12, "gp2": 15, "gp3": 15},
+	# os atributos de uma corrida saem de calendario.json (crescimento.corrida, docs/fama-e-crescimento.md §1)
 	"humor_seguidas": 0.3,
 	# moeda (GDD §6.1)
 	"moeda_por_fama": 5,       # 1 moeda a cada 5 de fama ganha numa corrida
@@ -136,6 +135,12 @@ var patio_vistos: Array = [] # conversas próprias de cada colega já vistas no 
 ## Não vai para o save: a tela consome e limpa.
 var ultima_reacao := {}
 var _cache_olheiro := {}
+# fama, corridas e boosts (docs/fama-e-crescimento.md)
+var boosts: Array = []       # [{id, nome, efeito, ate (último turno em que vale), treinos (-1 = sem limite), alvo}]
+var equipamento := {"vel": 0, "est": 0, "pod": 0, "det": 0, "int": 0}  # grau 0 a 3 por treino
+var equip_pendente := 0      # graus de equipamento ganhos e ainda não escolhidos
+var prestigio_visto := 0     # maior Prestígio já alcançado (as recompensas saem uma vez)
+var torcida_trecho := -1     # trecho em que a Torcida no treino já apareceu
 
 
 ## opcoes (endgame): {magnitude, regra, desafio}. Tudo que elas mudam sai da semente, então
@@ -294,12 +299,14 @@ func acampamento() -> String:
 
 
 ## O que a tela precisa resolver antes das ações normais deste turno:
-## "encontro", "amuleto", "mapa", "ferias", "corrida", "objetivo", "sem_fama" ou "" (ações).
+## "encontro", "amuleto", "equipamento", "mapa", "ferias", "corrida", "objetivo", "sem_fama" ou "" (ações).
 func pendencia() -> String:
 	if not encontro_pendente.is_empty():
 		return "encontro"
 	if not oferta_amuleto.is_empty():
 		return "amuleto"
+	if equip_pendente > 0 and opcoes_equipamento().size() > 0:
+		return "equipamento"
 	if not corrida_atual.is_empty():
 		return "corrida"
 	var t := trecho()
@@ -373,6 +380,10 @@ func chance_falha(t: String = "") -> float:
 	var c: float = BAL.falha_max * float(BAL.limite_falha - energia) / BAL.limite_falha
 	if serra and t in ["est", "det"]:
 		c *= 2.0
+	if t != "":
+		c *= float(CRESC().equipamento.falha[equipamento[t]])
+	for f in _efeito("falha_mult"):
+		c *= float(f)
 	return minf(maxf(c, minimo), 0.95)
 
 
@@ -381,7 +392,8 @@ func custo(t: String) -> int:
 	if clima() == "calor":
 		c += 5
 	c += int(_soma("custo_treino"))
-	return c
+	c -= int(CRESC().equipamento.energia[equipamento[t]])
+	return maxi(0, c)
 
 
 func ganho_previsto(t: String) -> Dictionary:
@@ -389,6 +401,7 @@ func ganho_previsto(t: String) -> Dictionary:
 	if t in naturais:
 		m *= 1.0 + (_soma("natural") if tem_efeito("natural") else BAL.bonus_natural)
 	m *= 1.0 + _soma("ganho_todos")
+	m *= mult_prestigio() * (1.0 + float(CRESC().equipamento.ganho[equipamento[t]]))
 	if lesionada:
 		m *= BAL.corte_lesao
 	if duplas.has(t):
@@ -448,6 +461,7 @@ func treinar(t: String) -> String:
 			ultima_lesao = turno
 			txt += " Ela se machucou de leve."
 		_limitar()
+		_consumir_treino()
 		_fim_turno()
 		return txt
 	var g := ganho_previsto(t)
@@ -467,6 +481,7 @@ func treinar(t: String) -> String:
 		_mudar_afinidade(colega, BAL.afinidade_por_dupla)
 		txt += " Treino em dupla com %s!" % _curto(colega)
 	_limitar()
+	_consumir_treino()
 	_fim_turno()
 	return txt
 
@@ -486,6 +501,9 @@ func descanso_previsto() -> int:
 func descansar() -> String:
 	energia = mini(100, energia + descanso_previsto())
 	var txt := "%s descansou e recuperou energia." % _primeiro_nome()
+	if humor == 4:
+		adicionar_boost("foco")
+		txt += " Com o humor lá em cima, ela entra em Foco total."
 	if lesionada:
 		lesionada = false
 		txt += " A lesão sarou."
@@ -545,7 +563,9 @@ func forca_categoria(cat: String, dist: String = "") -> float:
 	# por categoria e distância: um número ou uma lista com um valor por ano
 	var pc = cal.get("forca_distancia_cat", {}).get(cat, {}).get(dist, 1.0)
 	var por_cat: float = float(pc[mini(pc.size() - 1, ano)]) if pc is Array else float(pc)
-	return base * float(cal.get("forca_distancia", {}).get(dist, 1.0)) * por_cat
+	# o pelotão acompanha o crescimento com o Prestígio mínimo das metas de fama (fama-e-crescimento.md §3)
+	var cres: Array = cal.crescimento.forca_npc_ano
+	return base * float(cal.get("forca_distancia", {}).get(dist, 1.0)) * por_cat * float(cres[mini(cres.size() - 1, ano)])
 
 
 func pode_entrar(c: Dictionary) -> bool:
@@ -832,9 +852,12 @@ func registrar_corrida(posicao: int, extra: Dictionary = {}) -> String:
 	moeda_corridas += premio
 	var ganho_pontos := pontos_previstos(c, posicao)
 	pontos += ganho_pontos
-	var ganho_attr: float = float(BAL.atributos_corrida.get(c.cat, 0)) * (1.0 if posicao == 1 else (0.8 if posicao <= 3 else 0.5))
-	for k in attrs:
-		attrs[k] += ganho_attr
+	var ganho_attr := ganho_corrida(c, posicao)
+	var partes_attr := []
+	for k in SimCorrida.KEYS:
+		var antes: float = attrs[k]
+		attrs[k] = minf(limite, attrs[k] + round(ganho_attr[k]))
+		partes_attr.append("+%d %s" % [roundi(attrs[k] - antes), Dados.ATTR_CURTO[k]])
 	_limitar()
 	var custo_e: int = energia_corrida()
 	var seguida := _corrida_seguida()
@@ -842,9 +865,10 @@ func registrar_corrida(posicao: int, extra: Dictionary = {}) -> String:
 		custo_e += BAL.energia_seguidas
 	energia = maxi(0, energia - custo_e)
 	turnos_com_corrida.append(turno)
-	var txt := "%s terminou em %dº na %s. +%d de fama (%s, ×%s), +%d em cada atributo, +%d pontos de habilidade, %d moedas." % [
+	var txt := "%s terminou em %dº na %s. +%d de fama (%s, ×%s), %s, +%d pontos de habilidade, %d moedas." % [
 		_primeiro_nome(), posicao, c.nome, ganho_fama, nome_etiqueta(ol.etiqueta), str(ol.mult).replace(".", ","),
-		roundi(ganho_attr), ganho_pontos, premio]
+		" ".join(partes_attr), ganho_pontos, premio]
+	txt += _boosts_da_corrida(c, posicao)
 	if seguida and _rng("seguidas").randf() < BAL.humor_seguidas:
 		_mudar_humor(-1)
 		txt += " Três corridas seguidas pesaram no humor."
@@ -869,6 +893,7 @@ func registrar_corrida(posicao: int, extra: Dictionary = {}) -> String:
 		_mudar_humor(-2)
 	elif e_obj and not ok:
 		_mudar_humor(-1)
+	txt += _expectativa(posicao)
 	if c.get("desafio", false):
 		desafios_feitos.append(turno)
 		if posicao <= 3:
@@ -888,6 +913,14 @@ func registrar_corrida(posicao: int, extra: Dictionary = {}) -> String:
 		falhou_objetivo = true
 		terminou = true
 		return txt + " O objetivo era: %s. A carreira acaba aqui." % obj.texto.to_lower()
+	txt += _checar_prestigio()
+	var mf := meta_fama_do_turno(turno)
+	if e_obj and not mf.is_empty():
+		if fama < int(mf.fama):
+			falhou_objetivo = true
+			terminou = true
+			return txt + " Mas a meta de fama \"%s\" pedia %d de fama até aqui, e ela tem %d. A carreira acaba aqui." % [mf.nome, mf.fama, fama]
+		txt += " Meta de fama \"%s\" cumprida (%d de %d)!" % [mf.nome, fama, mf.fama]
 	if e_obj and turno == Campanha.TURNO_VIRADA:
 		txt += " " + _decidir_caminho()
 	if e_obj and turno < BAL.turnos:
@@ -973,7 +1006,8 @@ func _checar_series() -> String:
 		if s.id.begins_with("triplice"):
 			fama += int(cfg.triplice.fama)
 			oferecer_amuleto(4, true)
-			premio = "+%d de fama e um amuleto para escolher" % cfg.triplice.fama
+			equip_pendente += 1
+			premio = "+%d de fama, um amuleto e um grau de equipamento para escolher" % cfg.triplice.fama
 		elif s.id.begins_with("coroa"):
 			fama += int(cfg.coroa.fama)
 			var fraco := "terra" if Dados.APT[aptidao.terra] < Dados.APT[aptidao.grama] or \
@@ -1062,9 +1096,15 @@ func _inspiracao() -> void:
 func _fim_turno(chance_encontro: float = BAL.chance_encontro) -> void:
 	turno += 1
 	_cache_olheiro.clear()  # a chave tem o turno: as estimativas antigas não servem mais
+	boosts = boosts.filter(func(b): return int(b.ate) >= turno)
+	_checar_prestigio()
 	if turno > BAL.turnos:
 		terminou = true
 		return
+	var cfg_t: Dictionary = CRESC().boosts.torcida
+	if prestigio() >= int(cfg_t.prestigio) and trecho() >= 0 and trecho() != torcida_trecho:
+		torcida_trecho = trecho()
+		adicionar_boost("torcida")
 	var r := _rng("humor")
 	var x := r.randf()
 	if x < 0.07:
@@ -1284,6 +1324,8 @@ func _aplicar_efeitos(ef: Dictionary, outra: String) -> Array:
 				partes.append("fama %+d" % v)
 			"serra":
 				serra = true
+			"boost":
+				partes.append(adicionar_boost(str(v)))
 			"pontos":
 				if pontos + int(v) < 0:
 					partes.append("sem pontos suficientes, nada mudou")
@@ -1429,7 +1471,7 @@ const CAMPOS_SAVE := ["attrs", "energia", "humor", "lesionada", "turno", "usos_t
 	"ultimo_encontro", "ultima_corrida", "duplas", "encontro_pendente", "moeda_corridas",
 	"pontos", "habilidades", "amuletos", "oferta_amuleto", "estrela_usada",
 	"caminho", "flags", "ultima_lesao", "saidas", "viradas", "madrinha", "aptidao", "instrucao", "titulos",
-	"conversa_turno", "patio_vistos"]
+	"conversa_turno", "patio_vistos", "boosts", "equipamento", "equip_pendente", "prestigio_visto", "torcida_trecho"]
 
 
 ## Salva também a carreira terminada: ela só é apagada depois que o jogador decide
@@ -1484,8 +1526,14 @@ static func carregar() -> Carreira:
 		if d.has(campo):
 			c.set(campo, d[campo])
 	# o JSON devolve todos os números como float
-	for campo in ["energia", "humor", "turno", "fama", "moeda_corridas", "pontos", "ultima_lesao", "saidas", "viradas", "conversa_turno"]:
+	for campo in ["energia", "humor", "turno", "fama", "moeda_corridas", "pontos", "ultima_lesao", "saidas", "viradas", "conversa_turno",
+			"equip_pendente", "prestigio_visto", "torcida_trecho"]:
 		c.set(campo, int(c.get(campo)))
+	for t in c.equipamento:
+		c.equipamento[t] = int(c.equipamento[t])
+	for b in c.boosts:
+		b.ate = int(b.ate)
+		b.treinos = int(b.treinos)
 	for t in c.usos_treino:
 		c.usos_treino[t] = int(c.usos_treino[t])
 	for k in c.afinidade:
@@ -1543,6 +1591,9 @@ func _efeito(chave: String) -> Array:
 		var ef: Dictionary = Dados.amuleto(a).get("efeito", {})
 		if ef.has(chave):
 			lista.append(ef[chave])
+	for b in boosts:
+		if b.efeito.has(chave):
+			lista.append(b.efeito[chave])
 	return lista
 
 
@@ -1632,3 +1683,172 @@ func _ganhar_habilidade(id: String) -> String:
 	habilidades.append(id)
 	return "aprendeu %s" % h.nome
 
+
+# ---------- fama, corridas e boosts (docs/fama-e-crescimento.md) ----------
+
+func CRESC() -> Dictionary:
+	return Dados.calendario.crescimento
+
+
+## Nível de Prestígio pela fama (0 a 6).
+func prestigio() -> int:
+	var n := 0
+	var lista: Array = CRESC().prestigio
+	for i in lista.size():
+		if fama >= int(lista[i].fama):
+			n = i
+	return n
+
+
+func nome_prestigio(n: int = -1) -> String:
+	return CRESC().prestigio[prestigio() if n < 0 else n].nome
+
+
+## Multiplicador do Prestígio no ganho de treino e de corrida.
+func mult_prestigio() -> float:
+	return float(CRESC().prestigio[prestigio()].mult)
+
+
+## Fama do próximo degrau de Prestígio, ou -1 no último.
+func fama_proximo_prestigio() -> int:
+	var lista: Array = CRESC().prestigio
+	var n := prestigio()
+	return int(lista[n + 1].fama) if n + 1 < lista.size() else -1
+
+
+## Dá as recompensas dos degraus novos (uma vez cada) e devolve o texto.
+func _checar_prestigio() -> String:
+	var n := prestigio()
+	var partes := []
+	while prestigio_visto < n:
+		prestigio_visto += 1
+		var d: Dictionary = CRESC().prestigio[prestigio_visto]
+		var p := "Prestígio %d: %s (ganho ×%s)" % [prestigio_visto, d.nome, str(d.mult).replace(".", ",")]
+		if d.has("equipamento"):
+			equip_pendente += int(d.equipamento)
+			p += ", e um grau de equipamento para escolher"
+		partes.append(p)
+	return "" if partes.is_empty() else " " + ". ".join(partes) + "!"
+
+
+## Atributos que uma corrida dá: um treino no nível médio dos treinos dela, pela categoria,
+## colocação e Prestígio, espalhado pelo perfil da distância (fama-e-crescimento.md §1).
+func ganho_corrida(c: Dictionary, posicao: int) -> Dictionary:
+	var cfg: Dictionary = CRESC().corrida
+	var nivel := 0.0
+	for t in usos_treino:
+		nivel += nivel_treino(t)
+	nivel /= usos_treino.size()
+	var pos_mult := 0.35
+	for faixa in cfg.posicao:
+		if posicao <= int(faixa[0]):
+			pos_mult = float(faixa[1])
+			break
+	var total: float = (BAL.ganho_principal + BAL.ganho_secundario) * (1.0 + BAL.bonus_nivel * (nivel - 1.0)) \
+		* float(cfg.categoria.get(c.cat, 1.0)) * pos_mult * mult_prestigio()
+	var perfil: Dictionary = cfg.perfil[c.dist].duplicate()
+	if c.piso == "terra":
+		var x: float = cfg.terra_vel_para_pod
+		perfil.vel -= x
+		perfil.pod += x
+	var g := {}
+	for k in SimCorrida.KEYS:
+		g[k] = total * float(perfil[k]) * _retorno(k)
+	return g
+
+
+## Atributo que a corrida mais puxa (para a Lição da derrota).
+func atributo_da_corrida(c: Dictionary) -> String:
+	var perfil: Dictionary = CRESC().corrida.perfil[c.dist]
+	var melhor := "vel"
+	for k in perfil:
+		if float(perfil[k]) > float(perfil[melhor]):
+			melhor = k
+	return melhor
+
+
+## Boosts que saem do resultado: Embalo na vitória, Lição no 2º e 3º, Cansaço com corridas demais.
+func _boosts_da_corrida(c: Dictionary, posicao: int) -> String:
+	var txt := ""
+	if posicao == 1:
+		txt += " " + adicionar_boost("embalo") + "!"
+	elif posicao <= 3:
+		txt += " " + adicionar_boost("licao", atributo_da_corrida(c)) + "!"
+	var cfg: Dictionary = CRESC().boosts.cansaco
+	var recentes := turnos_com_corrida.filter(func(t): return t > turno - int(cfg.janela)).size()
+	if recentes >= int(cfg.corridas):
+		txt += " " + adicionar_boost("cansaco") + "."
+	return txt
+
+
+## Fama alta cobra: fora do top 5, a torcida pode derrubar o humor.
+func _expectativa(posicao: int) -> String:
+	var cfg: Dictionary = CRESC().expectativa
+	if posicao <= int(cfg.top):
+		return ""
+	var chance := 0.0
+	for par in cfg.chances:
+		if prestigio() >= int(par[0]):
+			chance = float(par[1])
+	if chance <= 0.0 or _rng("expectativa").randf() >= chance:
+		return ""
+	_mudar_humor(-1)
+	return " A torcida esperava mais, e o humor caiu."
+
+
+## Põe (ou renova) um boost temporário. alvo = treino, para os que sobem um nível.
+func adicionar_boost(id: String, alvo: String = "") -> String:
+	var cfg: Dictionary = CRESC().boosts[id]
+	if cfg.texto.contains("%s") and alvo == "":
+		alvo = SimCorrida.KEYS[_rng("boost:" + id).randi() % 5]
+	var ef: Dictionary = cfg.efeito.duplicate()
+	if alvo != "":
+		ef["nivel"] = alvo
+	boosts = boosts.filter(func(b): return b.id != id)
+	boosts.append({"id": id, "nome": cfg.nome, "efeito": ef, "ate": turno + int(cfg.turnos),
+		"treinos": int(cfg.get("treinos", -1)), "alvo": alvo})
+	return "%s: %s" % [cfg.nome, texto_boost(boosts[-1]).trim_suffix(".")]
+
+
+func texto_boost(b: Dictionary) -> String:
+	var t: String = CRESC().boosts[b.id].texto
+	return t % Dados.ATTR_NOME[b.alvo] if t.contains("%s") else t
+
+
+## Boosts que valem por número de treinos gastam 1 a cada treino.
+func _consumir_treino() -> void:
+	for b in boosts:
+		if int(b.treinos) > 0:
+			b.treinos = int(b.treinos) - 1
+	boosts = boosts.filter(func(b): return int(b.treinos) != 0)
+
+
+## Meta de fama conferida neste turno ({} se não houver).
+func meta_fama_do_turno(t: int) -> Dictionary:
+	for m in CRESC().metas_fama:
+		if int(m.turno) == t:
+			return m
+	return {}
+
+
+## Próxima meta de fama a conferir ({} depois da última).
+func proxima_meta_fama() -> Dictionary:
+	for m in CRESC().metas_fama:
+		if int(m.turno) >= turno:
+			return m
+	return {}
+
+
+## Treinos que ainda podem subir de grau.
+func opcoes_equipamento() -> Array:
+	return SimCorrida.KEYS.filter(func(t): return equipamento[t] < CRESC().equipamento.ganho.size() - 1)
+
+
+func escolher_equipamento(t: String) -> String:
+	equipamento[t] += 1
+	equip_pendente = maxi(0, equip_pendente - 1)
+	var cfg: Dictionary = CRESC().equipamento
+	var g: int = equipamento[t]
+	return "Equipamento de %s no grau %d: +%d%% de ganho%s%s." % [Dados.ATTR_NOME[t], g, roundi(float(cfg.ganho[g]) * 100),
+		", −%d de energia" % cfg.energia[g] if int(cfg.energia[g]) > 0 else "",
+		", falha −%d%%" % roundi((1.0 - float(cfg.falha[g])) * 100) if float(cfg.falha[g]) < 1.0 else ""]

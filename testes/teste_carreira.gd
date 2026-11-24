@@ -41,6 +41,10 @@ func _passo(c, r: RandomNumberGenerator) -> String:
 			var i: int = r.randi() % e.escolhas.size()
 			c.escolher(i)
 			return "e%d" % i
+		"equipamento":
+			var ops: Array = c.opcoes_equipamento()
+			c.escolher_equipamento(ops[r.randi() % ops.size()])
+			return "q"
 		"amuleto":
 			var oferta: Array = c.oferta_amuleto
 			if r.randf() < 0.15:

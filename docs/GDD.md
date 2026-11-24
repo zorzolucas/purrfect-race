@@ -415,6 +415,7 @@ Da análise de UI das referências: personagem grande no centro e informação e
 - [Elenco](elenco.md): as 6 garotas do MVP com eventos, 2 rivais e o elenco completo de 48.
 - [Visual do elenco](visual-elenco.md): signo, aniversário, pelagem, corpo, orelhas, rabo e personalidade de cada garota.
 - [Calendário da carreira](calendario.md): turnos, objetivos, mapa de rotas, clima, amuletos, semente, magnitude, fama e férias.
+- [Fama, corridas e boosts de treino](fama-e-crescimento.md) (proposta): corrida que dá atributo como treino, Prestígio, metas de fama e boosts.
 - [Campanhas e balanceamento](campanhas.md): metas de dificuldade, endgame, as campanhas do MVP, os 12 arquétipos das outras 42 garotas e o plano do bot.
 - [MCP do Blender](mcp-blender.md) e [MCP do Godot](mcp-godot.md): ferramentas para modelar e montar o jogo.
 - [Fórmula da corrida](corrida.md): fases, velocidade, fôlego, bloqueio, habilidades e calibração.

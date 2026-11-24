@@ -127,7 +127,7 @@ func _palco() -> Control:
 	var l_fama := UI.label(str(c.fama), 18, UI.DESTAQUE)
 	l_fama.add_theme_font_override("font", UI.negrito())
 	hf.add_child(l_fama)
-	hf.tooltip_text = "Fama: abre as corridas de categoria mais alta"
+	hf.tooltip_text = "Fama: sobe o Prestígio, que multiplica o ganho de treino e de corrida, e abre as corridas de categoria mais alta"
 	hf.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	var dfama: int = _delta.get("fama", 0)
 	if dfama != 0:
@@ -137,6 +137,7 @@ func _palco() -> Control:
 		UI.pop(lf, 0.3)
 	topo.add_child(hf)
 	v.add_child(topo)
+	v.add_child(_bloco_prestigio())
 	v.add_child(UI.label("%s · %s" % [Dados.ESTILO_NOME[c.estilo], "lesionada (treino rende metade)" if c.lesionada else "pronta para treinar"],
 		13, UI.PERIGO if c.lesionada else UI.SUAVE))
 
@@ -161,6 +162,9 @@ func _palco() -> Control:
 	var cor_e := UI.VERDE if c.energia >= 60 else (UI.LARANJA if c.energia >= Carreira.BAL.limite_falha else UI.PERIGO)
 	v.add_child(_linha_barra("Energia", c.energia, 100, cor_e, "energia"))
 	v.add_child(_chips_aptidao())
+	var fb := _chips_boosts()
+	if fb:
+		v.add_child(fb)
 	var bot := UI.hbox(6)
 	for d in [["objetivos", "Objetivos", "O"], ["relacoes", "Relações", "R"], ["itens", "Itens", "I"]]:
 		var id: String = d[0]
@@ -170,6 +174,56 @@ func _palco() -> Control:
 	v.add_child(bot)
 	p.add_child(v)
 	return p
+
+
+## Prestígio: selo com o nível, multiplicador do ganho, barra até o próximo degrau e a meta de
+## fama do ano (docs/fama-e-crescimento.md §2 e §3).
+func _bloco_prestigio() -> Control:
+	var v := UI.vbox(3)
+	var h := UI.hbox(6)
+	var n := c.prestigio()
+	var cap := UI.capsula("Prestígio %d · %s" % [n, c.nome_prestigio()], UI.OURO if n >= 4 else (UI.ROXO if n >= 2 else UI.CEU), 13)
+	cap.tooltip_text = "Cada degrau de Prestígio multiplica todo ganho de treino e de corrida daqui para frente."
+	cap.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	h.add_child(cap)
+	h.add_child(UI.label("ganho ×%s" % _mult_txt(c.mult_prestigio()), 13, UI.DESTAQUE))
+	var prox := c.fama_proximo_prestigio()
+	if prox > 0:
+		var base: int = int(c.CRESC().prestigio[n].fama)
+		var b := UI.barra(c.fama - base, prox - base, UI.OURO, 90)
+		b.custom_minimum_size.y = 12
+		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		b.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		b.tooltip_text = "Próximo degrau com %d de fama" % prox
+		h.add_child(b)
+	v.add_child(h)
+	var m := c.proxima_meta_fama()
+	if not m.is_empty():
+		var falta: int = int(m.fama) - c.fama
+		var cor := UI.OK if falta <= 0 else (UI.PERIGO if int(m.turno) - c.turno <= 6 else UI.SUAVE)
+		var l := UI.label("Meta de fama \"%s\": %d/%d até o turno %d%s" % [m.nome, c.fama, m.fama, m.turno,
+			" ✓" if falta <= 0 else ""], 13, cor, true)
+		l.tooltip_text = "Conferida depois do objetivo do turno %d. Sem a fama, a carreira acaba." % m.turno
+		v.add_child(l)
+	return v
+
+
+## Boosts ativos (temporários) em cápsulas, com quanto falta.
+func _chips_boosts() -> Control:
+	if c.boosts.is_empty():
+		return null
+	var f := HFlowContainer.new()
+	f.add_theme_constant_override("h_separation", 4)
+	f.add_theme_constant_override("v_separation", 4)
+	for b in c.boosts:
+		var cfg: Dictionary = c.CRESC().boosts[b.id]
+		var resta: int = int(b.ate) - c.turno + 1
+		var dur := "%d treino" % b.treinos if int(b.treinos) > 0 else "%d turno%s" % [resta, "s" if resta > 1 else ""]
+		var ruim := float(b.efeito.get("ganho_todos", 0.0)) < 0.0
+		var cap := UI.capsula("%s %s · %s" % [cfg.icone, cfg.nome, dur], UI.PERIGO if ruim else UI.VERDE, 12)
+		cap.tooltip_text = c.texto_boost(b)
+		f.add_child(cap)
+	return f
 
 
 # ---------- atributos em blocos ----------
@@ -460,6 +514,16 @@ func _detalhe_itens(v: VBoxContainer) -> void:
 	if not c.titulos.is_empty():
 		v.add_child(HSeparator.new())
 		v.add_child(UI.label("Títulos: %s" % ", ".join(c.titulos.map(func(t): return t.nome)), 14, UI.DESTAQUE, true))
+	v.add_child(HSeparator.new())
+	v.add_child(UI.label("Equipamento da academia", 16, UI.DESTAQUE))
+	var eq := []
+	for t in SimCorrida.KEYS:
+		if c.equipamento[t] > 0:
+			eq.append("%s grau %d (+%d%%)" % [Dados.ATTR_NOME[t], c.equipamento[t], roundi(float(c.CRESC().equipamento.ganho[c.equipamento[t]]) * 100)])
+	v.add_child(UI.label(", ".join(eq) if not eq.is_empty() else "Nenhum ainda. O Prestígio 3 e 5 e cada Tríplice dão um grau.", 14,
+		UI.TEXTO if not eq.is_empty() else UI.SUAVE, true))
+	for b in c.boosts:
+		v.add_child(UI.label("%s %s: %s" % [c.CRESC().boosts[b.id].icone, b.nome, c.texto_boost(b)], 14, UI.TEXTO, true))
 
 
 # ---------- painel do turno ----------
@@ -517,6 +581,8 @@ func _painel_turno() -> VBoxContainer:
 			v.add_child(_painel_encontro(c.encontro_atual()))
 		"amuleto":
 			v.add_child(_painel_amuleto())
+		"equipamento":
+			v.add_child(_painel_equipamento())
 		"mapa":
 			v.add_child(_painel_mapa())
 		"ferias":
@@ -709,6 +775,31 @@ func _painel_amuleto() -> Control:
 	return p
 
 
+## Escolha do treino que ganha um grau de equipamento (vale até o fim da carreira).
+func _painel_equipamento() -> Control:
+	var p := UI.painel_titulo("Equipamento novo para a academia", UI.OURO)
+	var v: VBoxContainer = p.get_meta("corpo")
+	v.add_child(UI.label("Escolha o treino que ganha 1 grau. O grau vale até o fim da carreira.", 14, UI.SUAVE, true))
+	var cfg: Dictionary = c.CRESC().equipamento
+	var i := 0
+	for t in c.opcoes_equipamento():
+		var g: int = c.equipamento[t] + 1
+		var extras := ["+%d%% de ganho" % roundi(float(cfg.ganho[g]) * 100)]
+		if int(cfg.energia[g]) > 0:
+			extras.append("−%d de energia" % cfg.energia[g])
+		if float(cfg.falha[g]) < 1.0:
+			extras.append("falha −%d%%" % roundi((1.0 - float(cfg.falha[g])) * 100))
+		var b := UI.botao("%s: grau %d\n%s" % [Dados.ATTR_NOME[t], g, ", ".join(extras)], func(): atualizou.emit(c.escolher_equipamento(t)), 16)
+		UI.tecla(b, str(i + 1))
+		_atalho(KEY_1 + i, b)
+		b.custom_minimum_size.y = 58
+		UI.colorir_botao(b, UI.ATTR_COR[t])
+		UI.pop(b, 0.08 * i)
+		v.add_child(b)
+		i += 1
+	return p
+
+
 func _escolher_amuleto(id: String) -> void:
 	if c.amuletos.size() < c.limite_amuletos():
 		atualizou.emit(c.escolher_amuleto(id))
@@ -723,7 +814,8 @@ func _cartao_corrida(cr: Dictionary) -> Control:
 	var linhas := ["%s%s%s" % ["⚔ " if cr.get("desafio", false) else "", "📅 " if cr.get("fixa", false) else "", cr.nome],
 		"%s · %s %s · %d m" % [cat.nome, Dados.DIST_NOME[cr.dist], cr.piso, Calendario.metros(cr)],
 		"Aptidão %s/%s · fama até %d" % [Dados.APT_NOME[c.aptidao[cr.dist]], Dados.APT_NOME[c.aptidao[cr.piso]], c.fama_prevista(cr, 1, ol.mult)],
-		"Olheiro: %s (%d%%) · fama ×%s" % [Carreira.nome_etiqueta(ol.etiqueta), roundi(ol.chance * 100), _mult_txt(ol.mult)]]
+		"Olheiro: %s (%d%%) · fama ×%s" % [Carreira.nome_etiqueta(ol.etiqueta), roundi(ol.chance * 100), _mult_txt(ol.mult)],
+		"Atributos: até +%d se vencer" % _soma_ganho(c.ganho_corrida(cr, 1))]
 	if cr.get("fixa", false):
 		var ss := c.series_da_corrida(cr).map(func(x): return "%s %d/%d" % [x.nome, x.feitas, x.total])
 		if not ss.is_empty():
@@ -733,10 +825,17 @@ func _cartao_corrida(cr: Dictionary) -> Control:
 		linhas.append("Precisa de %d de fama" % cat.fama_entrada)
 	var b := UI.botao("\n".join(linhas), func(): _correr(cr), 14)
 	b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	b.custom_minimum_size.y = 124 if cr.get("fixa", false) else 108
+	b.custom_minimum_size.y = 140 if cr.get("fixa", false) else 124
 	b.disabled = not pode
 	b.add_theme_color_override("font_color", _cor_etiqueta(ol.etiqueta))
 	return b
+
+
+static func _soma_ganho(g: Dictionary) -> int:
+	var t := 0.0
+	for k in g:
+		t += g[k]
+	return roundi(t)
 
 
 ## 0.985 -> "−1,5%", 1.12 -> "+12%"

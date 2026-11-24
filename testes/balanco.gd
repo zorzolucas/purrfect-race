@@ -243,7 +243,7 @@ func _imprimir(r: Dictionary) -> void:
 		"/".join([r.etiquetas.favorita, r.etiquetas.disputada, r.etiquetas.azarao].map(func(x): return str(x))), r.titulos])
 
 
-## Fama abaixo do ritmo da próxima meta (linha reta desde a anterior), com 10% de folga.
+## Fama abaixo do ritmo da próxima meta (linha reta desde a anterior).
 func _atrasada(c) -> bool:
 	var m: Dictionary = c.proxima_meta_fama()
 	if m.is_empty():
@@ -255,7 +255,7 @@ func _atrasada(c) -> bool:
 			t0 = int(x.turno)
 			f0 = int(x.fama)
 	var ritmo: float = f0 + (float(m.fama) - f0) * float(c.turno - t0) / float(int(m.turno) - t0)
-	return c.fama < ritmo * 1.1
+	return c.fama < ritmo
 
 
 func _melhor_no(c) -> int:

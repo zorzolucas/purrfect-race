@@ -770,24 +770,24 @@
     "metas_fama": [
       {
         "turno": 24,
-        "fama": 900,
+        "fama": 500,
         "nome": "Primeiros fãs"
       },
       {
         "turno": 48,
-        "fama": 3000,
+        "fama": 3500,
         "nome": "Nome no jornal"
       },
       {
         "turno": 72,
-        "fama": 6000,
+        "fama": 8000,
         "nome": "Lenda das pistas"
       }
     ],
     "forca_npc_ano": [
       1.0,
-      1.0,
-      1.0
+      1.05,
+      1.08
     ],
     "corrida": {
       "_doc": "Atributos de uma corrida: (ganho principal + secundário) × nível médio dos treinos × categoria × colocação × Prestígio, espalhado pelo perfil da distância e com o retorno decrescente de cada atributo.",

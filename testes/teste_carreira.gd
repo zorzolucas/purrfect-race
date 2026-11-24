@@ -131,7 +131,8 @@ func _jogar(nome: String, semente: int, vinculo := 0, madrinha := {}, salvar_em 
 	_checar(guard < 1000, "%s (%d): carreira não terminou (turno %d, pendência %s)" % [nome, semente, c.turno, c.pendencia()])
 	_checar(c.falhou_objetivo or c.turno > CarreiraS.BAL.turnos, "%s: terminou sem falhar e antes do turno 72" % nome)
 	if c.falhou_objetivo:
-		_checar(c.resultados[-1].objetivo > 0 and not c.resultados[-1].ok, "%s: falhou sem objetivo perdido" % nome)
+		var ult: Dictionary = c.resultados[-1]
+		_checar(ult.objetivo > 0 and (not ult.ok or ult.get("meta_fama", true) == false), "%s: falhou sem objetivo nem meta de fama perdidos" % nome)
 	else:
 		_checar(c.caminho in ["A", "B"], "%s: chegou ao fim sem caminho" % nome)
 		_checar(not c.final_da_campanha().is_empty(), "%s: sem final de campanha" % nome)

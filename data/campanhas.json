@@ -673,7 +673,7 @@
     }
    ],
    "virada": {
-    "fama_min": 4800
+    "fama_min": 5200
    },
    "caminhos": {
     "A": {
@@ -1839,7 +1839,7 @@
     "onde": "vizinha"
    },
    "virada": {
-    "fama_min": 4800
+    "fama_min": 5200
    },
    "capitulos": [
     {

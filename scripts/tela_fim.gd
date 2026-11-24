@@ -130,7 +130,9 @@ func _painel_objetivos() -> Control:
 		var marca := UI.capsula(("✓ " if r.ok else "✗ ") + pos, UI.VERDE if r.ok else UI.PERIGO, 14)
 		marca.custom_minimum_size.x = 64
 		h.add_child(marca)
-		var l := UI.label("T%d · %s" % [r.turno, r.nome], 14, UI.TEXTO if r.ok else UI.PERIGO)
+		var sem_fama: bool = r.get("meta_fama", true) == false
+		var l := UI.label("T%d · %s%s" % [r.turno, r.nome, " · sem a fama da meta" if sem_fama else ""], 14,
+			UI.PERIGO if sem_fama or not r.ok else UI.TEXTO)
 		l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		l.clip_text = true
 		l.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS

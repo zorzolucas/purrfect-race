@@ -917,6 +917,7 @@ func registrar_corrida(posicao: int, extra: Dictionary = {}) -> String:
 	var mf := meta_fama_do_turno(turno)
 	if e_obj and not mf.is_empty():
 		if fama < int(mf.fama):
+			resultados[-1]["meta_fama"] = false  # a corrida foi cumprida, a meta de fama não
 			falhou_objetivo = true
 			terminou = true
 			return txt + " Mas a meta de fama \"%s\" pedia %d de fama até aqui, e ela tem %d. A carreira acaba aqui." % [mf.nome, mf.fama, fama]

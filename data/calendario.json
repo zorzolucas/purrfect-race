@@ -786,8 +786,8 @@
     ],
     "forca_npc_ano": [
       1.0,
-      1.05,
-      1.08
+      1.09,
+      1.1
     ],
     "corrida": {
       "_doc": "Atributos de uma corrida: (ganho principal + secundário) × nível médio dos treinos × categoria × colocação × Prestígio, espalhado pelo perfil da distância e com o retorno decrescente de cada atributo.",

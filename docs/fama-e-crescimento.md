@@ -1,6 +1,7 @@
-# Fama, corridas e boosts de treino (v0.1, proposta)
+# Fama, corridas e boosts de treino (v0.2)
 
-> Mapa pedido pelo Lucas em 2026-11-24. Junta o que o protótipo já faz (com o arquivo e a função de cada coisa) e propõe como os 4 pedidos entram. **Nada daqui está implementado ainda.** Os números marcados (inicial) são pontos de partida para o bot de balanceamento.
+> Versão 0.2 — 2026-11-24. **No protótipo.** O Lucas decidiu: a fama age como **multiplicador** (§2) e a meta de fama falhada **acaba a carreira**, com o pelotão escalando para equilibrar com esse mínimo (§3). Os números finais e o resultado do bot estão na §8; os dados ficam em `data/calendario.json` (`crescimento`).
+> Versão 0.1 — 2026-11-24. Mapa pedido pelo Lucas: o que o protótipo já fazia e a proposta para os 4 pedidos.
 >
 > Os 4 pedidos:
 > 1. Corridas contribuem com atributos tanto quanto treinos.
@@ -88,7 +89,7 @@ O risco é a corrida ficar **sempre melhor** que o treino (dá o mesmo atributo 
 
 1. **Atributo espalhado**: o treino concentra onde ela precisa; a corrida espalha pelo perfil da corrida. Para uma Fechadora de Longa que precisa de Velocidade, uma Longa rende pouco do que importa.
 2. **Colocação**: em corrida difícil, o valor esperado cai para perto de metade de um treino.
-3. **Energia**: a corrida passa a custar **20** (era 15), quase o mesmo que o treino (22). A 3ª seguida continua com +10 e o risco de humor.
+3. **Energia**: a corrida passa a custar **20** (era 15), quase o mesmo que o treino (22). No protótipo. A 3ª seguida continua com +10 e o risco de humor.
 4. **Nível do treino não sobe**: o treino dá uso (sobe o nível a cada 3); a corrida não. Quem corre demais no ano 1 chega ao ano 2 com treinos de nível baixo.
 5. **O bot mede**: meta de equilíbrio = a carreira que **só treina** e a que **corre tudo o que pode** ficam a menos de 5 pontos de conclusão uma da outra, e a melhor rota fica no meio.
 
@@ -141,11 +142,14 @@ Além dos 8 objetivos de corrida, toda carreira tem **3 metas de fama** fixas, v
 
 | Meta | Turno | Fama mínima (inicial) | Falhou |
 |---|---|---|---|
-| Ano 1 · "Primeiros fãs" | 24 | 900 | a carreira **acaba** |
-| Ano 2 · "Nome no jornal" | 48 | 3000 | a carreira **acaba** |
-| Ano 3 · "Lenda das pistas" | 72 | 6000 | não acaba, mas o final vira o "final sem holofote" e a nota cai 1 grau |
+| Ano 1 · "Primeiros fãs" | 24 | 500 | a carreira **acaba** |
+| Ano 2 · "Nome no jornal" | 48 | 3500 | a carreira **acaba** |
+| Ano 3 · "Lenda das pistas" | 72 | 8000 | a carreira **acaba** (o GP final vencido não conta como carreira completa) |
 
-- Os números iniciais são chutes. A regra para calibrar: com a rota do bot (que corre opcionais quando é Favorita ou Disputada), **~90% das carreiras passam** da meta do ano 1 e **~80%** da do ano 2 na conta nova. Uma carreira que nunca corre opcional precisa falhar a meta do ano 2.
+- A meta é conferida **depois** do objetivo do mesmo turno (a fama dele conta).
+- **O pelotão escala junto** (decisão do Lucas): `forca_npc_ano` multiplica a força das NPCs por ano (1,00 · 1,05 · 1,08), calibrado para que quem chega no mínimo de fama, com o Prestígio que ele dá, tenha a mesma dificuldade da v0.7.
+
+- Regra usada para calibrar: com a rota do bot (que corre opcionais quando é Favorita ou Disputada), **~90% das carreiras passam** da meta do ano 1 e **~80%** da do ano 2 na conta nova. Uma carreira que nunca corre opcional precisa falhar a meta do ano 2.
 - Os objetivos de corrida já dão fama (são por convite e valem a fama da categoria), então a meta mede só o **excesso** que ela foi buscar nas opcionais e nas séries.
 - **Objetivos de campanha com fama**: o campo `fama_min` já existe em `scripts/campanha.gd`. Dá para usar em objetivos específicos de uma campanha (ex.: a Capela, que é sobre fama, ter o objetivo 5 como "ter 2500 de fama até o turno 40" em vez de uma corrida). Proposta: 2 das 8 campanhas ganham 1 objetivo de fama no lugar de um de corrida. Quais, fica para o Lucas.
 - A **virada** das campanhas que usam fama (4800 no turno 48) passa a bater com o Prestígio 4 (já bate).
@@ -187,7 +191,8 @@ Criar `var boosts: Array` na `Carreira`, com cada item:
 | 2 | +12% e −2 de energia nele | Prestígio 5 (escolhe 1 treino, pode ser o mesmo) |
 | 3 | +18%, −3 de energia e falha −20% nele | Tríplice da casa (escolhe 1 treino) |
 
-- Também dá para comprar graus com **pontos de habilidade** (proposta inicial: 120 / 200 / 300), competindo com as habilidades. Isso cria a escolha "habilidade de corrida agora ou equipamento que rende o resto da carreira".
+- Cada grau ganho é escolhido numa tela própria (pendência `equipamento`), e o mesmo treino pode subir até o grau 3.
+- **Ainda não feito:** comprar graus com pontos de habilidade (proposta: 120 / 200 / 300).
 - Os amuletos continuam sendo o outro tipo de melhoria fixa (já existem: Ferradura, Treino Pesado, Constelação).
 
 ### 4.3 Boosts temporários
@@ -238,9 +243,13 @@ A pergunta que o jogador faz a cada opcional deixa de ser "dá fama?" e vira "**
 
 O endgame não muda (a simulação não muda), mas as garotas salvas ficam com atributos diferentes, então o bot valida a conta madura e o circuito no fim.
 
-## 7. Decisões em aberto (para o Lucas)
+## 7. Decisões
 
-1. **Como a fama escala**: multiplicador de ganho daqui para frente (proposta) ou bônus direto nos atributos em dia de corrida (torcida)?
-2. **Meta de fama falhada** nos anos 1 e 2 acaba a carreira (como objetivo) ou só tira algo (moeda, nota)?
+Tomadas pelo Lucas em 2026-11-24:
+1. A fama age como **multiplicador** do ganho (§2.1).
+2. **Meta de fama falhada acaba a carreira**, e o pelotão escala para equilibrar com o mínimo (§3.1).
+
+Em aberto:
 3. **Equipamento** com pontos de habilidade também, ou só pelo Prestígio e pela Tríplice?
 4. Quais **campanhas** trocam um objetivo de corrida por um de fama (proposta: 2 das 8, começando pela Capela).
+5. A **Treinadora convidada** sai por enquanto só do encontro genérico "Treinadora visitante" (`gen_treinadora`). Dá para pôr `"boost": "treinadora"` em mais encontros.

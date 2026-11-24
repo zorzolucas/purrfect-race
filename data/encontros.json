@@ -176,6 +176,19 @@
       ]
     },
     {
+      "id": "gen_treinadora",
+      "garota": null,
+      "titulo": "Treinadora visitante",
+      "expressao": "surpresa",
+      "gesto": "pulinho",
+      "texto": "Uma treinadora famosa veio ver os treinos da academia. {outra} cutuca {nome}: — Vai lá falar com ela!",
+      "quando": {"turno_min": 8},
+      "escolhas": [
+        {"texto": "Pedir umas dicas", "efeitos": {"boost": "treinadora", "energia": -5}, "resultado": "A treinadora passa meia hora com {nome} e promete voltar no próximo treino."},
+        {"texto": "Ficar só olhando com {outra}", "efeitos": {"afinidade": 8, "humor": 1}, "resultado": "As duas cochicham a tarde inteira sobre cada detalhe que a treinadora corrige."}
+      ]
+    },
+    {
       "id": "gen_cansaco",
       "garota": null,
       "titulo": "Pernas pesadas",

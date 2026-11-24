@@ -10,7 +10,7 @@ const DISTS := ["sprint", "milha", "media", "longa"]
 const PISOS := ["grama", "terra"]
 const NOTAS_APT := ["R", "O", "B", "X"]
 ## Chaves de efeito que Carreira.escolher entende (além dos 5 atributos).
-const EFEITOS := ["humor", "energia", "afinidade", "nivel_treino", "fama", "serra", "pontos",
+const EFEITOS := ["boost", "humor", "energia", "afinidade", "nivel_treino", "fama", "serra", "pontos",
 	"habilidade", "amuleto", "unico_garantido", "flag", "perde_turno"]
 
 

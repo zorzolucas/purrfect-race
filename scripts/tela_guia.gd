@@ -309,6 +309,14 @@ static func bloco(bl: Dictionary, cor: Color) -> Control:
 				lista.append(_cartao({"titulo": "%s  %s" % [cl.get("icone", ""), cl.nome],
 					"texto": cl.get("descricao", "Sem efeito no treino nem na corrida."), "cor": "ceu"}))
 			return _grade(lista, 2)
+		"boosts":
+			var boosts: Dictionary = Dados.calendario.get("crescimento", {}).get("boosts", {})
+			var lista := []
+			for id in boosts:
+				var b: Dictionary = boosts[id]
+				lista.append(_cartao({"titulo": "%s  %s" % [b.get("icone", ""), b.nome],
+					"texto": str(b.get("texto", "")).replace("%s", "um atributo"), "cor": "laranja" if id == "cansaco" else "verde"}))
+			return _grade(lista, 2)
 	return null
 
 
@@ -431,6 +439,8 @@ static func valor(fonte: String, chave: String):
 			for parte in partes.slice(1):
 				if v is Dictionary and v.has(parte):
 					v = v[parte]
+				elif v is Array and parte.is_valid_int() and int(parte) < v.size():
+					v = v[int(parte)]
 				else:
 					return null
 	if v == null or not (v is float or v is int):

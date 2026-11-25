@@ -73,7 +73,7 @@ As 6 garotas cobrem as 5 copas e o Campeonato Final (5 garotas diferentes) sem s
 | 5 | 40 | **Prêmio Cometa** (Ouro do calendário), Milha Grama | Top 3 | Normal |
 | 6 | 48 | GP do ano 2, Milha Grama | Top 3 | Normal |
 
-**Ponto de virada** (depois do turno 48): se ela **venceu o Prêmio Cometa e o GP do ano 2**, segue o caminho **Coroa da Milha**. Senão, segue o caminho **Revanche**. O capítulo *Primeira derrota* pesa: se o jogador escolheu "deixar treinar sozinha", vencer só o GP do ano 2 já leva à Coroa.
+**Ponto de virada** (depois do turno 48): se ela **venceu o Prêmio Cometa, ficou top 2 no GP do ano 2 e tem 9 vitórias ou mais**, segue o caminho **Coroa da Milha**. Senão, segue o caminho **Revanche**. O capítulo *Primeira derrota* pesa: se o jogador escolheu "deixar treinar sozinha", basta o top 2 no GP do ano 2 com as 9 vitórias. (Até 2026-11-24 pedia vencer o GP do ano 2; com o Prestígio, a Coroa saía em quase 80% das carreiras.)
 
 *v0.6: o objetivo 4 era na Média Grama, a casa da Polaris, e derrubava 2 de cada 3 carreiras no bot. Agora a Polaris vem correr na Milha ([campanhas](campanhas.md) §7).*
 

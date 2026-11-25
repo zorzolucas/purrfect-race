@@ -52,7 +52,7 @@ Como no [calendário](calendario.md) §10: dificuldade **0 a 5 por garota**. Ven
 - **5 copas** de 3 corridas (Sprint, Milha, Média, Longa e Terra) e o **Campeonato Final** de 5 corridas, cada um em **Bronze, Prata e Ouro**.
 - O jogador escala **garotas salvas diferentes** em cada corrida (3 por copa, 5 no Final) e escolhe a instrução de cada uma.
 - **Abertura:** Bronze aberto desde o começo. O Prata de uma copa abre com o Bronze dela vencido, o Ouro com o Prata. O Final de um nível abre com as 5 copas daquele nível vencidas (e, a partir do Prata, com o Final do nível anterior).
-- **Força das NPCs (inicial):** Bronze 600, Prata 800, Ouro 950 (média dos atributos, antes da aptidão).
+- **Força das NPCs:** Bronze 660, Prata 880, Ouro 1045 (média dos atributos, antes da aptidão). Eram 600, 800 e 950 até 2026-11-24; subiram 10% junto com as garotas, que terminam a carreira ~10% mais fortes com o Prestígio ([fama e crescimento](fama-e-crescimento.md); §5.7).
 
 | Evento | Corridas |
 |---|---|
@@ -251,6 +251,27 @@ O fôlego do pelotão ([corrida](corrida.md) §6) e a correção de estilo por n
 - Como na §5.4, a versão salva tem os atributos que o jogador treinou, não o perfil da ficha, então isso pesa menos do que parece.
 
 **Níveis** (como na §5.5, 30 tentativas por célula): quase igual ao de antes. Com média 800, Bronze 93–100%, Prata 7–37% e Ouro 0–3%. Com 950, Prata 80–90% e Ouro 7–30%. Com 1000, Ouro 50–67%.
+
+### 5.7 Com o Prestígio (2026-11-25)
+
+Com o Prestígio e as corridas que dão atributo ([fama e crescimento](fama-e-crescimento.md)), a garota termina a carreira **~10% mais forte**: média ~890 na conta nova e ~970 na madura no turno 72 (eram ~807 e ~870). Sem mexer no circuito, o Prata ficava fácil para a conta madura e o Ouro ao alcance sem vínculo alto. As 3 forças subiram 10% (660, 880 e 1045).
+
+**Níveis** (como na §5.5, 30 tentativas por célula, forças novas):
+
+| Média M | Bronze | Prata | Ouro |
+|---|---|---|---|
+| 700 | 27–63% | 0% | 0% |
+| 800 | 87–97% | 0–7% | 0% |
+| 850 | 83–97% | 0–23% | 0% |
+| 900 | 93–100% | 10–43% | 0–3% |
+| 950 | 100% | 33–60% | 0–10% |
+| 1000 | 100% | 73–90% | 7–33% |
+| 1050 | 100% | 67–93% | 7–43% |
+| 1100 | 100% | 87–100% | 37–63% |
+| 1150 | 100% | 100% | 60–83% |
+| 1200 | 100% | 97–100% | 67–90% |
+
+- É a tabela da §5.5 andando ~10% para a direita: a conta nova (~890) vence o Bronze quase sempre e o Prata às vezes, a madura (~970) fica perto de 50% no Prata, e o Ouro pede média ~1100, que só o vínculo 3 ou mais alcança (limite 1000 + 40 por nível).
 
 ## 6. Como rodar
 

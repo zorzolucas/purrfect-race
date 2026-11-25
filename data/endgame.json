@@ -27,9 +27,9 @@
   "circuito": {
     "_doc": "Cada copa tem 3 corridas e pede 3 garotas diferentes; o Campeonato Final tem 5 e pede 5. Vence quem somar mais pontos entre a jogadora e as 3 casas rivais. O Prata de uma copa abre com o Bronze dela vencido, o Ouro com o Prata. O Final de um nível abre com as 5 copas daquele nível vencidas.",
     "niveis": [
-      {"id": "bronze", "nome": "Bronze", "forca": 600, "premio": 60},
-      {"id": "prata", "nome": "Prata", "forca": 800, "premio": 120},
-      {"id": "ouro", "nome": "Ouro", "forca": 950, "premio": 200}
+      {"id": "bronze", "nome": "Bronze", "forca": 660, "premio": 60},
+      {"id": "prata", "nome": "Prata", "forca": 880, "premio": 120},
+      {"id": "ouro", "nome": "Ouro", "forca": 1045, "premio": 200}
     ],
     "premio_final": 3.0,
     "premio_repeticao": 0.2,

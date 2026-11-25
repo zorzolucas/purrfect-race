@@ -239,7 +239,7 @@ func _circuito() -> void:
 	for linha in r1.escalacao_casas:
 		usadas.append_array(linha)
 	_conferir(usadas.filter(func(n): return n in nomes or usadas.count(n) > 1).is_empty(), "casas sem repetir e sem as da jogadora")
-	# progresso: força alta vence o Bronze (garotas 1100 contra NPCs 600)
+	# progresso: força alta vence o Bronze (garotas 1100 contra NPCs 660)
 	var vitorias := 0
 	for i in 3:
 		var r: Dictionary = p.correr_circuito(0, "sprint", esc)

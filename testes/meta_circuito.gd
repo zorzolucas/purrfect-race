@@ -143,7 +143,7 @@ func _desfazer_tracado(c: Dictionary, t: Dictionary) -> void:
 func _niveis(n: int, parte: Array, saida: String) -> void:
 	var resultado := {}
 	var idx := 0
-	for media in [700, 800, 850, 900, 950, 1000, 1050, 1100]:
+	for media in [700, 800, 850, 900, 950, 1000, 1050, 1100, 1150, 1200]:
 		for nivel in EndgameS.niveis().size():
 			for ev in EndgameS.eventos():
 				idx += 1

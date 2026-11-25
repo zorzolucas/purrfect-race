@@ -110,14 +110,19 @@
      {
       "e": [
        {
-        "venceu": [
-         40
+        "top": [
+         40,
+         1
         ]
        },
        {
-        "venceu": [
-         48
+        "top": [
+         48,
+         2
         ]
+       },
+       {
+        "vitorias_min": 9
        }
       ]
      },
@@ -127,9 +132,13 @@
         "flag": "treinar_sozinha"
        },
        {
-        "venceu": [
-         48
+        "top": [
+         48,
+         2
         ]
+       },
+       {
+        "vitorias_min": 9
        }
       ]
      }
@@ -849,15 +858,13 @@
    "virada": {
     "e": [
      {
-      "venceu": [
-       48
+      "top": [
+       48,
+       2
       ]
      },
      {
-      "top": [
-       40,
-       2
-      ]
+      "vitorias_min": 9
      },
      {
       "sem_lesao_desde": 25
@@ -1383,14 +1390,21 @@
    "virada": {
     "e": [
      {
-      "venceu": [
-       48
+      "top": [
+       32,
+       1
       ]
      },
      {
       "top": [
-       32,
-       3
+       40,
+       2
+      ]
+     },
+     {
+      "top": [
+       48,
+       2
       ]
      },
      {
@@ -2163,7 +2177,14 @@
     "forca_rival": 1.07
    },
    "virada": {
-    "viradas_min": 3
+    "e": [
+     {
+      "viradas_min": 3
+     },
+     {
+      "vitorias_min": 9
+     }
+    ]
    },
    "capitulos": [
     {

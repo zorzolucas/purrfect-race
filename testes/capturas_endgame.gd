@@ -95,6 +95,7 @@ func _salvar(nome: String) -> void:
 	var img := root.get_texture().get_image()
 	img.save_png("res://testes/capturas/%s.png" % nome)
 	print("captura: ", nome)
+	load("res://testes/estouro.gd").checar(root, nome)
 
 
 func _process(_delta: float) -> bool:

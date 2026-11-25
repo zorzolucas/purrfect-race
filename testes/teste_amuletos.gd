@@ -53,7 +53,7 @@ func _initialize() -> void:
 	var g2: float = base.ganho_previsto("vel").vel
 	_checar(absf(g2 / g0 - 1.2 / 1.1) < 0.001, "Constelação +20%% nos naturais")
 	base.amuletos = ["sapatilha"]
-	_checar(base.energia_corrida() == 10, "Sapatilha -5 de energia")
+	_checar(base.energia_corrida() == base.BAL.energia_corrida - 5, "Sapatilha -5 de energia")
 
 	# Estrela Cadente: com energia 0 a falha vira sucesso uma vez
 	var e = CarreiraS.new(lira, dados.config_carreira("Lira"), 3)

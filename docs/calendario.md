@@ -266,6 +266,7 @@ Cada carreira concluída (chegando ao objetivo 8, vencendo ou não) **libera nov
 A fama mede quantas pessoas acompanham a garota. Ela nunca diminui durante a carreira.
 
 **Para que serve**
+0. **Prestígio**: degraus de fama que multiplicam todo ganho de treino e de corrida, e **metas de fama** nos turnos 24, 48 e 72 que acabam a carreira se faltarem ([fama e crescimento](fama-e-crescimento.md), desde 2026-11-24).
 1. **Entrar em corridas** de categoria mais alta (tabela da §2).
 2. **Bônus de moeda** no fim da carreira (inicial: +1 moeda a cada 100 de fama; o valor da moeda fica para a etapa de economia).
 3. **Encontros com torcedoras**: alguns encontros genéricos só aparecem com fama alta (conteúdo futuro).
@@ -292,7 +293,7 @@ As opcionais vêm de duas fontes. As duas juntas deixam o jogador **planejar uma
 | **Circuito** | Corridas **geradas** (categoria × distância × piso, com nome sorteado de uma lista). Cada turno de um nó Circuito oferece **2**. | Só nos nós Circuito (§4.2) e no Desafio. |
 
 Regras que valem para as duas:
-- Correr gasta **15 de energia** (inicial) e não dá ganho de treino naquele turno, mas **dá atributos**: em cada atributo, Estreia +5, Aberta +6, Prata +9, Ouro e GP do ano 1 +12, GPs dos anos 2 e 3 +15 (inicial). Quem vence ganha tudo, top 3 ganha 80% e o resto 50%. Sem isso, a curva de atributos travava no ano 3, quando a garota corre mais.
+- Correr gasta **20 de energia** (era 15) e não dá ganho de treino naquele turno, mas **dá atributos como um treino**, espalhados pelo perfil da distância e com a colocação pesando ([fama e crescimento](fama-e-crescimento.md) §1, desde 2026-11-24). Antes eram +5 a +15 em cada atributo.
 - **Corridas seguidas:** a 3ª corrida em 3 turnos seguidos gasta +10 de energia e tem 30% de chance de baixar o humor 1 nível (inicial).
 - Uma carreira típica deve ter **14 a 20 corridas** contando os objetivos.
 

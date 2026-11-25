@@ -179,7 +179,7 @@ As corridas do ano 1 são na **Média**: no nível baixo a Fechadora sofre na Lo
 | — | 41–47 | *Capítulo 5: "Distância demais"*. O evento de mesmo nome acontece aqui. | — | — |
 | 6 | 48 | GP do ano 2, Sprint Terra | Top 3 | Normal |
 
-**Ponto de virada:** se ela **venceu o GP do ano 2**, ficou **top 2 no objetivo 5** e **não se lesionou desde o turno 25**, segue o caminho **Sem freio**. Senão, segue **Fôlego novo**.
+**Ponto de virada:** se ela ficou **top 2 no GP do ano 2**, tem **9 vitórias ou mais** e **não se lesionou desde o turno 25**, segue o caminho **Sem freio**. (Até 2026-11-24 pedia vencer o GP do ano 2 e top 2 no objetivo 5; com o Prestígio, 80% das carreiras iam para o Sem freio.) Senão, segue **Fôlego novo**.
 
 | Caminho | Objetivo 7 (turno 60) | GP final (turno 72) | Final |
 |---|---|---|---|
@@ -309,7 +309,7 @@ São **84 textos** no total (12 × 7). As campanhas do MVP têm mais capítulos 
 
 **Durona** (referência: Antares). *Só sabe ir com tudo e aprende a ouvir o corpo.*
 - Objetivo 2: top 3. Objetivo 4: Prata no **outro piso**, top 5 ("provar que corre em qualquer chão").
-- Virada: venceu o GP do ano 2, ficou **top 3 no objetivo 4** e está **sem lesão desde o turno 25** → **Sem limites**. Senão → **Corpo e cabeça**.
+- Virada: **venceu o objetivo 4**, ficou **top 2 no objetivo 5 e no GP do ano 2** e está **sem lesão desde o turno 25** → **Sem limites**. (Até 2026-11-24 pedia vencer o GP do ano 2 e top 3 no objetivo 4; com o Prestígio, 77% das carreiras iam para o A.) Senão → **Corpo e cabeça**.
 - Sem limites: vencer Ouro na casa (Difícil); GP final top 3. Corpo e cabeça: Ouro na distância vizinha, top 3; GP final top 3 e à frente de {rival}.
 - Capítulos: 1 *"Antes do sol"*: {nome} treina antes de todo mundo acordar. 2 *"Mais um"*: ela esconde uma dor para não perder treino. 3 *"Chão diferente"*: corrida no outro piso. 4A *"Sem freio"*. 4B *"Respirar"*.
 - Finais: A *"Ninguém segura"*. B *"Saber parar"*: ela ganha uma distância nova.
@@ -364,7 +364,7 @@ São **84 textos** no total (12 × 7). As campanhas do MVP têm mais capítulos 
 
 **Sonhadora** (referência: Mira). *Distraída o ano todo, acorda na reta final.*
 - Objetivo 2: top 3. Objetivo 4: Prata na casa, **à frente de {rival}**.
-- Virada: venceu **3 corridas de virada** (estava fora do top 5 na metade da corrida) até o turno 48 → **Acordada**. Senão → **Céu aberto**.
+- Virada: venceu **3 corridas de virada** (estava fora do top 5 na metade da corrida) **e 9 corridas no total** até o turno 48 → **Acordada**. (O total de 9 entrou em 2026-11-24: com o Prestígio, só as 3 viradas davam 71%.) Senão → **Céu aberto**.
 - Acordada: vencer Ouro na casa (Difícil); GP final top 3. Céu aberto: Ouro na distância vizinha, top 3; GP final top 3 e à frente de {rival}.
 - Capítulos: 1 *"Nas nuvens"*: {nome} esquece o horário do treino olhando o céu. 2 *"Lá atrás"*: ela larga em último na estreia e ninguém entende. 3 *"Reta final"*. 4A *"Desperta"*. 4B *"Nuvens"*.
 - Finais: A *"Do fundo"*: ela larga em último e cruza em primeiro. B *"Corre porque gosta"*.

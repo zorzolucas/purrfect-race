@@ -285,4 +285,8 @@ Bot de balanceamento (`testes/balanco.gd`), 48 garotas. O bot agora escolhe o eq
 - **Viradas**: as que dependem de vencer o GP do turno 48 (Durona 77%, Lira e Antares ~80%, com poucas carreiras nas do MVP) e a Sonhadora (71%) passaram de 65%. As viradas por fama foram para 5200 (Estrela 49%; a Capela teve só 6 carreiras no turno 48).
 - **A garota termina ~10% mais forte** (892 contra 807 no turno 72). As garotas salvas que vão para o **circuito do endgame** ficam mais fortes, e a força das NPCs do circuito (`data/endgame.json`) ainda não acompanhou.
 
-**Próximos ajustes:** rodar 80 carreiras por garota para separar sorte de diferença real (casas, estilos e arquétipos), recalibrar as viradas que pedem vencer o turno 48, revisar a Perseguidora +1,5% (`forca_estilo`), que pode ter ficado sobrando, e escalar o circuito do endgame.
+**Feito em 2026-11-25:**
+- **Circuito do endgame** +10% (Bronze 660, Prata 880, Ouro 1045), com a tabela de dificuldade medida de novo ([endgame](endgame.md) §5.7). Estilos no circuito a 4,4% um do outro (eram 2,7%), nenhum o melhor em mais de 39% das corridas.
+- **Viradas sem depender de vencer o GP do turno 48:** Durona (vencer o objetivo 4 e top 2 no 5 e no GP), Lira e Antares (top 2 no GP e 9 vitórias), Sonhadora (3 viradas e 9 vitórias). Com 40 carreiras por garota: Antares 45%, Lira 38%, Durona 48%, Sonhadora 46%, Competitiva 47%.
+
+**Próximos ajustes:** rodar 80 carreiras por garota para separar sorte de diferença real (casas, estilos e arquétipos) e revisar a Perseguidora +1,5% (`forca_estilo`), que pode ter ficado sobrando.

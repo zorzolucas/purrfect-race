@@ -7,7 +7,7 @@ extends SceneTree
 # que este script compila.
 var GuiaS: GDScript
 var falhas := []
-const TIPOS := ["texto", "dica", "itens", "tabela", "atributos", "nos", "climas"]
+const TIPOS := ["texto", "dica", "itens", "tabela", "atributos", "nos", "climas", "boosts"]
 const CORES := ["rosa", "ceu", "verde", "laranja", "roxo", "ouro"]
 
 

@@ -19,6 +19,7 @@ var amuletos: Dictionary = {}
 var campanhas: Dictionary = {}
 var endgame: Dictionary = {}
 var patio: Dictionary = {}
+var tutorial: Dictionary = {}
 
 
 func _ready() -> void:
@@ -32,6 +33,7 @@ func _ready() -> void:
 	campanhas = _ler_json("res://data/campanhas.json")
 	endgame = _ler_json("res://data/endgame.json")
 	patio = _ler_json("res://data/patio.json")
+	tutorial = _ler_json("res://data/tutorial.json")
 
 
 func habilidade(id: String) -> Dictionary:

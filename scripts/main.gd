@@ -45,6 +45,28 @@ func _primeira_garota(ini: Dictionary) -> void:
 	perfil = Perfil.novo(ini.nome)
 	mostrar_academia("%s entrou para a academia! Você tem %d moedas para conhecer outras garotas na pool." % [
 		ini.nome, perfil.moeda])
+	# primeira vez no jogo: o guia abre sozinho no começo
+	TelaGuia.abrir(tela, "jogo")
+
+
+## F1 abre o guia em qualquer tela, no capítulo que tem a ver com ela.
+func _unhandled_key_input(event: InputEvent) -> void:
+	var k := event as InputEventKey
+	if k and k.pressed and not k.echo and k.keycode == KEY_F1 and tela:
+		get_viewport().set_input_as_handled()
+		TelaGuia.abrir(tela, capitulo_do_guia())
+
+
+func capitulo_do_guia() -> String:
+	if tela is TelaCarreira:
+		return "turno"
+	if tela is TelaCorrida:
+		return "corridas"
+	if tela is TelaCircuito:
+		return "endgame"
+	if tela is TelaPool or tela is TelaAcademia or tela is TelaMadrinha:
+		return "academia"
+	return "jogo"
 
 
 func mostrar_academia(msg: String = "") -> void:

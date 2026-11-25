@@ -28,6 +28,10 @@ func _ready() -> void:
 	esp.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	topo.add_child(esp)
 	topo.add_child(UI.moedas(perfil.moeda))
+	var bg := UI.botao("Guia", func(): TelaGuia.abrir(self, "jogo"), 18)
+	bg.tooltip_text = "Como o jogo funciona (F1)"
+	UI.tecla(bg, "F1")
+	topo.add_child(bg)
 	topo.add_child(UI.botao_cor("Pátio", func(): abrir_patio.emit(), UI.VERDE, 18))
 	topo.add_child(UI.botao_cor("Circuito", func(): abrir_circuito.emit(), UI.LARANJA, 18))
 	topo.add_child(UI.botao_cor("Pool semanal", func(): abrir_pool.emit(), UI.ROSA, 18))

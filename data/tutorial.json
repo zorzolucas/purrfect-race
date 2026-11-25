@@ -1,0 +1,289 @@
+{
+  "_doc": "Guia do jogo (scripts/tela_guia.gd). Cada capítulo tem páginas e cada página tem blocos: texto, dica, itens (cartões com título e texto; 'icone' com um atributo vel/est/pod/det/int ou 'cor' com rosa/ceu/verde/laranja/roxo/ouro), tabela (colunas e linhas), atributos, nos e climas (os três últimos são montados a partir dos dados do jogo). Números entre chaves vêm dos dados, para o guia não ficar desatualizado: {bal:chave} lê Carreira.BAL, {pct:chave} é Carreira.BAL x 100, {perfil:chave} lê Perfil.BAL, {d:arquivo.caminho} lê um arquivo de data/ (ex.: {d:calendario.categorias.prata.fama_entrada}) e {pctd:...} é o mesmo x 100. Capítulos marcados com 'revisar' mudam quando a proposta de fama como Prestígio (docs/fama-e-crescimento.md) entrar.",
+  "capitulos": [
+    {
+      "id": "jogo",
+      "titulo": "O jogo",
+      "cor": "rosa",
+      "resumo": "O que você faz em Corrida Purrfeita",
+      "paginas": [
+        {
+          "titulo": "Bem-vinda à Academia Estelar",
+          "blocos": [
+            {"tipo": "texto", "texto": "Você é a treinadora de uma academia de garotas gato corredoras. Cada garota tem uma carreira de 3 anos: você decide o que ela faz em cada turno, escolhe as corridas e tenta cumprir os objetivos da história dela."},
+            {"tipo": "itens", "colunas": 2, "itens": [
+              {"titulo": "1. Escolha uma garota", "texto": "Na academia, aperte Treinar no cartão de quem vai correr. Garotas novas chegam pela pool semanal.", "cor": "rosa"},
+              {"titulo": "2. Jogue a carreira", "texto": "{bal:turnos} turnos (meio mês cada). Treine, descanse, corra e cumpra 8 objetivos.", "cor": "ceu"},
+              {"titulo": "3. Salve a versão treinada", "texto": "No fim, você decide se o resultado substitui a versão salva dela no elenco.", "cor": "verde"},
+              {"titulo": "4. Use o elenco", "texto": "As versões salvas correm no Circuito, viram madrinhas e rendem moeda para a pool.", "cor": "laranja"}
+            ]},
+            {"tipo": "dica", "texto": "Aperte F1 em qualquer tela para abrir este guia. A carreira é salva sozinha a cada turno."}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "atributos",
+      "titulo": "Atributos",
+      "cor": "ceu",
+      "resumo": "Os 5 números que decidem a corrida",
+      "paginas": [
+        {
+          "titulo": "Os cinco atributos",
+          "blocos": [
+            {"tipo": "texto", "texto": "Cada garota tem 5 atributos, que crescem com treinos e corridas. O limite é {bal:limite_attr} e sobe {bal:vinculo_limite} por nível de vínculo."},
+            {"tipo": "atributos", "descricoes": {
+              "vel": "Velocidade máxima. Pesa em quase toda corrida, principalmente nas retas e no sprint.",
+              "est": "Tamanho da barra de fôlego. Sem fôlego ela perde velocidade no fim; conta mais nas distâncias longas.",
+              "pod": "Aceleração e força para abrir espaço quando fica presa no pelotão.",
+              "det": "Segura a velocidade quando ela cansa e dá força no sprint final.",
+              "int": "Chance de disparar habilidades e boas escolhas de posição. O treino dela quase não cansa."
+            }},
+            {"tipo": "dica", "texto": "Nenhum atributo vence sozinho: o melhor plano depende da distância, do piso, do estilo dela e do traçado da corrida."}
+          ]
+        },
+        {
+          "titulo": "Nota geral, estilo e aptidões",
+          "blocos": [
+            {"tipo": "itens", "colunas": 1, "itens": [
+              {"titulo": "Nota geral (G a S)", "texto": "O hexágono no canto do palco resume a média dos 5 atributos. Serve para comparar garotas de relance.", "cor": "ouro"},
+              {"titulo": "Estilo de corrida", "texto": "Ponteira lidera desde a largada, Perseguidora corre logo atrás da frente, Arrancadora fica no meio e acelera na reta, Fechadora larga no fundo e faz um sprint forte no final. Cada estilo aproveita os atributos de um jeito diferente.", "cor": "roxo"},
+              {"titulo": "Aptidões", "texto": "Cada garota tem uma aptidão por distância (Sprint, Milha, Média e Longa) e por piso (Grama e Terra): Ruim, Ok, Boa ou Ótima. Correr fora da aptidão custa até 10% de desempenho.", "cor": "verde"}
+            ]}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "turno",
+      "titulo": "Turno e treino",
+      "cor": "verde",
+      "resumo": "O que fazer em cada meio mês",
+      "paginas": [
+        {
+          "titulo": "As ações do turno",
+          "blocos": [
+            {"tipo": "texto", "texto": "Cada turno você escolhe uma ação. Treinar, descansar, sair e correr gastam o turno; o pátio e a loja de habilidades não."},
+            {"tipo": "itens", "colunas": 2, "itens": [
+              {"titulo": "Treinar", "texto": "Escolha um dos 5 treinos: sobe muito um atributo e um pouco outro. Gasta {bal:custo_energia} de energia ({bal:custo_energia_int} no de Inteligência).", "cor": "ceu"},
+              {"titulo": "Descansar", "texto": "Recupera {bal:descanso} de energia e cura a lesão.", "cor": "verde"},
+              {"titulo": "Sair", "texto": "Humor sobe um nível, +{bal:sair_energia} de energia e boa chance de encontro.", "cor": "rosa"},
+              {"titulo": "Correr", "texto": "Corridas opcionais dão fama, atributos, pontos de habilidade e moeda. Gasta {bal:energia_corrida} de energia.", "cor": "laranja"},
+              {"titulo": "Enfermaria", "texto": "Só aparece com lesão: cura na hora e devolve um pouco de energia.", "cor": "roxo"},
+              {"titulo": "Ir ao pátio", "texto": "Não gasta o turno. Uma conversa curta por turno com uma colega, quase sempre afinidade.", "cor": "ouro"}
+            ]}
+          ]
+        },
+        {
+          "titulo": "Como o treino rende",
+          "blocos": [
+            {"tipo": "tabela", "colunas": ["Treino", "Sobe muito", "Sobe um pouco"], "linhas": [
+              ["Velocidade", "Velocidade", "Poder"],
+              ["Estamina", "Estamina", "Determinação"],
+              ["Poder", "Poder", "Estamina"],
+              ["Determinação", "Determinação", "Velocidade"],
+              ["Inteligência", "Inteligência", "Velocidade"]
+            ]},
+            {"tipo": "itens", "colunas": 2, "itens": [
+              {"titulo": "Nível do treino", "texto": "A cada {bal:usos_por_nivel} repetições o treino sobe de nível (até 5), e cada nível rende +{pct:bonus_nivel}%.", "cor": "verde"},
+              {"titulo": "Treinos naturais", "texto": "Cada garota tem 2 treinos naturais que rendem +{pct:bonus_natural}%.", "cor": "rosa"},
+              {"titulo": "Retorno menor no topo", "texto": "Quanto mais alto o atributo, menos o treino rende. Equilibrar costuma valer mais que empilhar um só.", "cor": "laranja"},
+              {"titulo": "Treino em dupla", "texto": "Colegas com afinidade {bal:afinidade_dupla}+ às vezes aparecem num treino: +{pct:bonus_dupla}% nele.", "cor": "ceu"}
+            ]}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "estado",
+      "titulo": "Energia e humor",
+      "cor": "laranja",
+      "resumo": "Cuidar dela para o treino render",
+      "paginas": [
+        {
+          "titulo": "Energia, falha e lesão",
+          "blocos": [
+            {"tipo": "itens", "colunas": 1, "itens": [
+              {"titulo": "Energia (0 a 100)", "texto": "Treinos e corridas gastam energia. Abaixo de {bal:limite_falha}, o treino pode falhar, e a chance cresce até {pct:falha_max}% com energia zero. A chance exata aparece em cada botão de treino.", "cor": "laranja"},
+              {"titulo": "Falha", "texto": "Um treino que falha tira atributos ({bal:perda_falha} do treinado), derruba o humor e tem {pct:chance_lesao}% de chance de lesão leve. Nunca acaba com a carreira.", "cor": "rosa"},
+              {"titulo": "Lesão", "texto": "Enquanto ela estiver lesionada, o treino rende metade. Descanse ou vá à enfermaria.", "cor": "roxo"}
+            ]},
+            {"tipo": "dica", "texto": "Treino de Inteligência é a opção segura quando a energia está no meio: gasta pouco e ainda sobe Velocidade."}
+          ]
+        },
+        {
+          "titulo": "Humor",
+          "blocos": [
+            {"tipo": "texto", "texto": "O humor aparece no canto do palco. Ele muda com encontros, saídas, vitórias, derrotas e falhas."},
+            {"tipo": "tabela", "colunas": ["Humor", "Treino", "Corrida"], "linhas": [
+              ["Ótimo", "+20%", "+5%"],
+              ["Bem", "+10%", "+2,5%"],
+              ["Normal", "0", "0"],
+              ["Mal", "−10%", "−2,5%"],
+              ["Péssimo", "−20%", "−5%"]
+            ]},
+            {"tipo": "dica", "texto": "Correr em 3 turnos seguidos cansa mais e pode derrubar o humor. Sair antes de um objetivo importante costuma compensar."}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "carreira",
+      "titulo": "Objetivos e rotas",
+      "cor": "roxo",
+      "resumo": "Os 3 anos, os 8 objetivos e o mapa",
+      "paginas": [
+        {
+          "titulo": "Os 8 objetivos",
+          "blocos": [
+            {"tipo": "texto", "texto": "Os turnos 1 a 12 são só treino e encontros. A Estreia é no turno 13, e depois vêm objetivos nos turnos 20, 24, 32, 40, 48, 60 e 72. O fim de cada ano tem um Grande Prêmio."},
+            {"tipo": "itens", "colunas": 2, "itens": [
+              {"titulo": "Falhou, acabou", "texto": "Se ela não cumprir a meta de um objetivo (vencer, top 3, top 5, bater a rival...), a carreira termina ali. A garota ainda pode ser salva como está.", "cor": "rosa"},
+              {"titulo": "Ponto de virada", "texto": "Depois do GP do ano 2, a história segue um de 2 caminhos, conforme os resultados e as escolhas. Cada caminho tem o próprio final.", "cor": "roxo"},
+              {"titulo": "Amuletos", "texto": "Cada objetivo cumprido dá a escolha de 1 entre 3 amuletos, que valem até o fim da carreira (até {d:amuletos.limite} equipados).", "cor": "ouro"},
+              {"titulo": "Botão Objetivos", "texto": "No palco da garota, mostra todas as metas, a próxima e a força estimada que ela precisa.", "cor": "ceu"}
+            ]}
+          ]
+        },
+        {
+          "titulo": "Mapa de rotas",
+          "blocos": [
+            {"tipo": "texto", "texto": "Entre um objetivo e outro você escolhe um caminho num mapa sorteado. Cada nó dura 2 turnos e muda as regras daquele trecho:"},
+            {"tipo": "nos"},
+            {"tipo": "dica", "texto": "Olhe o mapa inteiro antes de escolher: às vezes vale passar por uma Recuperação para chegar inteira num nó de Circuito."}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "corridas",
+      "titulo": "Corridas",
+      "cor": "ceu",
+      "resumo": "Olheiro, instrução e habilidades",
+      "paginas": [
+        {
+          "titulo": "Antes da largada",
+          "blocos": [
+            {"tipo": "itens", "colunas": 1, "itens": [
+              {"titulo": "Olheiro", "texto": "Mostra a força média do pelotão, se há rival e uma etiqueta pela chance estimada de vencer: Favorita, Disputada ou Azarão.", "cor": "ceu"},
+              {"titulo": "Instrução", "texto": "Poupar guarda fôlego para o fim, Forçar arrisca mais cedo, Normal fica no meio. O olheiro sugere a que tem mais chance.", "cor": "laranja"},
+              {"titulo": "Fases", "texto": "Largada, meio, final e sprint. Velocidade e fôlego pesam no meio, Poder e Inteligência na última curva, Velocidade e Determinação no sprint.", "cor": "verde"}
+            ]},
+            {"tipo": "dica", "texto": "Na corrida, troque de câmera com C ou com as teclas 1 a 6, e use 1x, 2x ou pular."}
+          ]
+        },
+        {
+          "titulo": "Habilidades e calendário",
+          "blocos": [
+            {"tipo": "itens", "colunas": 2, "itens": [
+              {"titulo": "Habilidades", "texto": "Disparam sozinhas quando a condição acontece (fase, posição, distância). Inteligência aumenta a chance. Até {d:habilidades.limite} equipadas.", "cor": "roxo"},
+              {"titulo": "Loja de habilidades", "texto": "Corridas dão pontos de habilidade, que compram habilidades no botão Habilidades. A Biblioteca dá {pctd:habilidades.desconto_biblioteca}% de desconto.", "cor": "ouro"},
+              {"titulo": "Calendário fixo", "texto": "Corridas Prata e Ouro com nome, iguais em toda carreira, que dá para correr em qualquer nó.", "cor": "ceu"},
+              {"titulo": "Séries e títulos", "texto": "Vencer certos conjuntos de corridas do calendário dá títulos, com fama, amuleto ou aptidão. Os títulos ficam na versão salva.", "cor": "rosa"}
+            ]}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fama",
+      "titulo": "Fama e prêmios",
+      "cor": "ouro",
+      "revisar": "Muda com a proposta de fama como Prestígio (docs/fama-e-crescimento.md, PR #31): fama vira multiplicador do ganho, corridas passam a dar atributos como um treino e entram metas de fama e boosts. Quando entrar, reescrever as duas páginas deste capítulo.",
+      "resumo": "O que cada corrida rende",
+      "paginas": [
+        {
+          "titulo": "Fama",
+          "blocos": [
+            {"tipo": "texto", "texto": "A fama (a estrela ao lado do nome) sobe com as corridas e abre as categorias mais altas. Os objetivos são por convite e não pedem fama."},
+            {"tipo": "tabela", "colunas": ["Categoria", "Fama para entrar", "Fama ao vencer"], "linhas": [
+              ["Estreia", "{d:calendario.categorias.estreia.fama_entrada}", "{d:calendario.categorias.estreia.fama}"],
+              ["Aberta", "{d:calendario.categorias.aberta.fama_entrada}", "{d:calendario.categorias.aberta.fama}"],
+              ["Prata", "{d:calendario.categorias.prata.fama_entrada}", "{d:calendario.categorias.prata.fama}"],
+              ["Ouro", "{d:calendario.categorias.ouro.fama_entrada}", "{d:calendario.categorias.ouro.fama}"],
+              ["Grande Prêmio", "convite", "{d:calendario.categorias.gp1.fama}"]
+            ]},
+            {"tipo": "dica", "texto": "Arriscar rende mais: como Azarão a fama vale ×{d:calendario.olheiro.mult.azarao}, e como Favorita, ×{d:calendario.olheiro.mult.favorita}."}
+          ]
+        },
+        {
+          "titulo": "O que uma corrida dá",
+          "blocos": [
+            {"tipo": "itens", "colunas": 2, "itens": [
+              {"titulo": "Atributos", "texto": "Um pouco em todos os atributos, mais nas categorias altas. Vencer dá o valor cheio, top 3 dá 80% e o resto, metade.", "cor": "ceu"},
+              {"titulo": "Pontos de habilidade", "texto": "Para a loja de habilidades. Vencer um GP dá {d:habilidades.pontos_por_categoria.gp1}.", "cor": "roxo"},
+              {"titulo": "Moeda", "texto": "1 moeda a cada {bal:moeda_por_fama} de fama ganha, mais {bal:moeda_base} por terminar a carreira e {bal:moeda_objetivo} por objetivo cumprido.", "cor": "ouro"},
+              {"titulo": "Energia", "texto": "Cada corrida gasta {bal:energia_corrida}, e a 3ª em 3 turnos seguidos gasta mais {bal:energia_seguidas}.", "cor": "laranja"}
+            ]}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "vida",
+      "titulo": "Clima e encontros",
+      "cor": "verde",
+      "resumo": "Clima, férias, encontros e afinidade",
+      "paginas": [
+        {
+          "titulo": "Clima do mês",
+          "blocos": [
+            {"tipo": "texto", "texto": "O clima aparece no topo da tela da carreira e segue as estações. Ele mexe no treino e, às vezes, na corrida."},
+            {"tipo": "climas"},
+            {"tipo": "dica", "texto": "Em janeiro de cada ano vêm as férias de verão: escolha a Serra (Estamina e Determinação) ou a Praia (Velocidade e Poder) e treine com 1 nível a mais, sem corridas."}
+          ]
+        },
+        {
+          "titulo": "Encontros e afinidade",
+          "blocos": [
+            {"tipo": "itens", "colunas": 2, "itens": [
+              {"titulo": "Encontros", "texto": "Em alguns turnos (mais ao Sair) aparece uma cena com 2 ou 3 escolhas. Cada escolha mexe em humor, atributos, energia ou afinidade.", "cor": "rosa"},
+              {"titulo": "Afinidade", "texto": "Cada colega tem afinidade com ela (botão Relações). Com {bal:afinidade_dupla}+, a colega pode aparecer no treino em dupla.", "cor": "verde"},
+              {"titulo": "Capítulos de história", "texto": "Em turnos fixos, a história da garota avança. Algumas escolhas pesam no ponto de virada.", "cor": "roxo"},
+              {"titulo": "Véspera", "texto": "Antes dos Grandes Prêmios, uma conversa com a rival que vai estar na pista.", "cor": "ceu"}
+            ]}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "academia",
+      "titulo": "Academia e elenco",
+      "cor": "rosa",
+      "resumo": "Pool, vínculo, versão salva e madrinha",
+      "paginas": [
+        {
+          "titulo": "Entre uma carreira e outra",
+          "blocos": [
+            {"tipo": "itens", "colunas": 2, "itens": [
+              {"titulo": "Pool semanal", "texto": "{perfil:tamanho_pool} garotas por rotação, com chances iguais e visíveis. Cada tiragem custa {perfil:custo_tiragem} moedas. Marque uma e ela vem garantida em até {perfil:garantia} tiragens.", "cor": "rosa"},
+              {"titulo": "Vínculo", "texto": "Tirar uma garota repetida sobe o vínculo (até {perfil:vinculo_max}): +{bal:vinculo_attr} em cada atributo inicial e +{bal:vinculo_limite} no limite por nível.", "cor": "ouro"},
+              {"titulo": "Versão salva", "texto": "Fica 1 versão salva por garota. No fim da carreira você escolhe se a nova substitui a antiga.", "cor": "verde"},
+              {"titulo": "Madrinha", "texto": "Com garotas salvas, a carreira começa escolhendo uma madrinha: bônus inicial de até +{bal:legado_teto} por atributo e inspirações nos turnos 25 e 49.", "cor": "roxo"}
+            ]},
+            {"tipo": "dica", "texto": "Cada carreira concluída gira a pool e as condições do circuito."}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "endgame",
+      "titulo": "Endgame",
+      "cor": "laranja",
+      "resumo": "Magnitude, Circuito e Desafio da semana",
+      "paginas": [
+        {
+          "titulo": "Depois do GP final",
+          "blocos": [
+            {"tipo": "itens", "colunas": 1, "itens": [
+              {"titulo": "Magnitude (0 a {d:endgame.magnitude.max})", "texto": "Vencer o GP final libera a próxima magnitude daquela garota: pelotão mais forte, maldições e metas mais altas, e +{pctd:endgame.magnitude.moeda_por_nivel}% de moeda por nível.", "cor": "laranja"},
+              {"titulo": "Circuito", "texto": "5 copas e o Campeonato Final em Bronze, Prata e Ouro, corridos com as versões salvas contra 3 casas rivais. O clima e o traçado de cada corrida mudam a cada rotação, então a melhor escalação muda também.", "cor": "ceu"},
+              {"titulo": "Desafio da semana", "texto": "Uma carreira com semente, garota e regra fixas, igual para todo mundo na rotação. A 1ª tentativa concluída rende moeda; as outras valem o recorde.", "cor": "roxo"}
+            ]},
+            {"tipo": "dica", "texto": "Treine garotas diferentes: no circuito, pistas pesadas, subidas, vento contra e retas longas favorecem perfis diferentes."}
+          ]
+        }
+      ]
+    }
+  ]
+}

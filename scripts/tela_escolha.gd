@@ -9,6 +9,12 @@ func _ready() -> void:
 	var v := UI.vbox(12)
 	var topo := UI.hbox(14)
 	topo.add_child(UI.faixa("Nekomusume: Corrida Purrfeita", UI.ROSA, 30))
+	var esp := Control.new()
+	esp.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	topo.add_child(esp)
+	var bg := UI.botao("Como jogar", func(): TelaGuia.abrir(self, "jogo"), 18)
+	UI.tecla(bg, "F1")
+	topo.add_child(bg)
 	v.add_child(topo)
 	v.add_child(UI.label("Escolha sua primeira garota. As outras você conhece pela pool semanal.", 18, UI.SUAVE))
 	var linha := UI.hbox(16)

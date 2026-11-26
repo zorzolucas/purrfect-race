@@ -2069,7 +2069,7 @@
    "virada": {
     "e": [
      {
-      "vitorias_min": 6
+      "vitorias_min": 8
      },
      {
       "distancias_top3_min": 3
@@ -2179,7 +2179,7 @@
    "virada": {
     "e": [
      {
-      "viradas_min": 3
+      "viradas_min": 2
      },
      {
       "vitorias_min": 9
@@ -2274,7 +2274,7 @@
     "turno": 20,
     "cat": "aberta",
     "meta": {
-     "max": 3
+     "max": 4
     },
     "onde": "casa"
    },

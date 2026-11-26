@@ -121,9 +121,16 @@ Em ordem de custo/benefício:
 | Opção | Custo | Prós | Contras |
 |---|---|---|---|
 | **GitHub Pages** (recomendado) | Grátis | Tudo no repo, deploy no mesmo Actions, junto do visualizador | Sem headers próprios (por isso o export sem threads); só gzip; limite de 1 GB de site e ~100 GB/mês de tráfego, sobra |
+| Vercel (já ligado ao repo) | Grátis (plano Hobby, uso não comercial) | Já publica cada PR com link de preview; aceita headers próprios (`vercel.json`) e Brotli | O build da Vercel não tem Godot: o export teria que rodar no Actions e subir com `vercel deploy --prebuilt` (precisa de token como segredo). Conferir o limite de tamanho de arquivo do plano antes |
 | itch.io | Grátis | Vitrine de jogos, tem opção de SharedArrayBuffer, Brotli | Upload manual ou via `butler` no CI (precisa de chave de API como segredo) |
 | Netlify | Grátis (100 GB/mês) | Headers próprios, Brotli, preview por PR | Mais uma conta e um token |
 | Cloudflare Pages | Grátis | Rápido | **Limite de 25 MB por arquivo**: o `.wasm` (39,5 MB) não passa sem motor sob medida |
+
+**Observação:** o repositório já tem a Vercel ligada (ela comentou no PR #37 com um
+preview, que hoje só mostra o visualizador). Se o Lucas preferir manter tudo na
+Vercel, ela vira a alternativa principal: ganha preview do jogo em cada PR, mas
+custa configurar um token. Sem isso, o GitHub Pages continua o caminho mais
+simples.
 
 ## Riscos
 

@@ -85,3 +85,24 @@ static func _caminho(c: Node) -> String:
 		partes.push_front(n.name)
 		n = n.get_parent()
 	return "/".join(partes).right(90)
+
+
+## Celular em pé: os controles mais internos que pedem mais largura do que `limite` (eles é que
+## obrigam a tela a encolher). Imprime "LARGO <tela>: ...".
+static func largos(raiz: Node, nome: String, limite: float) -> void:
+	for c in _controles(raiz):
+		if c.get_combined_minimum_size().x <= limite:
+			continue
+		var filho_largo := false
+		for f in c.get_children():
+			if f is Control and f.visible and f.get_combined_minimum_size().x > limite:
+				filho_largo = true
+				break
+		if not filho_largo:
+			var textos := []
+			for f in _controles(c):
+				if f.get("text") != null and str(f.get("text")) != "":
+					textos.append("%s(%d)" % [str(f.get("text")).replace("\n", " | ").left(40), int(f.get_combined_minimum_size().x)])
+			if c.get("text") != null:
+				textos.push_front(str(c.text).left(50))
+			print("LARGO %s: %s min=%s %s" % [nome, c.get_class(), c.get_combined_minimum_size(), " / ".join(textos.slice(0, 6))])

@@ -8,16 +8,17 @@ signal escolheu(inicial: Dictionary)
 func _ready() -> void:
 	var v := UI.vbox(12)
 	var topo := UI.hbox(14)
-	topo.add_child(UI.faixa("Nekomusume: Corrida Purrfeita", UI.ROSA, 30))
+	var em_pe := UI.em_pe()
+	topo.add_child(UI.faixa("Corrida Purrfeita" if em_pe else "Nekomusume: Corrida Purrfeita", UI.ROSA, 24 if em_pe else 30))
 	var esp := Control.new()
 	esp.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	topo.add_child(esp)
-	var bg := UI.botao("Como jogar", func(): TelaGuia.abrir(self, "jogo"), 18)
+	var bg := UI.botao("Como jogar", func(): TelaGuia.abrir(self, "jogo"), 16 if em_pe else 18)
 	UI.tecla(bg, "F1")
 	topo.add_child(bg)
 	v.add_child(topo)
-	v.add_child(UI.label("Escolha sua primeira garota. As outras você conhece pela pool semanal.", 18, UI.SUAVE))
-	var linha := UI.hbox(16)
+	v.add_child(UI.label("Escolha sua primeira garota. As outras você conhece pela pool semanal.", 16 if em_pe else 18, UI.SUAVE, em_pe))
+	var linha := UI.fila(16 if not em_pe else 10)
 	linha.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	var i := 0
 	for ini in Dados.iniciais:
@@ -27,7 +28,7 @@ func _ready() -> void:
 			UI.pop(cartao, 0.08 * i)
 			i += 1
 	v.add_child(linha)
-	add_child(UI.margem(v, 24))
+	add_child(UI.margem(v, 10 if em_pe else 24))
 
 
 func _cartao(ini: Dictionary) -> Control:
@@ -50,10 +51,23 @@ func _cartao(ini: Dictionary) -> Control:
 	var estilo := UI.capsula(Dados.ESTILO_NOME[g.estilo], cor, 13)
 	estilo.position = Vector2(4, 4)
 	palco.add_child(estilo)
-	v.add_child(palco)
+	var raiz_v := v
+	var info := v
+	if UI.em_pe():
+		# em pé: a garota à esquerda e a ficha à direita, num cartão deitado
+		palco.custom_minimum_size = Vector2(140, 250)
+		var hp := UI.hbox(8)
+		hp.add_child(palco)
+		info = UI.vbox(5)
+		info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		hp.add_child(info)
+		v.add_child(hp)
+	else:
+		v.add_child(palco)
+	v = info
 	v.add_child(UI.label(ini.descricao, 14, UI.TEXTO, true))
 	v.add_child(UI.label("Corrida-alvo: %s (%d m), %s" % [
-		Dados.DIST_NOME[ini.distancia], Dados.DISTANCIAS[ini.distancia], ini.piso.capitalize()], 13, UI.SUAVE))
+		Dados.DIST_NOME[ini.distancia], Dados.DISTANCIAS[ini.distancia], ini.piso.capitalize()], 13, UI.SUAVE, UI.em_pe()))
 	var grade := GridContainer.new()
 	grade.columns = 2
 	grade.add_theme_constant_override("h_separation", 12)
@@ -64,7 +78,7 @@ func _cartao(ini: Dictionary) -> Control:
 		var l := UI.label(Dados.ATTR_CURTO[k], 13)
 		l.custom_minimum_size.x = 30
 		h.add_child(l)
-		var b := UI.barra(g.atributos[k], 150, UI.ATTR_COR[k], 80)
+		var b := UI.barra(g.atributos[k], 150, UI.ATTR_COR[k], 40 if UI.em_pe() else 80)
 		b.custom_minimum_size.y = 10
 		b.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		h.add_child(b)
@@ -76,5 +90,5 @@ func _cartao(ini: Dictionary) -> Control:
 	var habil: String = SimCorrida.UNICAS[ini.unica].nome
 	v.add_child(UI.label("Habilidade única: ★ %s" % habil, 13, UI.DESTAQUE, true))
 	v.add_child(UI.botao_principal("Escolher %s" % ini.nome.split(" ")[0], func(): escolheu.emit(ini), 18))
-	p.add_child(v)
+	p.add_child(raiz_v)
 	return p

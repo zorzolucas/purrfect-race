@@ -55,10 +55,11 @@ func _init(d: Dictionary, cor: Color) -> void:
 
 
 func _ready() -> void:
-	var raiz := UI.vbox(10)
+	var em_pe := UI.em_pe()
+	var raiz := UI.vbox(8 if em_pe else 10)
 	var topo := UI.hbox(8)
-	topo.add_child(UI.faixa(dados.nome, UI.ROSA, 22))
-	var chips := UI.hbox(6)
+	topo.add_child(UI.faixa(dados.nome, UI.ROSA, 16 if em_pe else 22))
+	var chips: Container = UI.fluxo(6) if em_pe else UI.hbox(6)
 	chips.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	chips.add_child(UI.capsula("%d m" % dados.distancia, UI.CEU, 15))
 	if dados.objetivo > 0:
@@ -68,7 +69,8 @@ func _ready() -> void:
 	if dados.get("clima", "") != "":
 		var cl: Dictionary = Dados.calendario.climas[dados.clima]
 		chips.add_child(UI.capsula("%s %s" % [cl.icone, cl.nome], Color("#5bb8e8"), 15))
-	topo.add_child(chips)
+	if not em_pe:
+		topo.add_child(chips)
 	var esp := Control.new()
 	esp.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	topo.add_child(esp)
@@ -76,7 +78,7 @@ func _ready() -> void:
 	for v in [["1x", 1.0], ["2x", 2.0]]:
 		var vel: float = v[1]
 		var bv := UI.botao(v[0], func(): _mudar_velocidade(vel), 16)
-		bv.custom_minimum_size.x = 52
+		bv.custom_minimum_size.x = 46 if em_pe else 52
 		bv.set_meta("vel", vel)
 		botoes.add_child(bv)
 	botoes.add_child(UI.botao_cor("Pular ▶▶", _pular, UI.LARANJA, 16))
@@ -86,20 +88,27 @@ func _ready() -> void:
 	continuar.visible = false
 	topo.add_child(continuar)
 	raiz.add_child(topo)
+	if em_pe:
+		# em pé: distância, objetivo e clima numa segunda linha
+		raiz.add_child(chips)
 	_mudar_velocidade(1.0)
 
-	var meio := UI.hbox(16)
+	var meio := UI.fila(16 if not em_pe else 8)
 	meio.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	var area := Control.new()
 	area.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	area.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	if em_pe:
+		# em pé: a pista em cima (um pouco mais da metade) e a classificação embaixo
+		area.custom_minimum_size.y = 330
+		area.size_flags_stretch_ratio = 1.3
 	area.clip_contents = true
 	var vista := SubViewportContainer.new()
 	vista.stretch = true
 	vista.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	area.add_child(vista)
 	var vp := SubViewport.new()
-	vp.msaa_3d = Viewport.MSAA_4X
+	vp.msaa_3d = Viewport.MSAA_2X if Escala.compacto() else Viewport.MSAA_4X  # celular: mais leve
 	vista.add_child(vp)
 	mundo = Corrida3D.new(cores, dados.field.map(func(g): return g.nome))
 	vp.add_child(mundo)
@@ -114,13 +123,19 @@ func _ready() -> void:
 	cams.position = Vector2(12, -52)
 	cams.grow_vertical = Control.GROW_DIRECTION_BEGIN
 	botao_camera = UI.botao("", _proxima_camera, 16)
-	cams.add_child(UI.label("Câmera (C):", 16))
-	cams.add_child(botao_camera)
-	for m in Corrida3D.CAMERA_NOME.size():
-		var modo: int = m
-		cams.add_child(UI.botao(str(m + 1), func(): _usar_camera(modo), 16))
+	if em_pe:
+		# em pé só cabe o botão que troca de câmera (cada toque vai para a próxima)
+		cams.position = Vector2(8, -8)
+		botao_camera.custom_minimum_size.y = 44
+		cams.add_child(botao_camera)
+	else:
+		cams.add_child(UI.label("Câmera (C):", 16))
+		cams.add_child(botao_camera)
+		for m in Corrida3D.CAMERA_NOME.size():
+			var modo: int = m
+			cams.add_child(UI.botao(str(m + 1), func(): _usar_camera(modo), 16))
 	sobre.add_child(cams)
-	aviso = UI.faixa(" ", UI.OURO, 24) as UI.Faixa
+	aviso = UI.faixa(" ", UI.OURO, 18 if em_pe else 24) as UI.Faixa
 	faixa_aviso = aviso.rotulo
 	aviso.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
 	aviso.grow_horizontal = Control.GROW_DIRECTION_BOTH
@@ -131,20 +146,20 @@ func _ready() -> void:
 	resultado = UI.painel(UI.PAINEL, 18)
 	# embaixo, no centro: a chegada continua visível atrás
 	resultado.set_anchors_and_offsets_preset(Control.PRESET_CENTER_BOTTOM)
-	resultado.position.y -= 96
+	resultado.position.y -= 60 if em_pe else 96
 	resultado.grow_horizontal = Control.GROW_DIRECTION_BOTH
 	resultado.grow_vertical = Control.GROW_DIRECTION_BEGIN
 	resultado.visible = false
 	var rv := UI.vbox(8)
 	var rh := UI.hbox(14)
 	rh.alignment = BoxContainer.ALIGNMENT_CENTER
-	rh.add_child(UI.medalhao(dados.field[0].nome, 72, "feliz"))
-	resultado_pos = UI.label_contorno("", 60, UI.OURO, Color.WHITE, 12)
+	rh.add_child(UI.medalhao(dados.field[0].nome, 52 if em_pe else 72, "feliz"))
+	resultado_pos = UI.label_contorno("", 44 if em_pe else 60, UI.OURO, Color.WHITE, 12)
 	resultado_pos.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	rh.add_child(resultado_pos)
 	var rtv := UI.vbox(6)
 	rtv.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	resultado_txt = UI.label("", 20, UI.TEXTO)
+	resultado_txt = UI.label("", 17 if em_pe else 20, UI.TEXTO)
 	rtv.add_child(resultado_txt)
 	resultado_meta = PanelContainer.new()
 	resultado_meta.visible = false
@@ -152,15 +167,17 @@ func _ready() -> void:
 	rh.add_child(rtv)
 	rv.add_child(rh)
 	var b := UI.botao_principal("Continuar (Enter)", _continuar, 20)
-	b.custom_minimum_size = Vector2(300, 50)
+	b.custom_minimum_size = Vector2(240 if em_pe else 300, 50)
 	b.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	rv.add_child(b)
 	resultado.add_child(rv)
 	sobre.add_child(resultado)
 
 	var lado := UI.painel_titulo("Classificação", UI.CEU)
-	lado.custom_minimum_size.x = 310
+	lado.custom_minimum_size.x = 0 if em_pe else 310
 	lado.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	if em_pe:
+		lado.custom_minimum_size.y = 220
 	var lv := UI.vbox(6)
 	info = UI.label("", 15, UI.SUAVE)
 	info.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -187,7 +204,7 @@ func _ready() -> void:
 	corpo_lado.add_child(rolagem)
 	meio.add_child(lado)
 	raiz.add_child(meio)
-	add_child(UI.margem(raiz, 16))
+	add_child(UI.margem(raiz, 8 if em_pe else 16))
 	_atualizar_ranking()
 
 

@@ -301,6 +301,8 @@ static func com_tecla(tecla: String, texto: String) -> String:
 
 ## Plaquinha com a tecla de atalho no canto de cima à direita de um botão.
 static func tecla(b: Control, t: String) -> void:
+	if Escala.toque:  # no celular não há teclado: a plaquinha só ocuparia espaço
+		return
 	var p := PanelContainer.new()
 	var sb := StyleBoxFlat.new()
 	sb.bg_color = Color(1, 1, 1, 0.92)
@@ -450,10 +452,60 @@ static func vbox(sep: int = 8) -> VBoxContainer:
 	return v
 
 
+## Celular em pé: as telas trocam linhas por colunas.
+static func em_pe() -> bool:
+	return Escala.retrato()
+
+
+## Linha no desktop, coluna no celular em pé (painéis lado a lado que viram pilha).
+static func fila(sep: int = 8) -> BoxContainer:
+	return vbox(sep) if Escala.retrato() else hbox(sep)
+
+
+## Grade com `colunas` no desktop e `colunas_pe` no celular em pé.
+static func grade(colunas: int, colunas_pe: int, sep: int = 8) -> GridContainer:
+	var g := GridContainer.new()
+	g.columns = colunas_pe if Escala.retrato() else colunas
+	g.add_theme_constant_override("h_separation", sep)
+	g.add_theme_constant_override("v_separation", sep)
+	return g
+
+
+## Lista que rola dentro da tela (desktop). No celular a tela inteira já rola, então devolve
+## o conteúdo direto: duas rolagens, uma dentro da outra, brigam pelo dedo.
+static func rolavel(conteudo: Control) -> Control:
+	conteudo.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	if Escala.compacto():
+		return conteudo
+	var r := ScrollContainer.new()
+	r.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	r.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	r.add_child(conteudo)
+	return r
+
+
+## Linha de botões que quebra em mais linhas quando falta largura (topo das telas no celular).
+static func fluxo(sep: int = 8) -> HFlowContainer:
+	var f := HFlowContainer.new()
+	f.add_theme_constant_override("h_separation", sep)
+	f.add_theme_constant_override("v_separation", sep)
+	return f
+
+
 static func hbox(sep: int = 8) -> HBoxContainer:
 	var h := HBoxContainer.new()
 	h.add_theme_constant_override("separation", sep)
 	return h
+
+
+## Onde pôr janelas que cobrem a tela (guia, detalhes): a camada do Main, que fica por cima
+## da rolagem e tem sempre o tamanho visível. Fora do jogo (testes), o próprio nó.
+static func camada(no: Node) -> Node:
+	if no.is_inside_tree():
+		var m := no.get_tree().root.get_node_or_null("Main")
+		if m != null and m.get("camada") != null:
+			return m.camada
+	return no
 
 
 static func margem(filho: Control, m: int = 24) -> MarginContainer:

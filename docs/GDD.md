@@ -25,7 +25,7 @@
 
 **Garotas gato:** são garotas com **orelhas e rabo de gato**, ágeis e curiosas. Cada uma tem uma **pelagem** (laranja rajada, frajola, preta, tricolor…) que define as cores do modelo 3D: cabelo, orelhas e rabo ([elenco](elenco.md)). A pelagem é a identidade visual dela, e os detalhes do visual contam algo da personalidade (lição das referências de design de personagem). O jeito felino aparece nos encontros e nas animações: cochilo no sol, curiosidade, caixas de papelão, orelhas que mostram o humor.
 
-**Nome do jogo:** **Nekomusume: Corrida Purrfeita** (PT-BR) / **Nekomusume: Purrfect Sprint** (EN). "Nekomusume" é o termo japonês genérico para garota gato; "Purrfeita" brinca com *purr* (ronronar). Antes do lançamento, fazer uma busca de marca, porque o nome lembra o de outro jogo do gênero (§12). O repositório continua `stelar-gallop`, e o nome antigo era "Galope Estelar".
+**Nome do jogo:** **Nekomusume: Corrida Purrfeita** (PT-BR) / **Nekomusume: Purrfect Sprint** (EN). "Nekomusume" é o termo japonês genérico para garota gato; "Purrfeita" brinca com *purr* (ronronar). Antes do lançamento, fazer uma busca de marca, porque o nome lembra o de outro jogo do gênero (§12). O repositório se chama `purrfect-race` (era `stelar-gallop` até 2026-11-26), e o nome antigo do jogo era "Galope Estelar".
 
 ## 2. Loop principal
 

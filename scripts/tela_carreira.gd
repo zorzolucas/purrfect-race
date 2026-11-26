@@ -816,7 +816,7 @@ func _escolher_amuleto(id: String) -> void:
 func _cartao_corrida(cr: Dictionary) -> Control:
 	var cat: Dictionary = Dados.calendario.categorias[cr.cat]
 	var ol := c.olheiro(cr)
-	var linhas := ["%s%s%s" % ["⚔ " if cr.get("desafio", false) else "", "📅 " if cr.get("fixa", false) else "", cr.nome],
+	var linhas := ["%s%s%s" % ["⚔ " if cr.get("desafio", false) else "", "▦ " if cr.get("fixa", false) else "", cr.nome],
 		"%s · %s %s · %d m" % [cat.nome, Dados.DIST_NOME[cr.dist], cr.piso, Calendario.metros(cr)],
 		"Aptidão %s/%s · fama até %d" % [Dados.APT_NOME[c.aptidao[cr.dist]], Dados.APT_NOME[c.aptidao[cr.piso]], c.fama_prevista(cr, 1, ol.mult)],
 		"Olheiro: %s (%d%%) · fama ×%s" % [Carreira.nome_etiqueta(ol.etiqueta), roundi(ol.chance * 100), _mult_txt(ol.mult)],

@@ -45,15 +45,22 @@ static var _fonte_negrito: Font
 static var _ultima_moeda := -1
 
 
-## Fonte arredondada (M PLUS Rounded 1c, OFL) no peso pedido, com a fonte padrão do Godot
-## como reserva para os símbolos (★ ✓ ◆ ...), que o subconjunto latino não tem.
+## Fonte arredondada (M PLUS Rounded 1c, OFL) no peso pedido. Os símbolos (★ ✓ ◆ → ...),
+## que o subconjunto latino não tem, vêm de um recorte da DejaVu Sans: no navegador não há
+## fontes do sistema para o Godot buscar, e eles virariam quadradinhos.
+const FONTE_SIMBOLOS := "res://fontes/dejavu-sans-bold-simbolos.woff2"
+
 static func fonte(peso: int = 700) -> Font:
 	var caminho := "res://fontes/m-plus-rounded-1c-latin-%d-normal.woff2" % peso
 	var f: FontFile = load(caminho) if ResourceLoader.exists(caminho) else null
 	if f == null:
 		return ThemeDB.fallback_font
 	f = f.duplicate()
-	f.fallbacks = [ThemeDB.fallback_font]
+	var reservas: Array[Font] = []
+	if ResourceLoader.exists(FONTE_SIMBOLOS):
+		reservas.append(load(FONTE_SIMBOLOS))
+	reservas.append(ThemeDB.fallback_font)
+	f.fallbacks = reservas
 	return f
 
 

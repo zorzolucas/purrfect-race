@@ -3,3 +3,4 @@ __pycache__/
 .godot/
 testes/capturas/
 *.blend1
+build/

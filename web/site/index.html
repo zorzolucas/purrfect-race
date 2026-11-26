@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nekomusume: Corrida Purrfeita</title>
+<meta name="description" content="Protótipo de jogo de treinar garotas gato corredoras, jogável no navegador.">
+<link rel="icon" href="icone.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root { --fundo:#eef6fb; --listra:#dcecf8; --texto:#2c3550; --suave:#6b7a99; --rosa:#ff6fa8; --verde:#3cc96f; --painel:#fff; --borda:#d3dfea; }
+  * { box-sizing: border-box; }
+  body { margin:0; min-height:100vh; font-family: "M PLUS Rounded 1c", system-ui, sans-serif; color:var(--texto);
+    background: repeating-linear-gradient(45deg, var(--fundo) 0 40px, var(--listra) 40px 80px); }
+  main { max-width: 880px; margin: 0 auto; padding: 32px 16px 48px; }
+  .capa { width:100%; border-radius:18px; border:3px solid #fff; box-shadow:0 6px 24px rgba(44,53,80,.15); display:block; }
+  .painel { background:var(--painel); border:1px solid var(--borda); border-radius:18px; padding:24px; margin-top:20px; box-shadow:0 4px 0 var(--borda); }
+  h1 { margin:0 0 8px; font-size: clamp(24px, 5vw, 34px); }
+  p { margin: 8px 0; color: var(--suave); line-height:1.5; }
+  .botoes { display:flex; gap:12px; flex-wrap:wrap; margin-top:18px; }
+  a.botao { display:inline-block; text-decoration:none; font-weight:800; font-size:20px; padding:14px 28px; border-radius:14px; color:#fff; }
+  a.jogar { background:var(--verde); box-shadow:0 5px 0 #2a9a54; }
+  a.vis { background:#fff; color:var(--texto); border:2px solid var(--borda); box-shadow:0 5px 0 var(--borda); font-size:17px; }
+  a.botao:active { transform: translateY(3px); box-shadow:none; }
+  ul { color:var(--suave); padding-left:20px; line-height:1.6; margin:8px 0 0; }
+</style>
+</head>
+<body>
+<main>
+  <img class="capa" src="capa.png" alt="As garotas da Academia Estelar">
+  <section class="painel">
+    <h1>Nekomusume: Corrida Purrfeita</h1>
+    <p>Protótipo de um jogo de treinar garotas gato corredoras. Escolha uma garota, planeje os turnos de treino, encare as corridas e monte o elenco da Academia Estelar.</p>
+    <div class="botoes">
+      <a class="botao jogar" href="jogo/">Jogar no navegador</a>
+      <a class="botao vis" href="visualizador/">Visualizador da corrida</a>
+    </div>
+    <ul>
+      <li>O primeiro carregamento baixa cerca de 35 MB; depois o navegador guarda em cache.</li>
+      <li>O progresso fica salvo <b>neste navegador</b>. Limpar os dados do site apaga o save.</li>
+      <li>Feito para computador, com mouse e teclado (F1 abre o guia). No celular, use deitado.</li>
+    </ul>
+  </section>
+</main>
+</body>
+</html>

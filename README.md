@@ -4,6 +4,8 @@ Simulador de treino e corrida de garotas gato. O design está em [docs/GDD.md](d
 
 ## Protótipo jogável (Godot 4.7)
 
+**No navegador:** https://zorzolucas.github.io/stelar-gallop/ (publicado sozinho a cada merge na `main`; ver [docs/jogo-no-navegador.md](docs/jogo-no-navegador.md)).
+
 O projeto Godot fica na raiz do repositório. Para jogar, abra o `project.godot` no Godot 4.7
 e aperte F5, ou rode:
 

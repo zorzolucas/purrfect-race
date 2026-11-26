@@ -289,4 +289,4 @@ Bot de balanceamento (`testes/balanco.gd`), 48 garotas. O bot agora escolhe o eq
 - **Circuito do endgame** +10% (Bronze 660, Prata 880, Ouro 1045), com a tabela de dificuldade medida de novo ([endgame](endgame.md) §5.7). Estilos no circuito a 4,4% um do outro (eram 2,7%), nenhum o melhor em mais de 39% das corridas.
 - **Viradas sem depender de vencer o GP do turno 48:** Durona (vencer o objetivo 4 e top 2 no 5 e no GP), Lira e Antares (top 2 no GP e 9 vitórias), Sonhadora (3 viradas e 9 vitórias). Com 40 carreiras por garota: Antares 45%, Lira 38%, Durona 48%, Sonhadora 46%, Competitiva 47%.
 
-**Próximos ajustes:** rodar 80 carreiras por garota para separar sorte de diferença real (casas, estilos e arquétipos) e revisar a Perseguidora +1,5% (`forca_estilo`), que pode ter ficado sobrando.
+**Rodada de 80 carreiras por garota (2026-11-26):** o +1,5% da Perseguidora estava sobrando (10 pontos à frente da Arrancadora). Saiu, a Arrancadora ganhou +1% e o GP final ficou um pouco mais leve ([campanhas](campanhas.md) §7.4, v0.8).

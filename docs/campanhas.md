@@ -1,5 +1,6 @@
 # Nekomusume — Campanhas e balanceamento
 
+> Versão 0.8 — 2026-11-26. Na v0.8 a Perseguidora perdeu o +1,5% na carreira e a Arrancadora ganhou +1%, o GP final ficou 2% mais leve (4% na Longa), a Misteriosa pede top 4 no objetivo 2 e as viradas da Curiosa e da Sonhadora mudaram. Estilos de 10,0 para 2,9 pontos na conta nova (§7.4).
 > Versão 0.7 — 2026-11-20. Na v0.7 a simulação mudou (fôlego do pelotão e correção de estilo por nível, [corrida](corrida.md) §6 e §8.5), o bot treina pelo estilo, a Antares foi para a casa certa, a Algol perdeu o extra e a Perseguidora ganhou +1,5% na carreira. Casas, arquétipos e estilos ficaram em 9,8, 10,8 e 1,8 pontos de diferença, nenhum objetivo derruba mais de 22% em grupo nenhum e as 18 viradas ficaram entre 35% e 65% (§7).
 > Versão 0.6 — 2026-11-18. Na v0.6 a diferença entre casas chegou a 9,9 pontos e a entre arquétipos a 11,2, com o objetivo 4 da Teimosa e da Sonhadora, a Misteriosa e a Média Grama acertados (§7).
 > Versão 0.5 — 2026-11-18. Na v0.5 o ano 3 ficou mais forte, a garota cresce mais cedo, as corridas do calendário fixo ficaram mais fortes (a Coroa Dupla caiu de 28% para 14% das carreiras) e o bot passou a usar uma semente por garota (§7).
@@ -355,7 +356,7 @@ São **84 textos** no total (12 × 7). As campanhas do MVP têm mais capítulos 
 
 **Curiosa**. *Quer testar tudo e descobre onde é a casa dela.*
 - Objetivo 2: Aberta **fora de casa**, top 5. Objetivo 4: Prata no **outro piso**, top 5.
-- Virada: **venceu 6 corridas** e ficou **top 3 em pelo menos 3 distâncias** até o turno 48 → **Exploradora**. Senão → **Volta para casa**. (Até a v0.6 pedia correr nas 4 distâncias, o que só 1 em 4 carreiras fazia.)
+- Virada: **venceu 8 corridas** e ficou **top 3 em pelo menos 3 distâncias** até o turno 48 → **Exploradora**. Senão → **Volta para casa**. (Até a v0.6 pedia correr nas 4 distâncias, o que só 1 em 4 carreiras fazia. Na v0.8 foi de 6 para 8 vitórias: com o Prestígio, 6 davam 74% no caminho A.)
 - Exploradora: Ouro na distância vizinha, top 3; GP final, versão da distância vizinha, top 3. Volta para casa: vencer Ouro na casa (Difícil); GP final top 3.
 - Capítulos: 1 *"E se?"*: {nome} pergunta tudo sobre todas as pistas. 2 *"Outra distância"*: ela quer correr fora de casa logo depois da estreia. 3 *"Chão novo"*. 4A *"Mapa completo"*. 4B *"O caminho de volta"*.
 - Finais: A *"Exploradora"*: ela coleciona as 4 distâncias no caderno. B *"Volta para casa"*.
@@ -364,13 +365,13 @@ São **84 textos** no total (12 × 7). As campanhas do MVP têm mais capítulos 
 
 **Sonhadora** (referência: Mira). *Distraída o ano todo, acorda na reta final.*
 - Objetivo 2: top 3. Objetivo 4: Prata na casa, **à frente de {rival}**.
-- Virada: venceu **3 corridas de virada** (estava fora do top 5 na metade da corrida) **e 9 corridas no total** até o turno 48 → **Acordada**. (O total de 9 entrou em 2026-11-24: com o Prestígio, só as 3 viradas davam 71%.) Senão → **Céu aberto**.
+- Virada: venceu **2 corridas de virada** (estava fora do top 5 na metade da corrida) **e 9 corridas no total** até o turno 48 → **Acordada**. (O total de 9 entrou em 2026-11-24: com o Prestígio, só as 3 viradas davam 71%. Com 3 viradas e 9 vitórias ficava em 30%, e na v0.8 passou a pedir 2 viradas.) Senão → **Céu aberto**.
 - Acordada: vencer Ouro na casa (Difícil); GP final top 3. Céu aberto: Ouro na distância vizinha, top 3; GP final top 3 e à frente de {rival}.
 - Capítulos: 1 *"Nas nuvens"*: {nome} esquece o horário do treino olhando o céu. 2 *"Lá atrás"*: ela larga em último na estreia e ninguém entende. 3 *"Reta final"*. 4A *"Desperta"*. 4B *"Nuvens"*.
 - Finais: A *"Do fundo"*: ela larga em último e cruza em primeiro. B *"Corre porque gosta"*.
 
 **Misteriosa** (referência: Shaula). *Esconde um passado e decide se mostra quem é.*
-- Objetivo 2: top 3. Objetivo 4: Prata no **outro piso**, top 4 (era top 5 até a v0.6) ("a pista de onde ela veio").
+- Objetivo 2: top 4 (era top 3 até a v0.7). Objetivo 4: Prata no **outro piso**, top 4 (era top 5 até a v0.6) ("a pista de onde ela veio").
 - Virada: escolheu "perguntar" no capítulo 3 → **Raízes**. Senão → **Sombra**.
 - Raízes: Ouro na distância vizinha, top 3; GP final top 3 e à frente de {rival}. Sombra: vencer Ouro na casa (Difícil); GP final top 3.
 - Capítulos: 1 *"Ninguém sabe"*: {nome} não fala de onde veio. 2 *"Foto antiga"*: cai uma foto da mochila dela. 3 *"Pergunta"*: escolha entre perguntar e respeitar o silêncio. 4A *"De onde eu vim"*. 4B *"Sombra"*.
@@ -614,6 +615,15 @@ Na conta madura, passam de 65% a Curiosa (84%), a Estrela (80%), a Perfeccionist
 
 ### 7.4 O que mudou nas últimas rodadas
 
+**v0.8** (2026-11-26, a partir da main com o PR #35: 32,3% na conta nova com 80 carreiras por garota e `SEMENTE0=2000`, 6,7 pontos entre casas, 12,2 entre arquétipos e **10,0 entre estilos**):
+
+1. **Sem o bônus da Perseguidora** e **Arrancadora +1%** na carreira (`forca_estilo`, calendário §2). Depois do Prestígio e das corridas que dão atributo ([fama e crescimento](fama-e-crescimento.md)), a Perseguidora passou de 4 pontos atrás para 10 à frente: 37,6% contra 27,6% da Arrancadora (960 carreiras cada), e 68,1% contra 60,2% na conta madura. Sem o bônus, ela foi a 34,0% e a Arrancadora ficou em 29,0%. Com a Arrancadora a ×1,01, os 4 estilos ficaram de 32,3% a 35,2%. Vale só na carreira: o circuito do endgame não muda (nele os estilos ficam a 3% um do outro em pontos, sem meta).
+2. **GP final mais leve**: força 700 (era 715) e ×0,95 na Longa (era ×0,97). O objetivo 8 derrubava 23% de quem chegava, e 35% na Longa Grama (nos outros objetivos a média é de 4% a 16%). Foi a 19%.
+3. **Objetivo 2 da Misteriosa** pede top 4 (era top 3). Ela era o arquétipo mais baixo (26,6%) e a Zosma, a garota mais abaixo da curva (13,8%, −3,6 desvios), caía 27% nesse objetivo. A Misteriosa ficou em 27,2% (ainda a mais baixa, agora por causa do GP final com a rival no caminho A) e a Zosma saiu da lista dos fora da curva.
+4. **Viradas** da Curiosa (8 vitórias, eram 6: estava em 74%) e da Sonhadora (2 viradas, eram 3: estava em 30%), calibradas com o campo `na_virada` das saídas do bot e conferidas na validação: 42,6% e 37,6%.
+
+Validação com sementes novas (`SEMENTE0=3000`, 80 carreiras por garota): **34,0%** completas, casas a **6,3** pontos, arquétipos a **9,1**, estilos a **2,9**, 17 das 18 viradas entre 35% e 65% (a Perfeccionista ficou em 33,9%; era 44% na rodada anterior, então é sorte). Conta madura (40 por garota): **65,8%** (era 63,1%; o alvo é ~55%, e ela já passava da faixa antes da v0.8), estilos a 4,4 pontos (eram 7,9) e casas a 9,6. Na madura as viradas da Sonhadora (67%), da Capela (68%) e da Estrela (69%) passam de 65%; a meta vale para a conta nova.
+
 **v0.7** (a partir da v0.6: 38,7% na conta nova, 9,9 pontos entre casas, 11,2 entre arquétipos e a Fechadora 6,7 pontos acima da Ponteira):
 
 1. **Fôlego do pelotão** ([corrida](corrida.md) §6). Até a v0.6, a partir do nível ~550 o fôlego nunca acabava: a Estamina não mudava nenhuma colocação e a Velocidade valia mais que tudo ([endgame](endgame.md) §5.2), um meta de "treinar Velocidade". Agora a Estamina acima da média do pelotão conta no fôlego em todo nível, e no nível 800 +10% de Estamina vale quase o mesmo que +10% de Velocidade ([corrida](corrida.md) §8.6).
@@ -683,6 +693,11 @@ A taxa geral subiu de 36,2% para 38,7% com as três mudanças, ainda dentro da f
 | Rival no MVP (v0.7) | +15% | Sem bônus no objetivo 4 da Lira e da Antares, +7% no objetivo 5 da Nashira |
 | Algol (v0.7) | +15% × 1,08 | +15%, como as outras rivais (`forca_rival_extra` 1,0) |
 | Perseguidora na carreira (v0.7) | ×1,0 | ×1,015 (`forca_estilo`) |
+| Estilo na carreira (v0.8) | Perseguidora ×1,015 | Arrancadora ×1,01 (`forca_estilo`) |
+| GP final (v0.8) | 715, Longa ×0,97 | 700, Longa ×0,95 |
+| Objetivo 2 da Misteriosa (v0.8) | Top 3 | Top 4 |
+| Virada da Curiosa (v0.8) | 6 vitórias e top 3 em 3 distâncias | 8 vitórias e top 3 em 3 distâncias |
+| Virada da Sonhadora (v0.8) | 3 viradas e 9 vitórias | 2 viradas e 9 vitórias |
 
 O ganho do treino caiu porque o semestre de base sozinho levava a garota a ~320 na Estreia. O bônus por nível e os atributos por corrida devolvem o crescimento nos anos 2 e 3, quando ela corre mais e treina menos.
 

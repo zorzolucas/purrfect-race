@@ -27,7 +27,7 @@ static func abrir(pai: Node, capitulo: String = "") -> TelaGuia:
 		return aberto
 	var g := TelaGuia.new()
 	g.ir_para(capitulo, false)
-	pai.add_child(g)
+	UI.camada(pai).add_child(g)
 	aberto = g
 	return g
 
@@ -89,37 +89,56 @@ func _montar() -> void:
 
 	var mc := MarginContainer.new()
 	mc.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	var em_pe := UI.em_pe()
 	for lado in ["left", "right"]:
-		mc.add_theme_constant_override("margin_" + lado, 60)
+		mc.add_theme_constant_override("margin_" + lado, 8 if em_pe else 60)
 	for lado in ["top", "bottom"]:
-		mc.add_theme_constant_override("margin_" + lado, 34)
+		mc.add_theme_constant_override("margin_" + lado, 12 if em_pe else 34)
 	mc.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var p := UI.painel(UI.PAINEL, 16)
+	var p := UI.painel(UI.PAINEL, 10 if em_pe else 16)
 	mc.add_child(p)
 	_janela = mc
 	add_child(mc)
 
 	var v := UI.vbox(12)
 	var topo := UI.hbox(10)
-	topo.add_child(UI.faixa("Guia do jogo", UI.ROSA, 26))
-	var sub := UI.label("Como funciona a vida na Academia Estelar", 15, UI.SUAVE)
-	sub.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	topo.add_child(sub)
+	topo.add_child(UI.faixa("Guia do jogo", UI.ROSA, 22 if em_pe else 26))
+	if not em_pe:
+		var sub := UI.label("Como funciona a vida na Academia Estelar", 15, UI.SUAVE)
+		sub.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		topo.add_child(sub)
 	var esp := Control.new()
 	esp.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	topo.add_child(esp)
 	var bf := UI.botao("Fechar", fechar, 15)
 	UI.tecla(bf, "Esc")
-	bf.custom_minimum_size.x = 120
+	bf.custom_minimum_size = Vector2(96 if em_pe else 120, 44 if em_pe else 0)
 	topo.add_child(bf)
 	v.add_child(topo)
 
-	var meio := UI.hbox(16)
+	var meio := UI.fila(16 if not em_pe else 8)
 	meio.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	meio.add_child(_indice(lista))
+	meio.add_child(_seletor(lista) if em_pe else _indice(lista))
 	meio.add_child(_pagina(c, paginas, cor))
 	v.add_child(meio)
 	p.add_child(v)
+
+
+## Em pé não cabe a coluna de capítulos: vira uma lista de escolha (abre por cima).
+func _seletor(lista: Array) -> Control:
+	var op := OptionButton.new()
+	op.focus_mode = Control.FOCUS_NONE
+	op.add_theme_font_size_override("font_size", 16)
+	op.custom_minimum_size.y = 44
+	for i in lista.size():
+		op.add_item("%d. %s" % [i + 1, lista[i].titulo], i)
+	op.select(cap)
+	op.get_popup().add_theme_font_size_override("font_size", 18)
+	op.item_selected.connect(func(i):
+		cap = i
+		pag = 0
+		_montar())
+	return op
 
 
 ## Coluna de capítulos: um botão por capítulo, o atual pintado na cor dele.
@@ -154,13 +173,17 @@ func _pagina(c: Dictionary, paginas: Array, cor: Color) -> Control:
 	var pg: Dictionary = paginas[pag]
 	var v := UI.vbox(10)
 	v.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	v.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	var cab := UI.hbox(10)
-	cab.add_child(UI.faixa(pg.titulo, cor, 22))
+	cab.add_child(UI.faixa(pg.titulo, cor, 18 if UI.em_pe() else 22))
 	var esp := Control.new()
 	esp.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	cab.add_child(esp)
 	var cp := UI.capsula("%s · %d/%d" % [c.titulo, pag + 1, paginas.size()], cor.darkened(0.1), 13)
 	cp.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	if UI.em_pe():
+		cp = UI.capsula("%d/%d" % [pag + 1, paginas.size()], cor.darkened(0.1), 13)
+		cp.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	cab.add_child(cp)
 	v.add_child(cab)
 
@@ -190,7 +213,9 @@ func _pagina(c: Dictionary, paginas: Array, cor: Color) -> Control:
 ## Anterior / bolinhas das páginas / Próximo. Na última página, Próximo vai ao capítulo seguinte.
 func _navegacao(n: int, cor: Color) -> Control:
 	var h := UI.hbox(10)
-	var ba := UI.botao("◀ Anterior     ", _anterior, 15)
+	var folga := "" if Escala.toque else "     "  # espaço para a plaquinha da tecla
+	var ba := UI.botao("◀ Anterior" + folga, _anterior, 15)
+	ba.custom_minimum_size.y = 44 if Escala.toque else 0
 	ba.disabled = cap == 0 and pag == 0
 	UI.tecla(ba, "←")
 	h.add_child(ba)
@@ -208,14 +233,17 @@ func _navegacao(n: int, cor: Color) -> Control:
 	esp2.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	h.add_child(esp2)
 	var ultimo := cap == capitulos().size() - 1 and pag == n - 1
-	var texto := "Próximo ▶     "
+	var texto := "Próximo ▶" + folga
 	if pag == n - 1 and not ultimo:
-		texto = "%s ▶     " % capitulos()[cap + 1].titulo
+		texto = "%s ▶%s" % [capitulos()[cap + 1].titulo, folga]
+		if UI.em_pe():
+			texto = "Próximo ▶"
 	var bp: Button
 	if ultimo:
-		bp = UI.botao_principal("Pronto!     ", fechar, 15)
+		bp = UI.botao_principal("Pronto!" + folga, fechar, 15)
 	else:
 		bp = UI.botao_cor(texto, _proximo, cor, 15)
+	bp.custom_minimum_size.y = 44 if Escala.toque else 0
 	UI.tecla(bp, "→")
 	h.add_child(bp)
 	return h
@@ -322,7 +350,7 @@ static func bloco(bl: Dictionary, cor: Color) -> Control:
 
 static func _grade(filhos: Array, colunas: int) -> Control:
 	var g := GridContainer.new()
-	g.columns = maxi(1, colunas)
+	g.columns = 1 if UI.em_pe() else maxi(1, colunas)
 	g.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	g.add_theme_constant_override("h_separation", 10)
 	g.add_theme_constant_override("v_separation", 10)
@@ -397,6 +425,13 @@ static func _tabela(colunas: Array, linhas: Array, cor: Color) -> Control:
 			cel.add_child(l)
 			g.add_child(cel)
 	p.add_child(g)
+	if UI.em_pe():
+		# tabela larga demais para o celular em pé: rola para o lado
+		var r := ScrollContainer.new()
+		r.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+		r.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		r.add_child(p)
+		return r
 	return p
 
 

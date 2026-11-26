@@ -22,24 +22,23 @@ func _init(carreira: Carreira, mensagem: String, salva_atual: Dictionary, perfil
 
 
 func _ready() -> void:
-	var raiz := UI.vbox(12)
-	var topo := UI.hbox(14)
+	var em_pe := UI.em_pe()
+	var raiz := UI.vbox(10 if em_pe else 12)
+	var topo := UI.fila(8 if em_pe else 14)
 	var titulo := "Carreira encerrada" if c.falhou_objetivo else "Carreira concluída!"
-	topo.add_child(UI.faixa(titulo, UI.PERIGO if c.falhou_objetivo else UI.ROSA, 34))
+	topo.add_child(UI.faixa(titulo, UI.PERIGO if c.falhou_objetivo else UI.ROSA, 26 if em_pe else 34))
 	if msg != "":
 		var lm := UI.label(msg, 17, UI.TEXTO, true)
 		lm.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		topo.add_child(lm)
 	raiz.add_child(topo)
 
-	var corpo := UI.hbox(14)
+	var corpo := UI.fila(14)
 	corpo.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	corpo.add_child(_palco())
 
 	# coluna da direita rola se não couber, para os botões nunca ficarem fora da tela
-	var rolagem := ScrollContainer.new()
-	rolagem.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	rolagem.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	# (em pé a tela inteira rola)
 	var v := UI.vbox(12)
 	v.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var mg := MarginContainer.new()
@@ -47,10 +46,11 @@ func _ready() -> void:
 	for lado in ["left", "right", "top", "bottom"]:
 		mg.add_theme_constant_override("margin_" + lado, 6)
 	mg.add_child(v)
-	rolagem.add_child(mg)
+	var rolagem := UI.rolavel(mg)
+	rolagem.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	corpo.add_child(rolagem)
 	raiz.add_child(corpo)
-	add_child(UI.margem(raiz, 22))
+	add_child(UI.margem(raiz, 10 if em_pe else 22))
 
 	var final := c.final_da_campanha()
 	if not final.is_empty():
@@ -65,7 +65,7 @@ func _ready() -> void:
 		return
 	v.add_child(_comparacao())
 	v.add_child(UI.label("Fica uma versão salva por garota. Ela é a que vai correr nas copas do circuito. A moeda você recebe de qualquer jeito, e a pool gira.", 14, UI.SUAVE, true))
-	var botoes := UI.hbox(12)
+	var botoes := UI.fila(12)
 	var bs := UI.botao_principal("Substituir a versão salva" if not salva.is_empty() else "Salvar esta versão", func(): decidiu.emit(true), 20)
 	bs.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	botoes.add_child(bs)
@@ -78,7 +78,7 @@ func _ready() -> void:
 func _palco() -> Control:
 	var cor := UI.cor_garota(c.nome)
 	var p := UI.painel(UI.PAINEL, 12)
-	p.custom_minimum_size.x = 340
+	p.custom_minimum_size.x = 0 if UI.em_pe() else 340
 	var v := UI.vbox(8)
 	var topo := UI.hbox(8)
 	var fn := UI.faixa(c.nome, cor, 24)
@@ -91,7 +91,7 @@ func _palco() -> Control:
 	var palco := UI.Palco.new()
 	palco.nome = c.nome
 	palco.cor = cor
-	palco.custom_minimum_size = Vector2(300, 300)
+	palco.custom_minimum_size = Vector2(300, 260 if UI.em_pe() else 300)
 	palco.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	var nota := Dados.nota(c.attrs)
 	var selo := UI.SeloNota.new(nota, 84)
@@ -119,10 +119,8 @@ func _palco() -> Control:
 func _painel_objetivos() -> Control:
 	var p := UI.painel_titulo("Objetivos da campanha", UI.CEU)
 	var corpo: VBoxContainer = p.get_meta("corpo")
-	var grade := GridContainer.new()
-	grade.columns = 2
+	var grade := UI.grade(2, 1, 6)
 	grade.add_theme_constant_override("h_separation", 14)
-	grade.add_theme_constant_override("v_separation", 6)
 	for r in c.resultados.filter(func(r): return r.objetivo > 0):
 		var h := UI.hbox(8)
 		h.size_flags_horizontal = Control.SIZE_EXPAND_FILL

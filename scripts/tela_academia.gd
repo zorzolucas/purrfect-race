@@ -21,13 +21,19 @@ func _init(p: Perfil, mensagem: String = "") -> void:
 
 
 func _ready() -> void:
-	var v := UI.vbox(12)
-	var topo := UI.hbox(10)
-	topo.add_child(UI.faixa("Academia Estelar", UI.ROSA, 30))
+	var em_pe := UI.em_pe()
+	var v := UI.vbox(10 if em_pe else 12)
+	var topo: Container = UI.hbox(10)
+	var linha_topo := topo
+	topo.add_child(UI.faixa("Academia Estelar", UI.ROSA, 24 if em_pe else 30))
 	var esp := Control.new()
 	esp.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	topo.add_child(esp)
 	topo.add_child(UI.moedas(perfil.moeda))
+	if em_pe:
+		# em pé: título e moedas numa linha, os botões numa grade embaixo
+		v.add_child(linha_topo)
+		topo = UI.grade(4, 4, 6)
 	var bg := UI.botao("Guia", func(): TelaGuia.abrir(self, "jogo"), 18)
 	bg.tooltip_text = "Como o jogo funciona (F1)"
 	UI.tecla(bg, "F1")
@@ -36,10 +42,20 @@ func _ready() -> void:
 	topo.add_child(UI.botao_cor("Circuito", func(): abrir_circuito.emit(), UI.LARANJA, 18))
 	topo.add_child(UI.botao_cor("Pool semanal", func(): abrir_pool.emit(), UI.ROSA, 18))
 	# no navegador, a tela cheia precisa vir de um clique (F11 também funciona)
-	if OS.has_feature("web"):
+	if OS.has_feature("web") and not OS.has_feature("web_ios"):  # o Safari do iPhone não deixa
 		var bt := UI.botao("Tela cheia", _alternar_tela_cheia, 18)
 		bt.tooltip_text = "Joga em tela cheia (Esc ou F11 volta)"
 		topo.add_child(bt)
+	if em_pe:
+		(topo as GridContainer).columns = mini(4, topo.get_child_count())
+		if topo.get_child_count() == 5:
+			(topo as GridContainer).columns = 3
+		for b in topo.get_children():
+			if b is Button and b.text == "Pool semanal":
+				b.text = "Pool"
+			b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			b.custom_minimum_size.y = 46
+			b.add_theme_font_size_override("font_size", 16)
 	v.add_child(topo)
 
 	if msg != "":
@@ -64,8 +80,12 @@ func _ready() -> void:
 		h.add_child(l)
 		var bc := UI.botao_principal("Continuar carreira", func(): continuar.emit(), 18)
 		bc.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-		h.add_child(bc)
 		pc.get_meta("corpo").add_child(h)
+		if em_pe:
+			bc.custom_minimum_size.y = 50
+			pc.get_meta("corpo").add_child(bc)
+		else:
+			h.add_child(bc)
 		v.add_child(pc)
 
 	v.add_child(_painel_desafio())
@@ -77,11 +97,8 @@ func _ready() -> void:
 	dica.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	le.add_child(dica)
 	v.add_child(le)
-	var rolagem := ScrollContainer.new()
-	rolagem.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	rolagem.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	var grade := GridContainer.new()
-	grade.columns = 3
+	grade.columns = 1 if em_pe else 3
 	grade.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	grade.add_theme_constant_override("h_separation", 12)
 	grade.add_theme_constant_override("v_separation", 12)
@@ -97,9 +114,8 @@ func _ready() -> void:
 	for lado in ["left", "right", "top", "bottom"]:
 		mg.add_theme_constant_override("margin_" + lado, 6)
 	mg.add_child(grade)
-	rolagem.add_child(mg)
-	v.add_child(rolagem)
-	add_child(UI.margem(v, 22))
+	v.add_child(UI.rolavel(mg))
+	add_child(UI.margem(v, 10 if em_pe else 22))
 
 
 func _cartao(nome: String) -> Control:
@@ -179,8 +195,12 @@ func _painel_desafio() -> Control:
 	h.add_child(tv)
 	var bj := UI.botao_cor("Jogar desafio", func(): jogar_desafio.emit(), UI.ROXO, 17)
 	bj.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	h.add_child(bj)
 	p.get_meta("corpo").add_child(h)
+	if UI.em_pe():
+		bj.custom_minimum_size.y = 46
+		p.get_meta("corpo").add_child(bj)
+	else:
+		h.add_child(bj)
 	return p
 
 

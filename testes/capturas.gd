@@ -10,10 +10,12 @@ var passo := 0
 var espera := 0
 var ESPERA := int(OS.get_environment("CAPTURA_ESPERA")) if OS.get_environment("CAPTURA_ESPERA") != "" else 75
 var passos: Array[Callable] = []
+## Pasta das capturas (CAPTURA_PASTA=res://testes/capturas/1366x657, por exemplo).
+var PASTA := OS.get_environment("CAPTURA_PASTA") if OS.get_environment("CAPTURA_PASTA") != "" else "res://testes/capturas"
 
 
 func _initialize() -> void:
-	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("res://testes/capturas"))
+	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(PASTA))
 	var perfil_s: GDScript = load("res://scripts/perfil.gd")
 	var carreira_s: GDScript = load("res://scripts/carreira.gd")
 	perfil_s.CAMINHO = "user://captura_perfil.json"
@@ -151,15 +153,78 @@ func _avancar_ate(alvo: int) -> void:
 
 func _salvar(nome: String) -> void:
 	var img := root.get_texture().get_image()
-	img.save_png("res://testes/capturas/%s.png" % nome)
+	img.save_png("%s/%s.png" % [PASTA, nome])
 	print("captura: ", nome)
 	load("res://testes/estouro.gd").checar(root, nome)
+	if Escala.retrato():
+		load("res://testes/estouro.gd").largos(main.tela, nome, Escala.logico(Vector2(root.size), Vector2(Escala.calcular(Vector2(root.size), Escala.dpr(), true).base)).x - 2.0)
+	# tela que rola (celular): a página inteira já foi emendada antes deste passo
+	if _inteira != null:
+		_inteira.save_png("%s/%s_inteira.png" % [PASTA, nome])
+	_inteira = null
+
+
+var _pagina := {}
+var _inteira: Image
+var _paginou := false
+
+
+## Antes de cada passo: se a tela rola, emenda a página inteira (o passo salva com o nome dele).
+func _talvez_paginar() -> bool:
+	if _paginou:
+		return false
+	_paginou = true
+	var r: ScrollContainer = main.get("rolagem")
+	if r == null or r.get_v_scroll_bar().max_value <= r.get_v_scroll_bar().page + 2.0:
+		return false
+	r.scroll_vertical = 0
+	_pagina = {"imgs": [root.get_texture().get_image()], "pos": 0.0, "espera": 0}
+	return true
+
+## Rola a tela principal uma página por vez e emenda as imagens (CAPTURA de "nome_inteira").
+func _passo_pagina() -> void:
+	var r: ScrollContainer = main.rolagem
+	var bar := r.get_v_scroll_bar()
+	if _pagina.espera == 0:
+		_pagina.pos = minf(_pagina.pos + bar.page, bar.max_value - bar.page)
+		r.scroll_vertical = int(_pagina.pos)
+		_pagina.espera = 1
+		return
+	_pagina.espera += 1
+	if _pagina.espera < 4:
+		return
+	_pagina.espera = 0
+	_pagina.imgs.append(root.get_texture().get_image())
+	if _pagina.pos >= bar.max_value - bar.page - 1.0:
+		# emenda: a última parte só entra com o que ainda não apareceu
+		var px := float(root.size.y) / bar.page
+		var total := int(ceil(bar.max_value * px))
+		var w: int = _pagina.imgs[0].get_width()
+		var out := Image.create(w, total, false, _pagina.imgs[0].get_format())
+		var y := 0
+		for i in _pagina.imgs.size():
+			var im: Image = _pagina.imgs[i]
+			var h := im.get_height()
+			var src_y := 0
+			if i == _pagina.imgs.size() - 1:
+				src_y = maxi(0, h - (total - y))
+			out.blit_rect(im, Rect2i(0, src_y, w, h - src_y), Vector2i(0, y))
+			y += h - src_y
+		_inteira = out
+		r.scroll_vertical = 0
+		_pagina = {}
 
 
 func _process(_delta: float) -> bool:
+	if not _pagina.is_empty():
+		_passo_pagina()
+		return false
 	espera += 1
 	if espera < ESPERA:
 		return false
+	if _talvez_paginar():
+		return false
+	_paginou = false
 	espera = 0
 	if passo >= passos.size():
 		load("res://scripts/perfil.gd").apagar()

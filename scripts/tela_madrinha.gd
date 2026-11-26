@@ -36,10 +36,11 @@ static func _soma(a: Dictionary) -> float:
 
 
 func _ready() -> void:
-	var v := UI.vbox(12)
-	var topo := UI.hbox(12)
-	topo.add_child(UI.medalhao(nome, 56))
-	topo.add_child(UI.faixa("Escolha a madrinha de %s" % nome, UI.ROSA, 28))
+	var em_pe := UI.em_pe()
+	var v := UI.vbox(10 if em_pe else 12)
+	var topo := UI.hbox(8 if em_pe else 12)
+	topo.add_child(UI.medalhao(nome, 44 if em_pe else 56))
+	topo.add_child(UI.faixa(("Madrinha de %s" if em_pe else "Escolha a madrinha de %s") % nome, UI.ROSA, 20 if em_pe else 28))
 	var esp := Control.new()
 	esp.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	topo.add_child(esp)
@@ -54,20 +55,16 @@ func _ready() -> void:
 		v.add_child(UI.label("Vínculo %d: já dá +%d em cada atributo, então sobra até +%d para a madrinha." % [
 			vinculo, b.vinculo_attr * vinculo, maxf(0.0, b.legado_teto - b.vinculo_attr * vinculo)], 15, UI.TEXTO, true))
 
-	var rolagem := ScrollContainer.new()
-	rolagem.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	rolagem.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	var grade := GridContainer.new()
-	grade.columns = 3
+	grade.columns = 1 if em_pe else 3
 	grade.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	grade.add_theme_constant_override("h_separation", 12)
 	grade.add_theme_constant_override("v_separation", 12)
 	grade.add_child(_cartao_sem())
 	for n in candidatas(perfil, nome):
 		grade.add_child(_cartao(n))
-	rolagem.add_child(grade)
-	v.add_child(rolagem)
-	add_child(UI.margem(v, 28))
+	v.add_child(UI.rolavel(grade))
+	add_child(UI.margem(v, 10 if em_pe else 28))
 
 
 func _cartao_sem() -> Control:

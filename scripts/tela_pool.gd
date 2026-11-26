@@ -21,24 +21,27 @@ func _montar() -> void:
 		c.queue_free()
 	var v := UI.vbox(12)
 	var topo := UI.hbox(10)
-	topo.add_child(UI.faixa("Pool semanal · rotação %d" % (perfil.giro + 1), UI.ROSA, 30))
+	var em_pe := UI.em_pe()
+	topo.add_child(UI.faixa(("Pool · rot. %d" if em_pe else "Pool semanal · rotação %d") % (perfil.giro + 1), UI.ROSA, 22 if em_pe else 30))
 	var esp := Control.new()
 	esp.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	topo.add_child(esp)
 	topo.add_child(UI.moedas(perfil.moeda))
-	topo.add_child(UI.botao("Voltar", func(): voltar.emit(), 18))
+	topo.add_child(UI.botao("Voltar", func(): voltar.emit(), 16 if em_pe else 18))
+	if em_pe:
+		topo.add_theme_constant_override("separation", 4)
 	v.add_child(topo)
 	if not resultado.is_empty():
 		v.add_child(_painel_resultado())
 
 	# faixa da tiragem: explicação, garantia e o botão grande
 	var pt := UI.painel(UI.PAINEL, 12)
-	var ht := UI.hbox(14)
+	var ht := UI.fila(14)
 	var tv := UI.vbox(4)
 	tv.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var lg := UI.hbox(8)
 	lg.add_child(UI.capsula("Garantia", UI.LARANJA, 13))
-	var lm := UI.label("%s vem em no máximo %d tiragem(ns)." % [perfil.escolhida, perfil.faltam_para_garantia()], 16)
+	var lm := UI.label("%s vem em no máximo %d tiragem(ns)." % [perfil.escolhida, perfil.faltam_para_garantia()], 16, UI.TEXTO, em_pe)
 	lm.add_theme_font_override("font", UI.negrito())
 	lg.add_child(lm)
 	tv.add_child(lg)
@@ -55,14 +58,14 @@ func _montar() -> void:
 	v.add_child(pt)
 
 	var grade := GridContainer.new()
-	grade.columns = 3
+	grade.columns = 1 if em_pe else 3
 	grade.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	grade.add_theme_constant_override("h_separation", 12)
 	grade.add_theme_constant_override("v_separation", 12)
 	for nome in perfil.pool:
 		grade.add_child(_cartao(nome))
 	v.add_child(grade)
-	add_child(UI.margem(v, 22))
+	add_child(UI.margem(v, 10 if em_pe else 22))
 
 
 func _cartao(nome: String) -> Control:
@@ -111,7 +114,9 @@ func _painel_resultado() -> Control:
 	var tv := UI.vbox(4)
 	tv.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	tv.add_child(UI.faixa("NOVA GAROTA!" if resultado.nova else "VÍNCULO!", UI.OURO if resultado.nova else UI.ROSA, 20))
-	tv.add_child(UI.label(txt, 18))
+	tv.add_child(UI.label(txt, 18, UI.TEXTO, UI.em_pe()))
+	if UI.em_pe():
+		tv.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	h.add_child(tv)
 	p.add_child(h)
 	UI.pop(p)

@@ -44,9 +44,10 @@ func _ready() -> void:
 	move_child(svc, 0)
 	svc.gui_input.connect(_clique.bind(svc, vp))
 
+	var em_pe := UI.em_pe()
 	var cobre := UI.vbox(10)
 	cobre.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var m := UI.margem(cobre, 18)
+	var m := UI.margem(cobre, 8 if em_pe else 18)
 	m.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(m)
 
@@ -57,7 +58,7 @@ func _ready() -> void:
 	tv.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var ev: Dictionary = Dados.patio.eventos.get(evento.id, {})
 	var hti := UI.hbox(10)
-	hti.add_child(UI.faixa("Pátio da academia", UI.VERDE, 22))
+	hti.add_child(UI.faixa("Pátio" if em_pe else "Pátio da academia", UI.VERDE, 20 if em_pe else 22))
 	if c:
 		var cd := UI.capsula(Calendario.data_texto(c.turno), UI.CEU, 14)
 		cd.size_flags_vertical = Control.SIZE_SHRINK_CENTER
@@ -66,33 +67,37 @@ func _ready() -> void:
 	var lb := UI.label(_texto(ev.get("banner", ""), evento.get("outra", "")), 15, UI.TEXTO, true)
 	lb.add_theme_font_override("font", UI.negrito())
 	tv.add_child(lb)
-	var dica := "Clique numa colega para conversar (uma conversa por turno)."
+	var clique := "Toque" if Escala.toque else "Clique"
+	var dica := "%s numa colega para conversar (uma conversa por turno)." % clique
 	if c == null:
-		dica = "Clique numa garota para ouvir o que ela tem a dizer."
+		dica = "%s numa garota para ouvir o que ela tem a dizer." % clique
 	elif not c.pode_conversar_no_patio():
-		dica = "Vocês já conversaram neste turno. Clique numa colega para ouvir uma fala."
+		dica = "Vocês já conversaram neste turno. %s numa colega para ouvir uma fala." % clique
 	tv.add_child(UI.label(dica, 13, UI.SUAVE, true))
 	ht.add_child(tv)
 	var bv := UI.botao("Voltar", func(): voltar.emit(_resultado), 18)
 	bv.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	if em_pe:
+		bv.custom_minimum_size.y = 44
 	ht.add_child(bv)
 	topo.add_child(ht)
 	cobre.add_child(topo)
 
-	var meio := UI.hbox(12)
+	var meio := UI.fila(12)
 	meio.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	meio.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	cobre.add_child(meio)
-	# a garota da carreira, grande e parada (GDD §11.3)
-	if c:
+	# a garota da carreira, grande e parada (GDD §11.3); em pé não cabe ao lado da conversa
+	if c and not em_pe:
 		meio.add_child(_garota_grande())
 	var vazio := Control.new()
 	vazio.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	vazio.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	vazio.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	meio.add_child(vazio)
 	# painel da conversa (embaixo, à direita)
 	_painel = UI.painel(UI.PAINEL, 16)
-	_painel.custom_minimum_size.x = 560
+	_painel.custom_minimum_size.x = 0 if em_pe else 560
 	_painel.size_flags_vertical = Control.SIZE_SHRINK_END
 	_painel.visible = false
 	meio.add_child(_painel)
@@ -149,7 +154,7 @@ func abrir(nome: String) -> void:
 	var cv: Dictionary = c.conversa_patio(nome) if c else {}
 	var v := UI.vbox(10)
 	var topo := UI.hbox(12)
-	var med := UI.medalhao(nome, 96, cv.get("expressao", "normal"))
+	var med := UI.medalhao(nome, 64 if UI.em_pe() else 96, cv.get("expressao", "normal"))
 	var ret: RetratoGarota = med.get_child(0)
 	topo.add_child(med)
 	var tv := UI.vbox(4)
@@ -201,7 +206,7 @@ func _escolher(nome: String, i: int) -> void:
 		f.queue_free()
 	var v := UI.vbox(10)
 	var h := UI.hbox(12)
-	var med := UI.medalhao(nome, 96, reacao.get("expressao", "normal"))
+	var med := UI.medalhao(nome, 64 if UI.em_pe() else 96, reacao.get("expressao", "normal"))
 	var ret: RetratoGarota = med.get_child(0)
 	h.add_child(med)
 	h.add_child(UI.label(_resultado, 17, UI.TEXTO, true))

@@ -25,23 +25,56 @@ func _ready() -> void:
 
 
 func _montar() -> void:
+	if UI.em_pe():
+		_montar_em_pe()
+		return
 	var raiz := UI.vbox(10)
 	raiz.add_child(_barra_topo())
 	var meio := UI.hbox(14)
 	meio.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	meio.add_child(_palco())
-	var rolagem := ScrollContainer.new()
-	rolagem.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	rolagem.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	var direita := _painel_turno()
-	direita.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	rolagem.add_child(direita)
+	var rolagem := UI.rolavel(direita)
+	rolagem.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	meio.add_child(rolagem)
-	raiz.add_child(meio)
-	raiz.add_child(_faixa_atributos())
+	if Escala.paisagem():
+		# celular deitado: a tela inteira rola, então os atributos sobem para ficar à vista
+		raiz.add_child(_faixa_atributos())
+		raiz.add_child(meio)
+	else:
+		raiz.add_child(meio)
+		raiz.add_child(_faixa_atributos())
 	add_child(UI.margem(raiz, 14))
+	_abrir_janela()
+
+
+## Celular em pé: uma coluna só (a tela inteira rola). Topo em duas linhas, a garota num
+## cartão compacto com energia e humor, os atributos logo abaixo e então a decisão do turno.
+func _montar_em_pe() -> void:
+	var raiz := UI.vbox(8)
+	raiz.add_child(_barra_topo())
+	raiz.add_child(_palco())
+	raiz.add_child(_faixa_atributos())
+	raiz.add_child(_painel_turno())
+	add_child(UI.margem(raiz, 8))
+	_abrir_janela()
+
+
+## A janela de detalhes vai para a camada por cima da rolagem (fica do tamanho da tela visível).
+var _janela: Control
+
+func _abrir_janela() -> void:
+	if is_instance_valid(_janela):
+		_janela.queue_free()
+	_janela = null
 	if detalhe != "":
-		add_child(_janela_detalhe())
+		_janela = _janela_detalhe()
+		UI.camada(self).add_child(_janela)
+
+
+func _exit_tree() -> void:
+	if is_instance_valid(_janela):
+		_janela.queue_free()
 
 
 # ---------- estado guardado entre telas ----------
@@ -81,37 +114,53 @@ func _registrar_delta() -> void:
 # ---------- barra do topo ----------
 
 func _barra_topo() -> Control:
-	var p := UI.painel(UI.PAINEL, 10)
-	var h := UI.hbox(12)
-	h.add_child(UI.faixa(Calendario.data_texto(c.turno), UI.CEU, 20))
-	var cap := UI.capsula("Turno %d/%d" % [c.turno, Carreira.BAL.turnos], Color("#2c3550"), 14)
+	var p := UI.painel(UI.PAINEL, 6 if UI.em_pe() else 10)
+	var em_pe := UI.em_pe()
+	var h := UI.hbox(6 if em_pe else 12)
+	h.add_child(UI.faixa(Calendario.data_texto(c.turno), UI.CEU, 16 if em_pe else 20))
+	var cap := UI.capsula("Turno %d/%d" % [c.turno, Carreira.BAL.turnos], Color("#2c3550"), 12 if em_pe else 14)
 	cap.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	h.add_child(cap)
 	var tr := _trilha()
 	tr.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	tr.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	h.add_child(tr)
+	var h2 := h
+	if em_pe:
+		# em pé: data, turno e clima em cima; trilha e botões embaixo
+		var esp := Control.new()
+		esp.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		h.add_child(esp)
+		h2 = UI.hbox(8)
+	h2.add_child(tr)
 	var cl: Dictionary = Dados.calendario.climas[c.clima()]
 	var clima := UI.capsula("%s %s" % [cl.icone, cl.nome], Color("#5aa9d6"), 14)
 	clima.tooltip_text = cl.get("descricao", cl.nome)
 	clima.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	h.add_child(clima)
+	h2.add_child(clima)
+	if em_pe:
+		tr.custom_minimum_size.x = 110
 	var b_guia := UI.botao("Guia", func(): TelaGuia.abrir(self, "turno"), 14)
 	b_guia.tooltip_text = "Como funcionam treino, energia, humor, corridas e objetivos (F1)"
 	UI.tecla(b_guia, "F1")
-	b_guia.custom_minimum_size.x = 100
-	h.add_child(b_guia)
+	b_guia.custom_minimum_size.x = 64 if em_pe else 100
+	h2.add_child(b_guia)
 	var b_menu := UI.botao("Academia", func(): ir_academia.emit(), 14)
 	b_menu.tooltip_text = "Volta à academia (Esc). A carreira fica salva e continua de onde parou."
 	UI.tecla(b_menu, "Esc")
-	b_menu.custom_minimum_size.x = 150
-	h.add_child(b_menu)
+	b_menu.custom_minimum_size.x = 104 if em_pe else 150
+	h2.add_child(b_menu)
 	_atalhos[KEY_ESCAPE] = func():
 		if detalhe != "":
 			_abrir_detalhe("")
 		else:
 			ir_academia.emit()
-	p.add_child(h)
+	if em_pe:
+		var v := UI.vbox(4)
+		v.add_child(h)
+		v.add_child(h2)
+		p.add_child(v)
+	else:
+		p.add_child(h)
 	return p
 
 
@@ -151,30 +200,48 @@ func _palco() -> Control:
 	palco.cor = c.cor
 	palco.custom_minimum_size = Vector2(300, 236)
 	palco.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	var em_pe := UI.em_pe()
+	var info := v
+	if em_pe:
+		# em pé: a garota à esquerda, num palco menor; nome, fama e energia à direita
+		p.custom_minimum_size.x = 0
+		palco.custom_minimum_size = Vector2(150, 206)
+		var hp := UI.hbox(8)
+		hp.add_child(palco)
+		info = UI.vbox(6)
+		info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		for f in v.get_children():
+			v.remove_child(f)
+			info.add_child(f)
+		hp.add_child(info)
+		v.add_child(hp)
 	# humor no canto de cima à esquerda, nota no de cima à direita
 	var cor_h: Color = [UI.PERIGO, UI.LARANJA, UI.CEU, UI.VERDE, UI.VERDE][c.humor]
 	var humor := UI.capsula("Humor: %s" % Carreira.HUMOR_NOME[c.humor], cor_h, 13)
 	humor.position = Vector2(4, 4)
 	palco.add_child(humor)
-	var selo := UI.SeloNota.new(Dados.nota(c.attrs), 56)
+	var selo := UI.SeloNota.new(Dados.nota(c.attrs), 40 if em_pe else 56)
 	selo.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
-	selo.position += Vector2(-60, 2)
+	selo.position += Vector2(-44, 26) if em_pe else Vector2(-60, 2)
 	palco.add_child(selo)
 	if not _delta.is_empty() and not anterior_attrs.is_empty() and Dados.nota(c.attrs) != Dados.nota(anterior_attrs):
 		UI.pop(selo, 0.4)
-	v.add_child(palco)
+	if not em_pe:
+		v.add_child(palco)
 
 	var cor_e := UI.VERDE if c.energia >= 60 else (UI.LARANJA if c.energia >= Carreira.BAL.limite_falha else UI.PERIGO)
-	v.add_child(_linha_barra("Energia", c.energia, 100, cor_e, "energia"))
-	v.add_child(_chips_aptidao())
+	info.add_child(_linha_barra("Energia", c.energia, 100, cor_e, "energia"))
+	info.add_child(_chips_aptidao())
 	var fb := _chips_boosts()
 	if fb:
-		v.add_child(fb)
+		info.add_child(fb)
 	var bot := UI.hbox(6)
 	for d in [["objetivos", "Objetivos", "O"], ["relacoes", "Relações", "R"], ["itens", "Itens", "I"]]:
 		var id: String = d[0]
-		var b := UI.botao(d[1], func(): _abrir_detalhe(id), 13)
+		var b := UI.botao(d[1], func(): _abrir_detalhe(id), 14 if em_pe else 13)
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		if em_pe:
+			b.custom_minimum_size.y = 40
 		bot.add_child(b)
 	v.add_child(bot)
 	p.add_child(v)
@@ -185,7 +252,11 @@ func _palco() -> Control:
 ## fama do ano (docs/fama-e-crescimento.md §2 e §3).
 func _bloco_prestigio() -> Control:
 	var v := UI.vbox(3)
-	var h := UI.hbox(6)
+	var h: Container = UI.hbox(6)
+	if UI.em_pe():
+		h = HFlowContainer.new()
+		h.add_theme_constant_override("h_separation", 6)
+		h.add_theme_constant_override("v_separation", 4)
 	var n := c.prestigio()
 	var cap := UI.capsula("Prestígio %d · %s" % [n, c.nome_prestigio()], UI.OURO if n >= 4 else (UI.ROXO if n >= 2 else UI.CEU), 13)
 	cap.tooltip_text = "Cada degrau de Prestígio multiplica todo ganho de treino e de corrida daqui para frente."
@@ -195,7 +266,7 @@ func _bloco_prestigio() -> Control:
 	var prox := c.fama_proximo_prestigio()
 	if prox > 0:
 		var base: int = int(c.CRESC().prestigio[n].fama)
-		var b := UI.barra(c.fama - base, prox - base, UI.OURO, 90)
+		var b := UI.barra(c.fama - base, prox - base, UI.OURO, 70 if UI.em_pe() else 90)
 		b.custom_minimum_size.y = 12
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		b.size_flags_vertical = Control.SIZE_SHRINK_CENTER
@@ -234,7 +305,7 @@ func _chips_boosts() -> Control:
 # ---------- atributos em blocos ----------
 
 func _faixa_atributos() -> Control:
-	var h := UI.hbox(10)
+	var h := UI.hbox(4 if UI.em_pe() else 10)
 	var o := c.proximo_objetivo()
 	var marca := c.forca_prevista(o) if not o.is_empty() else -1.0
 	for k in SimCorrida.KEYS:
@@ -264,34 +335,40 @@ func _bloco_atributo(k: String, marca: float) -> Control:
 	sc.border_width_top = 2
 	cab.add_theme_stylebox_override("panel", sc)
 	var hc := UI.hbox(6)
-	hc.add_child(UI.Icone.new(k, 18))
-	hc.add_child(UI.label_contorno(Dados.ATTR_NOME[k], 14, Color.WHITE, cor.darkened(0.45), 4))
+	var em_pe := UI.em_pe()
+	hc.add_child(UI.Icone.new(k, 15 if em_pe else 18))
+	hc.add_child(UI.label_contorno((Dados.ATTR_CURTO if em_pe else Dados.ATTR_NOME)[k], 13 if em_pe else 14, Color.WHITE, cor.darkened(0.45), 4))
 	cab.add_child(hc)
 	v.add_child(cab)
-	var corpo := UI.hbox(8)
+	var corpo := UI.hbox(4 if em_pe else 8)
 	var mc := MarginContainer.new()
 	for lado in ["left", "right"]:
-		mc.add_theme_constant_override("margin_" + lado, 10)
+		mc.add_theme_constant_override("margin_" + lado, 5 if em_pe else 10)
 	mc.add_theme_constant_override("margin_top", 4)
 	mc.add_theme_constant_override("margin_bottom", 8)
 	var n := Dados.nota({k: valor})
 	var selo := UI.SeloNota.new(n, 38)
 	selo.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	corpo.add_child(selo)
+	if em_pe:
+		# em pé o bloco é estreito: a nota vai para o cabeçalho, ao lado do nome
+		selo = UI.SeloNota.new(n, 18)
+		hc.add_child(selo)
+	else:
+		corpo.add_child(selo)
 	var dir := UI.vbox(2)
 	dir.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	var hv := UI.hbox(6)
-	var num := UI.label_contorno("%d" % valor, 26, UI.TEXTO, Color.WHITE, 2)
+	var hv := UI.hbox(2 if em_pe else 6)
+	var num := UI.label_contorno("%d" % valor, 19 if em_pe else 26, UI.TEXTO, Color.WHITE, 2)
 	hv.add_child(num)
 	if d != 0.0:
 		UI.contar(num, valor - d, valor)
-		var dl := UI.label("%+d" % roundi(d), 15, UI.OK if d > 0 else UI.PERIGO)
+		var dl := UI.label("%+d" % roundi(d), 12 if em_pe else 15, UI.OK if d > 0 else UI.PERIGO)
 		dl.add_theme_font_override("font", UI.negrito())
 		dl.size_flags_vertical = Control.SIZE_SHRINK_END
 		hv.add_child(dl)
 		UI.pop(dl, 0.25)
 	dir.add_child(hv)
-	var b := UI.barra(valor - d if d > 0 else valor, c.limite, cor, 60)
+	var b := UI.barra(valor - d if d > 0 else valor, c.limite, cor, 30 if em_pe else 60)
 	b.custom_minimum_size.y = 10
 	b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	if d > 0:
@@ -302,7 +379,7 @@ func _bloco_atributo(k: String, marca: float) -> Control:
 		p.ready.connect(func():
 			await p.get_tree().process_frame
 			if is_instance_valid(p):
-				UI.numero_flutuante(p, txt_f, cor, Vector2(p.size.x * 0.55, 40), 22), CONNECT_ONE_SHOT)
+				UI.numero_flutuante(p, txt_f, cor, Vector2(p.size.x * (0.2 if UI.em_pe() else 0.55), 40), 18 if UI.em_pe() else 22), CONNECT_ONE_SHOT)
 	if marca > 0.0:
 		var m := MarcaBarra.new()
 		m.frac = clampf(marca / c.limite, 0.0, 1.0)
@@ -322,10 +399,10 @@ func _bloco_atributo(k: String, marca: float) -> Control:
 func _linha_barra(rotulo: String, valor: float, maximo: float, cor: Color, chave: String = "") -> Control:
 	var h := UI.hbox(8)
 	var l := UI.label(rotulo, 14)
-	l.custom_minimum_size.x = 64
+	l.custom_minimum_size.x = 0 if UI.em_pe() else 64
 	h.add_child(l)
 	var d: float = _delta.get(chave, 0.0)
-	var b := UI.barra(valor - d if d > 0 else valor, maximo, cor, 150)
+	var b := UI.barra(valor - d if d > 0 else valor, maximo, cor, 60 if UI.em_pe() else 150)
 	b.custom_minimum_size.y = 18
 	b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	if d > 0:
@@ -395,15 +472,24 @@ func _janela_detalhe() -> Control:
 	var titulos := {"objetivos": "Objetivos", "relacoes": "Relações", "itens": "Itens e habilidades"}
 	var cores := {"objetivos": UI.LARANJA, "relacoes": UI.ROSA, "itens": UI.ROXO}
 	var p := UI.painel_titulo(titulos.get(detalhe, ""), cores.get(detalhe, UI.CEU))
-	p.custom_minimum_size = Vector2(700, 480)
-	p.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
-	p.grow_horizontal = Control.GROW_DIRECTION_BOTH
-	p.grow_vertical = Control.GROW_DIRECTION_BOTH
+	if UI.em_pe():
+		# em pé: ocupa a tela toda, com uma margem
+		p.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		p.offset_left = 8
+		p.offset_right = -8
+		p.offset_top = 16
+		p.offset_bottom = -16
+		(p.get_meta("corpo") as Control).get_parent().size_flags_vertical = Control.SIZE_EXPAND_FILL
+	else:
+		p.custom_minimum_size = Vector2(700, 480)
+		p.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+		p.grow_horizontal = Control.GROW_DIRECTION_BOTH
+		p.grow_vertical = Control.GROW_DIRECTION_BOTH
 	var corpo: VBoxContainer = p.get_meta("corpo")
 	var abas := UI.hbox(6)
 	for id in titulos:
 		var qual: String = id
-		var b := UI.botao(titulos[id], func(): _abrir_detalhe(qual), 14)
+		var b := UI.botao("Itens" if UI.em_pe() and id == "itens" else titulos[id], func(): _abrir_detalhe(qual), 14)
 		if id == detalhe:
 			UI.colorir_botao(b, cores[id])
 		abas.add_child(b)
@@ -417,6 +503,9 @@ func _janela_detalhe() -> Control:
 	var rol := ScrollContainer.new()
 	rol.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	rol.custom_minimum_size.y = 380
+	if UI.em_pe():
+		rol.custom_minimum_size.y = 200
+		rol.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	var v := UI.vbox(8)
 	v.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	match detalhe:
@@ -621,7 +710,7 @@ func _acoes(v: VBoxContainer) -> void:
 	var corridas := c.corridas_opcionais()
 	if not corridas.is_empty():
 		v.add_child(_titulo_secao("Correr", UI.ROSA, "gasta %d de energia, sem treino neste turno" % c.energia_corrida()))
-		var hc := UI.hbox(8)
+		var hc := UI.fila(8)
 		for i in corridas.size():
 			var bc := _cartao_corrida(corridas[i])
 			if i < 3:
@@ -631,9 +720,7 @@ func _acoes(v: VBoxContainer) -> void:
 		v.add_child(hc)
 
 	v.add_child(_titulo_secao("Treinar", UI.CEU, "um treino por turno"))
-	var grade := GridContainer.new()
-	grade.columns = 5
-	grade.add_theme_constant_override("h_separation", 8)
+	var grade := UI.grade(5, 5, 4 if UI.em_pe() else 8)
 	var lista_treinos: Array = Carreira.TREINOS.keys()
 	for i in lista_treinos.size():
 		var b := _botao_treino(lista_treinos[i])
@@ -643,7 +730,9 @@ func _acoes(v: VBoxContainer) -> void:
 	v.add_child(grade)
 
 	v.add_child(_titulo_secao("Outras ações", UI.VERDE, ""))
-	var h := UI.hbox(8)
+	var h: Container = UI.hbox(8)
+	if UI.em_pe():
+		h = UI.grade(4, 4 if c.lesionada else 3, 6)
 	var b_desc := _botao_acao("Descansar\n+%d energia" % c.descanso_previsto(), c.descansar)
 	UI.tecla(b_desc, "D")
 	_atalho(KEY_D, b_desc)
@@ -669,7 +758,10 @@ func _acoes(v: VBoxContainer) -> void:
 	h.add_child(b_loja)
 	for filho in h.get_children():
 		filho.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		filho.custom_minimum_size.y = 86
+		filho.custom_minimum_size.y = 72
+		if UI.em_pe():
+			filho.custom_minimum_size = Vector2(0, 72)
+			filho.add_theme_font_size_override("font_size", 13)
 	v.add_child(h)
 	if loja_aberta:
 		v.add_child(_loja_habilidades())
@@ -713,7 +805,7 @@ func _faixa_patio() -> Control:
 	UI.tecla(b, "P")
 	UI.colorir_botao(b, UI.VERDE)
 	_atalho(KEY_P, b)
-	b.custom_minimum_size = Vector2(176, 44)
+	b.custom_minimum_size = Vector2(112 if UI.em_pe() else 176, 44)
 	b.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	h.add_child(b)
 	p.add_child(h)
@@ -730,10 +822,7 @@ func _loja_habilidades() -> Control:
 	hl.add_child(UI.capsula("%d/%d equipadas" % [c.habilidades.size(), Dados.habilidades.limite], UI.CEU, 14))
 	hl.add_child(UI.label("comprar não gasta o turno%s" % desconto, 13, UI.SUAVE, true))
 	v.add_child(hl)
-	var grade := GridContainer.new()
-	grade.columns = 5
-	grade.add_theme_constant_override("h_separation", 6)
-	grade.add_theme_constant_override("v_separation", 6)
+	var grade := UI.grade(5, 2, 6)
 	for h in Dados.habilidades.lista:
 		var tem: bool = h.id in c.habilidades
 		var txt := "%s\n%s" % [h.nome, "✓ aprendida" if tem else "%d pts" % c.custo_habilidade(h.id)]
@@ -947,7 +1036,7 @@ func _painel_mapa() -> Control:
 	var mapa: Array = c.mapas[t]
 	var feitas: Array = c.rota[t]
 	var opcoes := c.opcoes_mapa()
-	var p := UI.painel_titulo("Trecho %d · escolha a rota dos próximos 2 turnos" % (t + 1), UI.CEU)
+	var p := UI.painel_titulo(("Trecho %d · rota dos próximos 2 turnos" if UI.em_pe() else "Trecho %d · escolha a rota dos próximos 2 turnos") % (t + 1), UI.CEU)
 	var v: VBoxContainer = p.get_meta("corpo")
 	var aviso := "Cada nó dura 2 turnos e liga ao de baixo e às diagonais."
 	if not "circuito" in Dados.calendario.trechos[t].get("sem", []):
@@ -1065,7 +1154,7 @@ func _painel_encontro(e: Dictionary) -> Control:
 	var v: VBoxContainer = p.get_meta("corpo")
 	var topo := UI.hbox(14)
 	var quem := c.quem_do_encontro()
-	var med := UI.medalhao(quem, 104, e.get("expressao", "normal"))
+	var med := UI.medalhao(quem, 72 if UI.em_pe() else 104, e.get("expressao", "normal"))
 	med.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 	var ret: RetratoGarota = med.get_child(0)
 	topo.add_child(med)
@@ -1101,23 +1190,37 @@ func _botao_treino(t: String) -> Button:
 	var nv_txt := "Nv %d" % nv
 	if nv > c.nivel_treino(t):
 		nv_txt += "↑"
+	var em_pe := UI.em_pe()
+	var falha := c.chance_falha(t)
 	var linhas := ["%s%s" % [Dados.ATTR_NOME[t], " ★" if t in c.naturais else ""], nv_txt]
+	if em_pe:
+		# em pé o cartão tem ~85 px: nome curto e linhas enxutas
+		linhas = ["%s%s" % [Dados.ATTR_CURTO[t], "★" if t in c.naturais else ""], nv_txt]
 	if c.duplas.has(t):
-		linhas.append("com %s!" % c.duplas[t].split(" ")[0])
+		linhas.append(("+%s" if em_pe else "com %s!") % c.duplas[t].split(" ")[0])
 	for k in g:
 		linhas.append("+%d %s" % [round(g[k]), Dados.ATTR_CURTO[k]])
-	linhas.append("−%d energia" % c.custo(t))
-	var falha := c.chance_falha(t)
-	linhas.append(("⚠ Falha %d%%" if falha > 0.0 else "Falha %d%%") % round(falha * 100))
+	if em_pe:
+		linhas.append("−%d en." % c.custo(t))
+		linhas.append(("⚠%d%%" if falha > 0.0 else "%d%%") % round(falha * 100))
+	else:
+		linhas.append("−%d energia" % c.custo(t))
+		linhas.append(("⚠ Falha %d%%" if falha > 0.0 else "Falha %d%%") % round(falha * 100))
 	var b := _botao_acao("\n".join(linhas), func(): return c.treinar(t))
 	b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	b.tooltip_text = Dados.ATTR_NOME[t]
-	b.custom_minimum_size.y = 150
+	b.tooltip_text = "Treino de %s. Energia −%d, chance de falha %d%%." % [Dados.ATTR_NOME[t], c.custo(t), round(falha * 100)]
+	b.custom_minimum_size.y = 136
 	UI.colorir_botao(b, UI.ATTR_COR[t])
 	b.add_theme_font_size_override("font_size", 14)
+	if em_pe:
+		b.custom_minimum_size = Vector2(0, 148)
+		b.add_theme_font_size_override("font_size", 13)
+		b.autowrap_mode = TextServer.AUTOWRAP_OFF
+		b.alignment = HORIZONTAL_ALIGNMENT_CENTER
+		b.vertical_icon_alignment = VERTICAL_ALIGNMENT_BOTTOM
 	# ícone do atributo no canto do cartão de treino
-	var ic := UI.Icone.new(t, 26)
-	ic.position = Vector2(8, 8)
+	var ic := UI.Icone.new(t, 18 if em_pe else 26)
+	ic.position = Vector2(4, 4) if em_pe else Vector2(8, 8)
 	b.add_child(ic)
 	if falha > 0.0:
 		# risco de falha: borda vermelha/dourada (o texto fica branco para ler sobre a cor)
@@ -1188,8 +1291,8 @@ func _banner_objetivo() -> Control:
 	sb.border_color = UI.VERDE if ok else UI.PERIGO
 	sb.set_border_width_all(3)
 	p.add_theme_stylebox_override("panel", sb)
-	var h := UI.hbox(14)
-	h.add_child(UI.faixa("✓ OBJETIVO CUMPRIDO!" if ok else "✗ OBJETIVO NÃO CUMPRIDO", UI.VERDE if ok else UI.PERIGO, 24))
+	var h := UI.fila(14)
+	h.add_child(UI.faixa("✓ OBJETIVO CUMPRIDO!" if ok else "✗ OBJETIVO NÃO CUMPRIDO", UI.VERDE if ok else UI.PERIGO, 22 if UI.em_pe() else 24))
 	var sub := UI.label("%s · %dº lugar · +%d de fama" % [r.nome, r.posicao, r.fama], 16, UI.TEXTO, true)
 	sub.add_theme_font_override("font", UI.negrito())
 	sub.size_flags_vertical = Control.SIZE_SHRINK_CENTER

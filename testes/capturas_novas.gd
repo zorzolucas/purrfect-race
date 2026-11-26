@@ -10,10 +10,11 @@ var passo := 0
 var espera := 0
 var ESPERA := int(OS.get_environment("CAPTURA_ESPERA")) if OS.get_environment("CAPTURA_ESPERA") != "" else 75
 var passos: Array[Callable] = []
+var PASTA := OS.get_environment("CAPTURA_PASTA") if OS.get_environment("CAPTURA_PASTA") != "" else "res://testes/capturas"
 
 
 func _initialize() -> void:
-	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("res://testes/capturas"))
+	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(PASTA))
 	var perfil_s: GDScript = load("res://scripts/perfil.gd")
 	var carreira_s: GDScript = load("res://scripts/carreira.gd")
 	perfil_s.CAMINHO = "user://captura_perfil.json"
@@ -103,7 +104,7 @@ func _avancar_ate(alvo: int) -> void:
 
 func _salvar(nome: String) -> void:
 	var img := root.get_texture().get_image()
-	img.save_png("res://testes/capturas/%s.png" % nome)
+	img.save_png("%s/%s.png" % [PASTA, nome])
 	print("captura: ", nome)
 	load("res://testes/estouro.gd").checar(root, nome)
 

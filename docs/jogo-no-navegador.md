@@ -30,7 +30,7 @@ templates do 4.7.2 na primeira vez).
   tela de escolha, guia, academia, e o save continuou lá depois de recarregar a
   página.
 - **Recomendação:** GitHub Pages, com deploy automático por GitHub Actions, em
-  `https://zorzolucas.github.io/stelar-gallop/jogo/`. Custo zero (o repositório é
+  `https://zorzolucas.github.io/purrfect-race/jogo/`. Custo zero (o repositório é
   público). itch.io como segunda vitrine, se quiser mostrar para outras pessoas.
 - **Download:** cerca de 63 MB brutos, **34 MB comprimidos** (gzip). Dá para
   baixar para uns 20 a 25 MB com as otimizações da etapa 4.

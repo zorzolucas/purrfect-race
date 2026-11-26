@@ -1,5 +1,5 @@
 # Exporta o jogo para Web (Godot 4.7.2, sem threads) e publica no GitHub Pages.
-# Site: https://zorzolucas.github.io/stelar-gallop/  (jogo em /jogo/, visualizador em /visualizador/)
+# Site: https://zorzolucas.github.io/purrfect-race/  (jogo em /jogo/, visualizador em /visualizador/)
 # Em PRs só monta o site e guarda como artefato (baixar em Actions > execução > Artifacts).
 # Plano e detalhes: docs/jogo-no-navegador.md
 name: Site

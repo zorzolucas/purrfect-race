@@ -3,6 +3,26 @@
 Objetivo: abrir um link e jogar o protótipo no navegador, sem instalar nada, com o
 site atualizado sozinho a cada merge na `main`.
 
+## Situação (2026-11-26)
+
+As etapas 1 a 3 estão feitas:
+
+- `export_presets.cfg` com o preset "Web" (sem threads).
+- `.github/workflows/site.yml`: a cada push na `main` exporta o jogo e publica no
+  GitHub Pages; em PRs, monta o site e guarda como artefato. **Para ligar:** em
+  Settings > Pages, escolher Source: **GitHub Actions** (uma vez só).
+- `web/site/index.html` é a página inicial (Jogar / Visualizador); `web/splash.png`
+  virou a tela de carregamento e `web/icone.png` o ícone do jogo.
+- Botão "Tela cheia" na academia (só aparece no navegador).
+- **Achado no teste:** os símbolos ★ ✓ → ▶ viravam quadradinhos no navegador,
+  porque lá não há fontes do sistema para o Godot buscar o que a M PLUS não tem.
+  Entrou um recorte de 59 KB da DejaVu Sans como reserva
+  (`fontes/dejavu-sans-bold-simbolos.woff2`, licença em `fontes/LICENSE-DejaVu.txt`).
+  O 📅 das corridas fixas virou ▦.
+
+Para exportar no PC: Projeto > Exportar > Web (o editor oferece baixar os
+templates do 4.7.2 na primeira vez).
+
 ## Resumo
 
 - **Dá para fazer, e já foi testado.** Em 2026-11-26 o projeto foi exportado para

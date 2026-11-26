@@ -35,6 +35,11 @@ func _ready() -> void:
 	topo.add_child(UI.botao_cor("Pátio", func(): abrir_patio.emit(), UI.VERDE, 18))
 	topo.add_child(UI.botao_cor("Circuito", func(): abrir_circuito.emit(), UI.LARANJA, 18))
 	topo.add_child(UI.botao_cor("Pool semanal", func(): abrir_pool.emit(), UI.ROSA, 18))
+	# no navegador, a tela cheia precisa vir de um clique (F11 também funciona)
+	if OS.has_feature("web"):
+		var bt := UI.botao("Tela cheia", _alternar_tela_cheia, 18)
+		bt.tooltip_text = "Joga em tela cheia (Esc ou F11 volta)"
+		topo.add_child(bt)
 	v.add_child(topo)
 
 	if msg != "":
@@ -177,3 +182,10 @@ func _painel_desafio() -> Control:
 	h.add_child(bj)
 	p.get_meta("corpo").add_child(h)
 	return p
+
+
+func _alternar_tela_cheia() -> void:
+	if DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_FULLSCREEN:
+		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
+	else:
+		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)

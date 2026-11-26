@@ -85,7 +85,7 @@
     },
     "gp3": {
       "nome": "Grande Prêmio",
-      "forca": 715,
+      "forca": 700,
       "fama_entrada": 0,
       "fama": 1500,
       "desde": 72
@@ -106,7 +106,7 @@
     "Algol": 1.0
   },
   "forca_estilo": {
-    "per": 1.015
+    "arr": 1.01
   },
   "forca_desafio": 1.2,
   "forca_fixa": [
@@ -680,7 +680,7 @@
       ]
     },
     "gp3": {
-      "longa": 0.97
+      "longa": 0.95
     }
   },
   "olheiro": {

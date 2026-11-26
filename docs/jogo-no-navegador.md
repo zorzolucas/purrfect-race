@@ -145,7 +145,7 @@ simples.
 
 ## Fora do escopo agora
 
-- Multiplayer ou ranking online (precisaria de servidor).
+- Corridas entre jogadores e ranking online: plano próprio em [Liga Estelar](liga-online.md).
 - PWA instalável (o Godot gera, mas complica o cache de versões; dá para ligar
   depois).
 
